@@ -1,0 +1,34 @@
+{
+  "name": "@easy-formdesign/render",
+  "version": "0.0.1",
+  "description": "dynamic rendering of simple forms",
+  "author": "mezhanglei <496623925@qq.com>",
+  "homepage": "https://github.com/mezhanglei/easy-formdesign#readme",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "types": "./lib/index.d.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib",
+    "README.md",
+    "README_CN.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mezhanglei/easy-formdesign.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "node ./__tests__/render.test.js"
+  },
+  "dependencies": {
+    "@easy-formdesign/form": "*",
+    "classnames": "^2.3.2"
+  }
+}

@@ -1,0 +1,43 @@
+.DS_Store
+node_modules
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+npm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+
+# build file
+dist
+build
+dist/bound.js
+lib
+es
+app
+
+# Logs
+logs
+*.log
+
+runtime/
+app/
+
+config.development.js
+adapter.development.js
+
+public
+www/
+!.gitkeep
