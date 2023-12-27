@@ -1,0 +1,169 @@
+import { deepClone } from "./utils/object";
+import { CustomUnionType, GenerateParams, PropertiesData } from "./types";
+import { getItemByPath, setItemByPath, updateItemByPath, moveSameLevel, moveDiffLevel, updateName, getKeyValueByIndex, InsertItemType, insertItemByIndex } from "./utils/utils";
+import { createFormElement, getFormComponent } from "./utils/transform";
+import { joinFormPath } from "@simpleform/form";
+
+export type FormRenderListener = (newValue?: any, oldValue?: any) => void;
+
+// 管理formrender过程中的数据
+export class SimpleFormRender {
+  public plugins: any;
+  public components: any;
+  private properties: PropertiesData;
+  private lastProperties: PropertiesData | undefined;
+  private propertiesListeners: FormRenderListener[] = [];
+  constructor() {
+    this.properties = {};
+    this.lastProperties = undefined;
+    this.getProperties = this.getProperties.bind(this);
+    this.setProperties = this.setProperties.bind(this);
+    this.addPlugin = this.addPlugin.bind(this);
+    this.getFormComponent = this.getFormComponent.bind(this);
+    this.createFormElement = this.createFormElement.bind(this);
+    this.plugins = {};
+    this.components = {};
+  }
+
+  // 增加plugin
+  public addPlugin(data: any) {
+    this.plugins = Object.assign({}, this.plugins, data);
+  };
+  // 注册组件
+  public registry(data: any) {
+    this.components = Object.assign({}, this.components, data);
+  };
+
+  // 解析components
+  public getFormComponent(target?: CustomUnionType) {
+    const typeMap = this.components;
+    return getFormComponent(target, typeMap);
+  }
+
+  // 创建components的实例
+  public createFormElement(target?: CustomUnionType, commonProps?: GenerateParams) {
+    const typeMap = this.components;
+    return createFormElement(target, typeMap, commonProps);
+  }
+
+  // 获取当前组件的properties
+  public getProperties() {
+    return deepClone(this.properties || {});
+  }
+
+  // 设置properties
+  setProperties(data?: PropertiesData) {
+    this.lastProperties = this.properties;
+    this.properties = data || {};
+    this.notifyProperties();
+  }
+
+  // 更新指定路径的值
+  updateItemByPath = (data?: any, path?: string, attributeName?: string) => {
+    const cloneProperties = this.getProperties();
+    if (cloneProperties) {
+      let newProperties = updateItemByPath(cloneProperties, data, path, attributeName);
+      this.setProperties(newProperties);
+    }
+  };
+
+  // 设置指定路径的值
+  setItemByPath = (data?: any, path?: string, attributeName?: string) => {
+    const cloneProperties = this.getProperties();
+    if (cloneProperties) {
+      let newProperties = setItemByPath(cloneProperties, data, path, attributeName);
+      this.setProperties(newProperties);
+    }
+  };
+
+  // 设置指定路径的值
+  setItemByIndex = (data?: any, index?: number, parent?: { path?: string, attributeName?: string }) => {
+    const cloneProperties = this.getProperties();
+    if (cloneProperties) {
+      const [key] = getKeyValueByIndex(cloneProperties, index, parent);
+      const { path, attributeName } = parent || {};
+      const formPath = attributeName ? path : joinFormPath(path, key);
+      let newProperties = setItemByPath(cloneProperties, data, formPath, attributeName);
+      this.setProperties(newProperties);
+    }
+  };
+
+  // 更新节点的键
+  updateNameByPath = (endName?: string, path?: string) => {
+    const cloneProperties = this.getProperties();
+    if (cloneProperties) {
+      let newProperties = updateName(cloneProperties, endName, path);
+      this.setProperties(newProperties);
+    }
+  };
+
+  // 插入值，默认末尾
+  insertItemByIndex = (data: InsertItemType, index?: number, parent?: { path?: string, attributeName?: string }) => {
+    const cloneProperties = this.getProperties();
+    if (cloneProperties) {
+      let newProperties = insertItemByIndex(cloneProperties, data, index, parent);
+      this.setProperties(newProperties);
+    }
+  };
+
+  // 根据path删除一条
+  delItemByPath = (path?: string, attributeName?: string) => {
+    const cloneProperties = this.getProperties();
+    if (cloneProperties) {
+      let newProperties = setItemByPath(cloneProperties, undefined, path, attributeName);
+      this.setProperties(newProperties);
+    }
+  };
+
+  // 获取指定路径的项
+  getItemByPath = (path?: string, attributeName?: string) => {
+    const cloneProperties = this.getProperties();
+    if (cloneProperties) {
+      return getItemByPath(cloneProperties, path, attributeName);
+    }
+  };
+
+  // 获取指定index的项
+  getItemByIndex = (index: number, parent: { path?: string, attributeName?: string }) => {
+    const cloneProperties = this.getProperties();
+    if (cloneProperties) {
+      const [, value] = getKeyValueByIndex(cloneProperties, index, parent);
+      return value;
+    }
+  };
+
+  // 从from到to更换位置
+  moveItemByPath = (from: { parent?: string, index: number }, to: { parent?: string, index?: number }) => {
+    const cloneProperties = this.getProperties();
+    if (cloneProperties) {
+      let newProperties;
+      if (from?.parent === to?.parent) {
+        newProperties = moveSameLevel(cloneProperties, from, to);
+      } else {
+        newProperties = moveDiffLevel(cloneProperties, from, to);
+      }
+      this.setProperties(newProperties);
+    }
+  };
+
+  // 订阅表单渲染数据的变动
+  public subscribeProperties(listener: FormRenderListener) {
+    this.propertiesListeners.push(listener);
+    return () => {
+      this.propertiesListeners = [];
+    };
+  }
+
+  // 卸载
+  public unsubscribeProperties() {
+    this.propertiesListeners = [];
+  }
+
+  // 同步表单渲染数据的变化
+  private notifyProperties() {
+    this.propertiesListeners.forEach((onChange) => {
+      const cloneProperties = this.getProperties();
+      onChange && onChange(cloneProperties, this.lastProperties);
+    });
+  }
+}

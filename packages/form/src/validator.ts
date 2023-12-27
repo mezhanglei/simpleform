@@ -108,6 +108,7 @@ const handleRule = async (rule: FormRule | undefined, value: any) => {
         return defaultMessage;
       }
       // 其他字段的校验，返回true表示报错
+      // @ts-ignore
     } else if (validatorsMap[ruleKey]?.(ruleValue, value) === true) {
       return defaultMessage;
     }

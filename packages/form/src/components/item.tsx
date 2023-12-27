@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import { Control, ControlBaseProps } from './control';
 import { Label, LabelBaseProps } from './label';
 import './item.less';
-import pickAttrs from 'src/utils/pickAttrs';
+import pickAttrs from '../utils/pickAttrs';
 
 export type Layout = 'horizontal' | 'vertical' | string;
 export interface ItemProps extends LabelBaseProps, ControlBaseProps {

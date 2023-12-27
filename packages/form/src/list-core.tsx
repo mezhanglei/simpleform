@@ -1,5 +1,5 @@
 import React, { cloneElement, useContext } from 'react';
-import { FormOptionsContext } from './form-context';
+import { SimpleFormContext } from './form-context';
 import { isEmpty } from './utils/type';
 import { joinFormPath } from './utils/utils';
 import { FormRule } from './validator';
@@ -13,7 +13,7 @@ export interface ListCoreProps {
 }
 
 export const ListCore = (props: ListCoreProps) => {
-  const options = useContext(FormOptionsContext);
+  const options = useContext(SimpleFormContext);
   const mergeProps = Object.assign({}, options, props);
   const { children, ...fieldProps } = mergeProps;
   const {

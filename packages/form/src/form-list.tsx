@@ -1,9 +1,8 @@
 import React, { CSSProperties, useContext, useMemo } from 'react';
-import { useFormError } from './use-form';
+import { useFormError } from './hooks';
 import { Item, ItemProps } from './components/item';
 import { ListCore, ListCoreProps } from './list-core';
-import { FormStore } from './form-store';
-import { FormStoreContext, FormOptionsContext } from './form-context';
+import { SimpleFormContext } from './form-context';
 
 export type FormListProps<T = ItemProps> = T & ListCoreProps & {
   className?: string;
@@ -14,8 +13,7 @@ export type FormListProps<T = ItemProps> = T & ListCoreProps & {
 }
 
 export const FormList = React.forwardRef<any, FormListProps>((props, ref) => {
-  const form = useContext<FormStore>(FormStoreContext);
-  const options = useContext<any>(FormOptionsContext);
+  const { form, ...options } = useContext(SimpleFormContext);
   const mergeProps = Object.assign({}, options, props);
   const { children, ...fieldProps } = mergeProps;
   const {

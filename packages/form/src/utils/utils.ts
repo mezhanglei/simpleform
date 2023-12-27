@@ -62,7 +62,7 @@ export const validateTriggerCondition = (eventName?: TriggerType | boolean, vali
   }
 };
 
-export function toArray<T>(list: T | T[]): T[] {
+export function toArray<T>(list?: T | T[]): T[] {
   if (!list) {
     return [];
   }

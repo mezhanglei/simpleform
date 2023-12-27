@@ -25,14 +25,17 @@ export const pickObject = <T = any>(obj: T | undefined, keys: string[] | ((key?:
     return keys.reduce((iter, key) => {
       const item = deepGet(obj as any, key);
       if (item !== undefined) {
+        // @ts-ignore
         iter[key] = item;
       }
       return iter;
     }, {}) as T;
   } else if (typeof keys === 'function') {
     return Object.keys(obj || {}).reduce((iter, key) => {
+      // @ts-ignore
       const item = obj[key];
       if (keys(key, item)) {
+        // @ts-ignore
         iter[key] = item;
       }
       return iter;
@@ -46,10 +49,12 @@ export function deepGet(obj: object | undefined, keys?: string | string[]): any 
   if (keys instanceof Array) {
     const result = obj instanceof Array ? [] : {};
     for (let key of keys) {
+      // @ts-ignore
       result[key] = pathToArr(key)?.reduce?.((o, k) => (o)?.[k], obj);
     }
     return result;
   } else {
+    // @ts-ignore
     return pathToArr(keys)?.reduce?.((o, k) => (o)?.[k], obj);
   }
 }

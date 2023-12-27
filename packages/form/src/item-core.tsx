@@ -1,7 +1,6 @@
 import classnames from 'classnames';
 import React, { cloneElement, isValidElement, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { FormStore } from './form-store';
-import { FormStoreContext, FormOptionsContext, FormInitialValuesContext } from './form-context';
+import { SimpleFormContext, FormInitialValuesContext } from './form-context';
 import { deepGet, getValueFromEvent, getValuePropName, toArray } from './utils/utils';
 import { FormRule } from './validator';
 import { isEmpty } from './utils/type';
@@ -31,9 +30,8 @@ export interface ItemCoreProps {
 }
 
 export const ItemCore = (props: ItemCoreProps) => {
-  const form = useContext<FormStore>(FormStoreContext);
+  const { form, ...options } = useContext(SimpleFormContext);
   const initialValues = useContext(FormInitialValuesContext);
-  const options = useContext(FormOptionsContext);
   const mergeProps = Object.assign({}, options, props);
   const { children, ...fieldProps } = mergeProps;
   const {

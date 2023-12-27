@@ -1,5 +1,6 @@
 import React from 'react';
+import { SimpleForm } from './form-store';
 
-export const FormStoreContext = React.createContext<any | undefined>(undefined);
+export type SimpleFormContextProps<T = { [key: string]: any }> = { form?: SimpleForm } & T;
+export const SimpleFormContext = React.createContext<SimpleFormContextProps>({});
 export const FormInitialValuesContext = React.createContext<any | undefined>(undefined);
-export const FormOptionsContext = React.createContext<any>({});

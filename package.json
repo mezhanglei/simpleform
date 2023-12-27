@@ -1,13 +1,13 @@
 {
-  "name": "easy-formdesign",
+  "name": "simpleform",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
     "start": "npm run start --workspaces",
-    "build:form": "npm run build --workspace=packages/form",
-    "build:render": "npm run build --workspace=packages/render",
-    "build:editor": "npm run build --workspace=packages/editor",
+    "build": "npm run build --workspaces --if-present",
+    "clean": "rm -rf node_modules packages/**/node_modules",
+    "publish": "npm --workspaces publish",
     "lint": "eslint --ext=.js,.ts,.jsx,.tsx ./packages",
     "lint:fix": "eslint --fix --ext=.js,.ts,.jsx,.tsx ./packages",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,9 +15,9 @@
   "author": "",
   "license": "ISC",
   "workspaces": [
-    "packages/editor",
     "packages/form",
-    "packages/render"
+    "packages/render",
+    "packages/editor"
   ],
   "devDependencies": {
     "@babel/core": "^7.23.3",

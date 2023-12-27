@@ -18,6 +18,7 @@ const configs = require('./configs.js');
 // 引入路径
 const paths = require('./paths.js');
 const isDev = configs.isDev;
+const isDist = configs.isDist;
 // less/less module 正则表达式
 const lessRegex = /\.less$/;
 const lessModuleRegex = /\.module\.less$/;
@@ -35,8 +36,10 @@ const cssLoader = isDev ? 'style-loader' : {
   },
 };
 
-const outputPath = isDev ? paths.devOutputPath : paths.outputPath;
-const entry = isDev ? `${paths.examplePath}/index` : `${paths.srcPath}/index`;
+// 输出目录
+const outputPath = isDev || isDist ? paths.distOutputPath : paths.libOutputPath;
+// 入口js
+const entry = isDev || isDist ? `${paths.pagePath}/index` : `${paths.srcPath}/index`;
 
 //  === webpack配置内容 === //
 module.exports = {
@@ -44,15 +47,15 @@ module.exports = {
   context: paths.appRoot,
   target: ["web", "es5"],
   output: {
-    clean: !isDev ? true : false, // 在生成文件之前清空 output 目录
+    clean: isDev ? false : true, // 在生成文件之前清空 output 目录
     path: outputPath,
     filename: "index.js",
     publicPath: paths.publicPath,
-    library: isDev ? undefined : {
+    library: isDev || isDist ? undefined : {
       type: 'umd', // 这将在所有模块定义下暴露你的库, 允许它与 CommonJS、AMD 和作为全局变量工作
     }
   },
-  externals: isDev ? undefined : {
+  externals: isDev || isDist ? undefined : {
     'react': {
       'commonjs': 'react',
       'commonjs2': 'react',
@@ -78,7 +81,7 @@ module.exports = {
     alias: {
       "@": `${paths.srcPath}`,
       "src": `${paths.srcPath}`,
-      "example": `${paths.examplePath}`
+      "example": `${paths.pagePath}`
     }
   },
   // 用来指定loaders的匹配规则和指定使用的loaders名称
@@ -201,35 +204,35 @@ module.exports = {
         PUBLIC_PATH: JSON.stringify(paths.publicPath || '/')
       }
     }),
-    // 热更新
-    ...(isDev ? [
-      new ESLintWebpackPlugin({
-        context: paths.appRoot
-      }),
-      new HtmlWebpackPlugin({
-        filename: `index.html`,
-        template: paths.appHtml,
-        inject: true,
-        minify: {
-          html5: true,
-          caseSensitive: false,
-          removeAttributeQuotes: !isDev ? true : false,
-          collapseWhitespace: !isDev ? true : false,
-          preserveLineBreaks: false,
-          minifyCSS: false,
-          minifyJS: true,
-          removeComments: true
-        },
-        commonJs: [
-        ],
-        commonCSS: [
-        ]
-      })
-    ] : [
-      new MiniCssExtractPlugin({
-        filename: 'css/main.css'
-      }),
-      ...(configs.isAnalyz ? [new BundleAnalyzerPlugin()] : [])
-    ])
+    isDev &&
+    new ESLintWebpackPlugin({
+      context: paths.appRoot
+    }),
+    isDev || isDist &&
+    new HtmlWebpackPlugin({
+      filename: `index.html`,
+      template: paths.appHtml,
+      inject: true,
+      minify: {
+        html5: true,
+        caseSensitive: false,
+        removeAttributeQuotes: isDev ? false : true,
+        collapseWhitespace: isDev ? false : true,
+        preserveLineBreaks: false,
+        minifyCSS: false,
+        minifyJS: true,
+        removeComments: true
+      },
+      commonJs: [
+      ],
+      commonCSS: [
+      ]
+    }),
+    !isDev &&
+    new MiniCssExtractPlugin({
+      filename: 'css/main.css'
+    }),
+    !isDev && configs.isAnalyz &&
+    new BundleAnalyzerPlugin(),
   ]
 };

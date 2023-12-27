@@ -1,0 +1,36 @@
+.simple-form-container {
+
+  .panel,
+  .editor,
+  .setting {
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .editor {
+    border-left: 1px solid #e4e7ed;
+    border-right: 1px solid #e4e7ed;
+  }
+
+  // 滚动条外侧
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+  }
+
+  // 滚动条轨道
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, .1);
+    border-radius: 0;
+  }
+
+  // 滚动条方块
+  ::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, .15);
+    transition: color .2s ease;
+  }
+}

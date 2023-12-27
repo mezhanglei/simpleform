@@ -14,7 +14,7 @@ export type FieldProps = { rules?: FormRule[], [other: string]: any };
 
 export type FormFieldsProps<T = any> = { [key in keyof T]: FieldProps };
 
-export class FormStore<T extends Object = any> {
+export class SimpleForm<T extends Object = any> {
   private initialValues?: Partial<T>;
 
   private formItemListeners: FormListener[] = [];
@@ -138,6 +138,7 @@ export class FormStore<T extends Object = any> {
       this.notifyFormValue(path);
       this.notifyFormValues();
     } else if (isObject(path)) {
+      // @ts-ignore
       Promise.all(Object.keys(path).map((n) => setFormItemValue(n, path?.[n])));
       this.notifyFormItem();
       this.notifyFormValue();

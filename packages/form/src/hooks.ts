@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FormStore } from './form-store';
+import { SimpleForm } from './form-store';
 import { pickObject } from './utils/object';
 import Validator from './validator';
 
-export function useFormStore<T extends Object = any>(
+export function useSimpleForm<T extends Object = any>(
   values?: Partial<T>
 ) {
-  return useMemo(() => new FormStore(values), []);
+  return useMemo(() => new SimpleForm(values), []);
 }
 
 export function useValidator() {
@@ -14,7 +14,7 @@ export function useValidator() {
 }
 
 // 获取error信息
-export function useFormError(form: FormStore, path?: string) {
+export function useFormError(form?: SimpleForm, path?: string) {
   const [error, setError] = useState();
 
   const subscribeError = () => {
@@ -41,7 +41,7 @@ export function useFormError(form: FormStore, path?: string) {
 }
 
 // 获取表单值
-export function useFormValues<T = unknown>(form: FormStore, path?: string | string[]) {
+export function useFormValues<T = unknown>(form: SimpleForm, path?: string | string[]) {
   const [formValues, setFomValues] = useState<T>();
 
   const subscribeForm = () => {

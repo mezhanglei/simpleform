@@ -10,10 +10,10 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const isEnvProductionProfile = process.argv.includes('--profile');
 // 引入配置
 const configs = require('./configs.js');
-const isProd = configs.isProd;
+const isDev = configs.isDev;
 const webpackConfig = merge(base, {
   mode: "production",
-  devtool: isProd ? false : "cheap-module-source-map",
+  devtool: isDev ? "cheap-module-source-map" : false,
   optimization: {
     // 默认true，表示启用压缩代码
     minimize: true,

@@ -1,11 +1,10 @@
-# `editor`
+# `@simpleform/editor`
 
-> TODO: description
+> TODO: updateing
 
 ## Usage
 
 ```
-const editor = require('editor');
 
 // TODO: DEMONSTRATE API
 ```

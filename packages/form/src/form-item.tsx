@@ -1,7 +1,6 @@
 import React, { useContext, CSSProperties, useMemo } from 'react';
-import { FormStoreContext, FormOptionsContext } from './form-context';
-import { FormStore } from './form-store';
-import { useFormError } from './use-form';
+import { SimpleFormContext, SimpleFormContextProps } from './form-context';
+import { useFormError } from './hooks';
 import { Item, ItemProps } from './components/item';
 import { ItemCore, ItemCoreProps } from './item-core';
 
@@ -13,8 +12,7 @@ export type FormItemProps<T = ItemProps> = T & ItemCoreProps & {
 }
 
 export const FormItem = React.forwardRef<any, FormItemProps>((props, ref) => {
-  const form = useContext<FormStore>(FormStoreContext);
-  const options = useContext<FormItemProps>(FormOptionsContext);
+  const { form, ...options } = useContext<SimpleFormContextProps<FormItemProps>>(SimpleFormContext);
   const mergeProps = Object.assign({}, options, props);
   const { children, ...fieldProps } = mergeProps;
   const {

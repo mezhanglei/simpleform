@@ -6,26 +6,27 @@ const appRoot = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appRoot, relativePath);
 // 打包入口
 const srcPath = resolveApp('src');
-// 开发环境入口
-const examplePath = resolveApp('example');
-// 打包输出目录
-const outputPath = resolveApp('lib');
-// 开发环境下的输出目录
-const devOutputPath = resolveApp('dist');
+// lib输出目录
+const libOutputPath = resolveApp('lib');
+// 页面输出目录
+const distOutputPath = resolveApp('dist');
 // node_modules的目录
 const nodeModulesPath = resolveApp('node_modules');
-// 页面模板
-const appHtml = path.join(appRoot, 'public/index.html');
+// 页面入口
+const pagePath = resolveApp('example');
+// 应用html模板
+const appHtml = path.join(pagePath, 'index.html');
 // 引入配置
 const configs = require('./configs.js');
+// 是否为开发环境
 const isDev = configs.isDev;
 // 合并为一个对象输出
 module.exports = {
   appRoot,
   srcPath,
-  examplePath,
-  outputPath,
-  devOutputPath,
+  pagePath,
+  libOutputPath,
+  distOutputPath,
   nodeModulesPath,
   appHtml,
   // 资源访问的公共绝对路径, 并且访问路由会加上对应的路径字符串， 默认为/不能为空(格式如: /publicPath/)

@@ -6,8 +6,8 @@
 module.exports = {
   // 是否开启体积分析插件
   isAnalyz: false,
-  // 是否是打包环境
-  isProd: process.env.NODE_ENV === 'prod',
+  // 是否打包dist
+  isDist: process.env.NODE_ENV === 'dist',
   // 是否是开发环境
   isDev: process.env.NODE_ENV === 'dev',
 };
