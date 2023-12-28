@@ -19,9 +19,9 @@
 - `@simpleform/render`: <a href="https://mezhanglei.github.io/simpleform/" target="_blank">documentation</a>.
 - `@simpleform/editor`: <a href="https://mezhanglei.github.io/simpleform/" target="_blank">documentation</a>.
 
-## 开发环境
+## 本地运行环境
 
-### 环境
+### 依赖
 - [Node.js](https://nodejs.org/en/) Version >= 18.8.2
 - [react](https://react.docschina.org/) Version >= 16.8.0
 

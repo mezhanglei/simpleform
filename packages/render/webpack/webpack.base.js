@@ -208,7 +208,7 @@ module.exports = {
     new ESLintWebpackPlugin({
       context: paths.appRoot
     }),
-    isDev || isDist &&
+    (isDev || isDist) &&
     new HtmlWebpackPlugin({
       filename: `index.html`,
       template: paths.appHtml,

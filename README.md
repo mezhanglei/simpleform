@@ -34,11 +34,11 @@ npm install
 npm run start
 ```
 
-## Sponsor
+<!-- ## Sponsor
 If you think it's awesome, sponsor the author with a cup of coffee!
 |  WeChatPay  | Alipay |
 |---|---|
-|<img src="https://cdn.jsdelivr.net/gh/mezhanglei/myImages@master/mine/weixin_pay.png" width="200" />| <img src="https://cdn.jsdelivr.net/gh/mezhanglei/myImages@master/mine/ali_pay.png" width="200" /> |
+|<img src="https://cdn.jsdelivr.net/gh/mezhanglei/myImages@master/mine/weixin_pay.png" width="200" />| <img src="https://cdn.jsdelivr.net/gh/mezhanglei/myImages@master/mine/ali_pay.png" width="200" /> | -->
 
 ## License
 The MIT License (MIT), Please enjoy it.

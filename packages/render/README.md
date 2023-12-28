@@ -303,7 +303,7 @@ export default function Demo(props) {
 }
 ```
 ### 4. List Demo
-支持数组渲染
+Support for array rendering
 ```javascript
 import React, { useState } from 'react';
 import FormRender, { useSimpleForm } from './form-render';
