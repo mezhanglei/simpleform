@@ -1,11 +1,11 @@
 import React from 'react';
 import "./index.less";
-// import { Form, useFormStore, useFormValues } from '../../lib';
-import { Form, useFormStore, useFormValues } from '../../src';
+// import { Form, useSimpleForm, useFormValues } from '../../lib';
+import { Form, useSimpleForm, useFormValues } from '../../src';
 
 export default function Demo() {
 
-  const form = useFormStore();
+  const form = useSimpleForm();
 
   const onSubmit = async (e) => {
     e.preventDefault();

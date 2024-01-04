@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import "./index.less";
-import FormRender, { useFormStore } from '../../src/index';
+import FormRender, { useSimpleForm } from '../../src/index';
 import { Button, Checkbox, Input, Radio, Select } from 'antd';
 
 // 原子组件
@@ -127,8 +127,8 @@ export default function Demo(props) {
     },
   });
 
-  const form = useFormStore();
-  // const formRenderStore = useFormRenderStore()
+  const form = useSimpleForm();
+  // const formrender = useSimpleFormRender()
 
   const onSubmit = async (e) => {
     e?.preventDefault?.();
@@ -141,7 +141,7 @@ export default function Demo(props) {
       <FormRender
         form={form}
         inside={{ type: 'row' }}
-        // formrender={formRenderStore}
+        // formrender={formrender}
         properties={properties}
         components={defaultComponents}
         watch={watch} />
