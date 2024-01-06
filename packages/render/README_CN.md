@@ -401,7 +401,7 @@ export default function Demo(props) {
 `properties`属性中每一项均为一个表单节点，节点分为嵌套节点和控件节点。
 - 嵌套节点:
 有`properties`属性的节点，通过`type`和`props`字段描述该节点为哪个组件，不携带表单域组件(`Form.Item`)。
-- 节点:
+- 控件节点:
 无`properties`属性的节点，默认携带表单域组件(`Form.Item`)。
 ```javascript
 const properties = {
@@ -462,7 +462,10 @@ export type FormNodeProps = {
 
 ### 参数注入
 - 表单节点的属性全局设置：
+通过`options`设置表单节点的全局属性
 ```javascript
+
+  ...
 
   <FormRender
     options={{
@@ -473,6 +476,7 @@ export type FormNodeProps = {
 ```
 
 - 表单中的注册组件接收的参数:
+表单中的注册组件会接收到上下文参数
 ```javascript
 export interface GenerateParams<T = {}> {
   name?: string;
@@ -495,6 +499,8 @@ export interface GenerateParams<T = {}> {
  表单节点中属性字段除`properties`外均可以支持字符串表达式来进行联动
  1. 快速使用：用`{{`和`}}`包裹目标属性值的计算表达式
 ```javascript
+  ...
+
   const properties = {
     name1: {
       label: 'name1',
@@ -537,7 +543,7 @@ export interface GenerateParams<T = {}> {
 ```
 2. 字符串表达式的使用规则
 - 一个字符串有且只能有一对`{{`和`}}`.
-- 除了内置的三个变量(`form`(即`useSimpleForm()`), `formrender`(即`useSimpleFormRender()`), `formvalues`(表单值对象))以外, 还可以通过`plugins`引入外部变量, 然后在字符串表达式内直接引用该变量名.
+- 除了内置的三个变量(`form`(即`useSimpleForm()`), `formrender`(即`useSimpleFormRender()`), `formvalues`(表单值对象))以外, 还可以通过`plugins`引入外部模块, 然后在字符串表达式内直接引用该变量名.
 ```javascript
 import dayjs from 'dayjs';
 import FormRender from "./form-render";

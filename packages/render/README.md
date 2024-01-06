@@ -398,7 +398,7 @@ Sourced from [@simpleform/form](../form);
 Each item in the `properties` property is a form node, and the nodes are categorized into nested nodes and control nodes.
 - Nested nodes.
 Nodes that have a `properties` property that describes which component the node is, via the `type` and `props` fields, and do not carry a form field component (`Form.Item`).
-- Node.
+- Form control Node.
 A node with no `properties` attribute that carries the form field component (`Form.Item`) by default.
 ```javascript
 const properties = {
@@ -458,8 +458,11 @@ export type FormNodeProps = {
 ```
 ### parameter injection
 - The properties of the form node are set globally:
+Set the global properties of the form node via 'options'
 ```javascript
 
+  ...
+  
   <FormRender
     options={{
       layout: 'vertical',
@@ -469,6 +472,7 @@ export type FormNodeProps = {
 ```
 
 - Parameters received by the registration component of the form:
+The registration component in the form receives a context parameter
 ```javascript
 export interface GenerateParams<T = {}> {
   name?: string;
@@ -490,6 +494,9 @@ Example:
 Property fields in a form node can support string expressions for linkage, except for `properties`.
 1. Quick use: computational expressions wrapping target attribute values in `{{` and `}}`
 ```javascript
+
+  ...
+
   const properties = {
     name1: {
       label: 'name1',

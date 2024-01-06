@@ -19,7 +19,7 @@ export default function bindRequest(component: any, codeStr: string = "options")
     const formrender = props.formrender;
     const request = formrender.plugins && formrender.plugins.request;
 
-    const [response, setResponse] = useState<any>();
+    const [response, setResponse] = useState<any>([]);
 
     useEffect(() => {
       getRequest();
@@ -48,9 +48,8 @@ export default function bindRequest(component: any, codeStr: string = "options")
     };
 
     const emptyResult = props.children ? undefined : []; // 空值逻辑
-    const resultData = isRequest ? (target?.url && codeStr ? response : emptyResult) : (target instanceof Array ? target : emptyResult);
+    const resultData = isRequest ? (target?.url && codeStr ? response : []) : (target instanceof Array ? target : emptyResult);
     const params = resultData == undefined ? {} : { [codeStr]: resultData };
-
     return (
       <Component {...props} {...params} ref={ref} />
     );
