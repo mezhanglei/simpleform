@@ -30,7 +30,7 @@ function whitespace(ruleValue: boolean, value: any) {
 function max(ruleValue: number, value: any) {
   if (typeof ruleValue === 'number') {
     if (typeof value === 'string' || value instanceof Array) {
-      return value?.length > ruleValue;
+      return value.length > ruleValue;
     } else if (typeof value === 'number') {
       return value > ruleValue;
     }
@@ -42,7 +42,7 @@ function min(ruleValue: number, value: any) {
   if (typeof ruleValue === 'number') {
     if (value === undefined) return true;
     if (typeof value === 'string' || value instanceof Array) {
-      return value?.length < ruleValue;
+      return value.length < ruleValue;
     } else if (typeof value === 'number') {
       return value < ruleValue;
     }

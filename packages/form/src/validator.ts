@@ -1,5 +1,4 @@
 import { TriggerType } from "./item-core";
-import { validateTriggerCondition } from "./utils/utils";
 import { validatorsMap } from "./validate-rules";
 export type FormRule = {
   required?: boolean;
@@ -21,14 +20,14 @@ export default class Validator {
   constructor() {
     this.getError = this.getError.bind(this);
     this.setError = this.setError.bind(this);
-    this.resetError = this.resetError.bind(this);
+    this.clearError = this.clearError.bind(this);
     this.start = this.start.bind(this);
-    this.add = this.add.bind(this);
+    this.addRules = this.addRules.bind(this);
     this.rulesMap = {};
     this.errorsMap = {};
   }
 
-  add(path: string, rules?: FormRule[]) {
+  addRules(path: string, rules?: FormRule[]) {
     if (rules === undefined) {
       if (this.rulesMap[path]) {
         delete this.rulesMap[path];
@@ -36,6 +35,10 @@ export default class Validator {
     } else {
       this.rulesMap[path] = rules;
     }
+  }
+
+  setRulesMap(rulesMap: { [path: string]: FormRule[] }) {
+    this.rulesMap = Object.assign(this.rulesMap, rulesMap);
   }
 
   getRulesMap() {
@@ -57,7 +60,7 @@ export default class Validator {
     }
   }
 
-  resetError() {
+  clearError() {
     this.errorsMap = {};
   }
 
@@ -65,11 +68,11 @@ export default class Validator {
     this.setError(path);
     const rules = this.rulesMap[path];
     if (!(rules instanceof Array)) return;
-    for (let i = 0; i < rules?.length; i++) {
-      const rule = rules?.[i];
+    for (let i = 0; i < rules.length; i++) {
+      const rule = rules[i];
       const { validateTrigger, ...rest } = rule || {};
       // 是否可以触发规则
-      const canTrigger = validateTriggerCondition(eventName, validateTrigger);
+      const canTrigger = isCanTrigger(eventName, validateTrigger);
       if (canTrigger) {
         const message = await handleRule(rest, value);
         if (message) {
@@ -85,16 +88,16 @@ export default class Validator {
 const handleRule = async (rule: FormRule | undefined, value: any) => {
   if (!rule) return;
   // 默认消息
-  const defaultMessage = rule?.message;
+  const defaultMessage = rule.message;
   // 参与校验的字段
-  const entries = Object.entries(rule)?.filter(([key]) => key !== 'message');
+  const entries = Object.entries(rule).filter(([key]) => key !== 'message');
 
   for (let [ruleKey, ruleValue] of entries) {
     // 自定义校验
     if (ruleKey === 'validator' && typeof ruleValue === 'function') {
       try {
         let msg;
-        await ruleValue?.(value, (err) => {
+        await ruleValue(value, (err) => {
           msg = err;
         });
         return msg;
@@ -102,15 +105,29 @@ const handleRule = async (rule: FormRule | undefined, value: any) => {
         if (typeof error === 'string') {
           return error;
         }
-        if (typeof error?.message == 'string') {
-          return error?.message;
+        if (typeof error.message == 'string') {
+          return error.message;
         }
         return defaultMessage;
       }
       // 其他字段的校验，返回true表示报错
       // @ts-ignore
-    } else if (validatorsMap[ruleKey]?.(ruleValue, value) === true) {
+    } else if (validatorsMap[ruleKey](ruleValue, value) === true) {
       return defaultMessage;
     }
+  }
+};
+
+// 是否触发校验规则
+export const isCanTrigger = (eventName?: TriggerType | boolean, validateTrigger?: TriggerType | TriggerType[],) => {
+  // 默认允许触发
+  if (validateTrigger === undefined || eventName === undefined) return true;
+  // 如果为布尔值则返回该值
+  if (typeof eventName === 'boolean') return eventName;
+  if (typeof validateTrigger === 'string') {
+    return validateTrigger === eventName;
+  }
+  if (validateTrigger instanceof Array) {
+    return validateTrigger.includes(eventName);
   }
 };

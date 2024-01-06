@@ -1,4 +1,3 @@
-import { TriggerType } from "../item-core";
 import { pathToArr, deepGet, deepSet } from "./object";
 import { isEmpty, isNumberStr } from "./type";
 export { pathToArr, deepGet, deepSet };
@@ -46,20 +45,6 @@ export function joinFormPath(...args: Array<any>) {
     }
   });
   return result;
-};
-
-// 是否触发校验规则
-export const validateTriggerCondition = (eventName?: TriggerType | boolean, validateTrigger?: TriggerType | TriggerType[],) => {
-  // 不设置validateTrigger允许触发
-  if (validateTrigger === undefined || eventName === undefined) return true;
-  // 如果为布尔值则返回该值
-  if (typeof eventName === 'boolean') return eventName;
-  if (typeof validateTrigger === 'string') {
-    return validateTrigger === eventName;
-  }
-  if (validateTrigger instanceof Array) {
-    return validateTrigger?.includes(eventName);
-  }
 };
 
 export function toArray<T>(list?: T | T[]): T[] {

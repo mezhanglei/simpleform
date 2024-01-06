@@ -1,6 +1,6 @@
-import { isExitPrefix, validateTriggerCondition } from './utils/utils';
+import { isExitPrefix } from './utils/utils';
 import { deepClone, deepGet, deepSet } from './utils/object';
-import Validator, { FormRule } from './validator';
+import Validator, { FormRule, isCanTrigger } from './validator';
 import { TriggerType } from './item-core';
 import { isObject } from './utils/type';
 
@@ -84,7 +84,7 @@ export class SimpleForm<T extends Object = any> {
       const lastField = this.fieldProps[path];
       const newField = Object.assign({}, lastField, field);
       this.fieldProps[path] = newField;
-      this.validator.add(path, field?.['rules']);
+      this.validator.addRules(path, field?.['rules']);
     };
   }
 
@@ -198,7 +198,7 @@ export class SimpleForm<T extends Object = any> {
       const fieldProps = this.getFieldProps(path) || {};
       const value = this.getFieldValue(path);
       const ignore = fieldProps?.ignore;
-      const canTrigger = validateTriggerCondition(eventName, fieldProps?.['validateTrigger']);
+      const canTrigger = isCanTrigger(eventName, fieldProps?.['validateTrigger']);
       if (canTrigger && ignore !== true) {
         const error = await this.validator.start(path, value, eventName);
         if (error) {
