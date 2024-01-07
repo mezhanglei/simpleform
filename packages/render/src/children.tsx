@@ -264,9 +264,10 @@ export default function FormChildren(props: FormChildrenProps) {
           parent: { name, path, field: mergeField }
         });
       }) as any;
+      const withSideChildren = withSide(FormNodeChildren, inside, renderList, commonParams);
       result = React.isValidElement(FormNodeWidget) ?
-        React.cloneElement(FormNodeWidget, { children: FormNodeChildren } as Partial<unknown>)
-        : FormNodeChildren;
+        React.cloneElement(FormNodeWidget, { children: withSideChildren } as Partial<unknown>)
+        : withSideChildren;
     } else {
       // 最底层的项携带表单域的节点
       const { onValuesChange, ...restFieldProps } = fieldProps;
