@@ -12,23 +12,30 @@ const libOutputPath = resolveApp('lib');
 const distOutputPath = resolveApp('dist');
 // node_modules的目录
 const nodeModulesPath = resolveApp('node_modules');
-// 页面入口
-const pagePath = resolveApp('example');
-// 应用html模板
-const appHtml = path.join(pagePath, 'index.html');
 // 引入配置
 const configs = require('./configs.js');
 // 是否为开发环境
 const isDev = configs.isDev;
+// 是否打包dist
+const isDist = configs.isDist;
+// 打包页面入口
+const distEntry = path.join('example', 'index');
+// 打包库的入口
+const libEntry = path.join(srcPath, 'index');
+// 应用html模板
+const appHtml = path.join('example', 'index.html');
+// 打包入口
+const appEntry = isDev || isDist ? distEntry : libEntry;
+// 输出目录
+const outputPath = isDev || isDist ? distOutputPath : libOutputPath;
 // 合并为一个对象输出
 module.exports = {
   appRoot,
   srcPath,
-  pagePath,
-  libOutputPath,
-  distOutputPath,
   nodeModulesPath,
+  appEntry,
   appHtml,
+  outputPath,
   // 资源访问的公共绝对路径, 并且访问路由会加上对应的路径字符串， 默认为/不能为空(格式如: /publicPath/)
   publicPath: isDev ? '/' : './',
   babelrcPath: path.join(appRoot, './.babelrc'),

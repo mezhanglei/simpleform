@@ -36,19 +36,14 @@ const cssLoader = isDev ? 'style-loader' : {
   },
 };
 
-// 输出目录
-const outputPath = isDev || isDist ? paths.distOutputPath : paths.libOutputPath;
-// 入口js
-const entry = isDev || isDist ? `${paths.pagePath}/index` : `${paths.srcPath}/index`;
-
 //  === webpack配置内容 === //
 module.exports = {
-  entry: entry,
+  entry: paths.appEntry,
   context: paths.appRoot,
   target: ["web", "es5"],
   output: {
     clean: isDev ? false : true, // 在生成文件之前清空 output 目录
-    path: outputPath,
+    path: paths.outputPath,
     filename: "index.js",
     publicPath: paths.publicPath,
     library: isDev || isDist ? undefined : {
@@ -80,8 +75,7 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js", ".jsx", ".json", ".less"],
     alias: {
       "@": `${paths.srcPath}`,
-      "src": `${paths.srcPath}`,
-      "example": `${paths.pagePath}`
+      "src": `${paths.srcPath}`
     }
   },
   // 用来指定loaders的匹配规则和指定使用的loaders名称
