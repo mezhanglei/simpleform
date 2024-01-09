@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FormNodeProps, GenerateParams, CustomUnionType, PropertiesData, CustomRenderType, FormChildrenProps } from './types';
 import { Form, joinFormPath } from '@simpleform/form';
 import { isEqual } from './utils/object';
-// import '@simpleform/form/lib/css/main.css';
+import '@simpleform/form/lib/css/main.css';
 import { matchExpression } from './utils/utils';
 import { useSimpleFormRender } from './hooks';
 import { isEmpty, isObject } from './utils/type';

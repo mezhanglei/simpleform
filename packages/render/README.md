@@ -2,7 +2,7 @@
 
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-1.0.12-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-1.0.13-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > A lightweight dynamic forms engine that makes it easy to dynamically render forms.
 
