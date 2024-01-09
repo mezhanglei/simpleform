@@ -6,6 +6,7 @@ const appRoot = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appRoot, relativePath);
 // 打包入口
 const srcPath = resolveApp('src');
+const expamlePath = resolveApp('example');
 // lib输出目录
 const libOutputPath = resolveApp('lib');
 // 页面输出目录
@@ -19,11 +20,11 @@ const isDev = configs.isDev;
 // 是否打包dist
 const isDist = configs.isDist;
 // 打包页面入口
-const distEntry = path.join('example', 'index');
+const distEntry = path.join(expamlePath, 'index');
 // 打包库的入口
 const libEntry = path.join(srcPath, 'index');
 // 应用html模板
-const appHtml = path.join('example', 'index.html');
+const appHtml = path.join(expamlePath, 'index.html');
 // 打包入口
 const appEntry = isDev || isDist ? distEntry : libEntry;
 // 输出目录
@@ -36,7 +37,7 @@ module.exports = {
   appEntry,
   appHtml,
   outputPath,
-  // 资源访问的公共绝对路径, 并且访问路由会加上对应的路径字符串， 默认为/不能为空(格式如: /publicPath/)
+  // 访问静态资源的路径：当为'./'路径时则相对于index.html，/开头时则相对于服务器根路径, 完整域名时则是以域名为前缀访问
   publicPath: isDev ? '/' : './',
   babelrcPath: path.join(appRoot, './.babelrc'),
   mockPath: path.join(srcPath, 'mock')

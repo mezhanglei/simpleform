@@ -4,7 +4,7 @@ import { SimpleForm } from './form-store';
 import { SimpleFormContext, FormInitialValuesContext } from './form-context';
 import { FormList } from './form-list';
 import { ItemCoreProps } from './item-core';
-import { ItemProps } from './components/item';
+import { ItemProps } from './components/Item';
 import { isObject } from './utils/type';
 
 interface CreateFormProps extends React.HTMLAttributes<HTMLElement> {

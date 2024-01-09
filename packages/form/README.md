@@ -1,7 +1,7 @@
 # `@simpleform/form`
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-1.0.1-green)](https://www.npmjs.com/package/@simpleform/form)
+[![](https://img.shields.io/badge/version-1.0.12-green)](https://www.npmjs.com/package/@simpleform/form)
 
 > The underlying form component automatically injects `value` and `onChange` into the target control to display and update the form values.
 

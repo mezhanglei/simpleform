@@ -2,7 +2,7 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-1.0.1-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-1.0.12-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 轻量级动态表单引擎，实现动态渲染表单很简单.
 
@@ -26,7 +26,7 @@ yarn add @simpleform/render
 ### 1.首先注册基本组件(以antd@5.x组件库为例)
 ```javascript
 // register
-import FormRenderCore, { FormChildren as FormChildrenCore, FormNodeProps, FormRenderProps, FormChildrenProps, GenerateParams } from '@simpleform/render';
+import FormRenderCore, { FormChildren as FormChildrenCore, FormRenderProps, FormChildrenProps } from '@simpleform/render';
 import '@simpleform/render/lib/css/main.css';
 import React from 'react';
 import dayjs from 'dayjs';
@@ -42,6 +42,7 @@ import {
   Slider,
   Switch,
   TimePicker,
+  TreeSelect,
 } from 'antd';
 
 export * from '@simpleform/render';
@@ -69,7 +70,7 @@ export const widgets = {
   "Switch": Switch,
   "TimePicker": TimePicker,
   "TimePicker.RangePicker": TimePicker.RangePicker
-}
+};
 
 export type CustomFormChildrenProps = FormChildrenProps<any>;
 export function FormChildren(props: CustomFormChildrenProps) {
@@ -94,7 +95,7 @@ export default function FormRender(props: CustomFormRenderProps) {
       {...rest}
     />
   );
-}
+};
 ```
 ### 2. 引入第一步已经注册完的组件
 ```javascript

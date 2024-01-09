@@ -2,7 +2,7 @@
 
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-1.0.1-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-1.0.12-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > A lightweight dynamic forms engine that makes it easy to dynamically render forms.
 
@@ -25,7 +25,7 @@ yarn add @simpleform/render
 ### 1. First register the basic components (Take antd@5.x as an example)
 ```javascript
 // register
-import FormRenderCore, { FormChildren as FormChildrenCore, FormNodeProps, FormRenderProps, FormChildrenProps, GenerateParams } from '@simpleform/render';
+import FormRenderCore, { FormChildren as FormChildrenCore, FormRenderProps, FormChildrenProps } from '@simpleform/render';
 import '@simpleform/render/lib/css/main.css';
 import React from 'react';
 import dayjs from 'dayjs';
@@ -41,6 +41,7 @@ import {
   Slider,
   Switch,
   TimePicker,
+  TreeSelect,
 } from 'antd';
 
 export * from '@simpleform/render';
@@ -68,7 +69,7 @@ export const widgets = {
   "Switch": Switch,
   "TimePicker": TimePicker,
   "TimePicker.RangePicker": TimePicker.RangePicker
-}
+};
 
 export type CustomFormChildrenProps = FormChildrenProps<any>;
 export function FormChildren(props: CustomFormChildrenProps) {
@@ -93,7 +94,7 @@ export default function FormRender(props: CustomFormRenderProps) {
       {...rest}
     />
   );
-}
+};
 ```
 ### 2. Introduce the components that were registered in the first step.
 ```javascript

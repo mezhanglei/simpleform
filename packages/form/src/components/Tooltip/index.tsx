@@ -1,5 +1,5 @@
 import React from 'react';
-import './tooltip.less';
+import './index.less';
 import { Tooltip } from 'react-tooltip';
 
 interface TooltipCustomProps extends React.HtmlHTMLAttributes<HTMLElement> {

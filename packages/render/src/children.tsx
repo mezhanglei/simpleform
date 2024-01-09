@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FormNodeProps, GenerateParams, CustomUnionType, PropertiesData, CustomRenderType, FormChildrenProps } from './types';
 import { Form, joinFormPath } from '@simpleform/form';
 import { isEqual } from './utils/object';
-import '@simpleform/form/lib/css/main.css';
+// import '@simpleform/form/lib/css/main.css';
 import { matchExpression } from './utils/utils';
 import { useSimpleFormRender } from './hooks';
 import { isEmpty, isObject } from './utils/type';
@@ -237,51 +237,53 @@ export default function FormChildren(props: FormChildrenProps) {
       suffix: suffixInstance,
       component: component !== undefined ? formrender.getFormComponent(component) : undefined,
     }, restField);
+    let result;
     if (isReadOnly) {
+      // 只读节点
       const readOnlyWidget = formrender.createFormElement(readOnlyRender, commonParams);
-      return haveProperties ?
+      result = haveProperties ?
         readOnlyWidget
         :
         <Form.Item {...fieldProps}>
           {readOnlyWidget}
         </Form.Item>;
-    }
-    // 当前节点组件
-    const FormNodeWidget = formrender.createFormElement(typeRender || { type, props }, commonParams);
-    let result;
-    if (properties) {
-      const FormNodeChildren = Object.entries(properties as PropertiesData || {}).map(([key, field], index: number) => {
-        const joinPath = joinFormPath(path, key);
-        const generateField = getEvalFieldProps(field, joinPath);
-        const joinName = generateField?.ignore === true ? name : joinFormPath(name, key);
-        if (generateField) {
-          generateField['index'] = index;
-        }
-        return renderChild({
-          name: joinName,
-          path: joinPath,
-          field: generateField,
-          parent: { name, path, field: mergeField }
-        });
-      }) as any;
-      const withSideChildren = withSide(FormNodeChildren, inside, renderList, commonParams);
-      result = React.isValidElement(FormNodeWidget) ?
-        React.cloneElement(FormNodeWidget, { children: withSideChildren } as Partial<unknown>)
-        : withSideChildren;
     } else {
-      // 最底层的项携带表单域的节点
-      const { onValuesChange, ...restFieldProps } = fieldProps;
-      result = (
-        <Form.Item
-          {...restFieldProps}
-          onValuesChange={(...args) => {
-            onValuesChange && onValuesChange(...args);
-            handleFieldProps();
-          }}>
-          {FormNodeWidget}
-        </Form.Item>
-      );
-    };
+      // 其他表单节点
+      const FormNodeWidget = formrender.createFormElement(typeRender || { type, props }, commonParams);
+      if (properties) {
+        const FormNodeChildren = Object.entries(properties as PropertiesData || {}).map(([key, field], index: number) => {
+          const joinPath = joinFormPath(path, key);
+          const generateField = getEvalFieldProps(field, joinPath);
+          const joinName = generateField?.ignore === true ? name : joinFormPath(name, key);
+          if (generateField) {
+            generateField['index'] = index;
+          }
+          return renderChild({
+            name: joinName,
+            path: joinPath,
+            field: generateField,
+            parent: { name, path, field: mergeField }
+          });
+        }) as any;
+        const withSideChildren = withSide(FormNodeChildren, inside, renderList, commonParams);
+        result = React.isValidElement(FormNodeWidget) ?
+          React.cloneElement(FormNodeWidget, { children: withSideChildren } as Partial<unknown>)
+          : withSideChildren;
+      } else {
+        // 最底层的项携带表单域的节点
+        const { onValuesChange, ...restFieldProps } = fieldProps;
+        result = (
+          <Form.Item
+            {...restFieldProps}
+            onValuesChange={(...args) => {
+              onValuesChange && onValuesChange(...args);
+              handleFieldProps();
+            }}>
+            {FormNodeWidget}
+          </Form.Item>
+        );
+      };
+    }
     return withSide(result, outside, renderItem, commonParams);
   };
 

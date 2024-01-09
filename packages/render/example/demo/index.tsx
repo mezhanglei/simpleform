@@ -32,7 +32,27 @@ export default function Demo(props) {
       label: "readonly",
       readOnly: true,
       outside: { type: 'col', props: { span: 12 } },
-      readOnlyRender: "readonly component",
+      readOnlyRender: "测试结果",
+      initialValue: 1111,
+      hidden: '{{formvalues.name6 == true}}',
+      type: 'Input',
+      props: {}
+    },
+    name11: {
+      label: "readonly",
+      readOnly: true,
+      outside: { type: 'col', props: { span: 12 } },
+      readOnlyRender: "测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果",
+      initialValue: 1111,
+      hidden: '{{formvalues.name6 == true}}',
+      type: 'Input',
+      props: {}
+    },
+    name12: {
+      label: "readonly",
+      readOnly: true,
+      outside: { type: 'col', props: { span: 12 } },
+      readOnlyRender: "测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果",
       initialValue: 1111,
       hidden: '{{formvalues.name6 == true}}',
       type: 'Input',

@@ -1,7 +1,7 @@
 import React, { useContext, CSSProperties, useMemo } from 'react';
 import { SimpleFormContext, SimpleFormContextProps } from './form-context';
 import { useFormError } from './hooks';
-import { Item, ItemProps } from './components/item';
+import { Item, ItemProps } from './components/Item';
 import { ItemCore, ItemCoreProps } from './item-core';
 
 export type FormItemProps<T = ItemProps> = T & ItemCoreProps & {

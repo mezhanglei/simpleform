@@ -1,9 +1,9 @@
 import classnames from 'classnames';
 import React, { CSSProperties } from 'react';
-import SvgIcon from './SvgIcon';
-import Tooltip from './tooltip';
+import SvgIcon from '../SvgIcon';
+import Tooltip from '../Tooltip';
 import "./label.less";
-import { isEmpty } from '../utils/type';
+import { isEmpty } from '../../utils/type';
 
 export interface LabelBaseProps {
   colon?: boolean;

@@ -1,6 +1,6 @@
 import React, { CSSProperties, useContext, useMemo } from 'react';
 import { useFormError } from './hooks';
-import { Item, ItemProps } from './components/item';
+import { Item, ItemProps } from './components/Item';
 import { ListCore, ListCoreProps } from './list-core';
 import { SimpleFormContext } from './form-context';
 

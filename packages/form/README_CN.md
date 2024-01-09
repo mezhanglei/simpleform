@@ -2,7 +2,7 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-1.0.1-green)](https://www.npmjs.com/package/@simpleform/form)
+[![](https://img.shields.io/badge/version-1.0.12-green)](https://www.npmjs.com/package/@simpleform/form)
 
 > 表单底层组件，自动注入`value`和`onChange`到目标控件中，完成表单值的显示和更新.
 

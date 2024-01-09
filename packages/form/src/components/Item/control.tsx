@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React, { CSSProperties } from 'react';
-import { isEmpty } from '../utils/type';
+import { isEmpty } from '../../utils/type';
 import './control.less';
 
 export interface ControlBaseProps {
