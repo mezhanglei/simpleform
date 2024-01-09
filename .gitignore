@@ -22,8 +22,6 @@ npm-debug.log*
 
 # build file
 dist
-build
-dist/bound.js
 lib
 es
 app
