@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import './index.less';
 import RequiredComponent from "./required";
@@ -43,6 +43,10 @@ const RulesComponent = React.forwardRef<HTMLElement, RulesComponentProps>((props
     onChange,
     ...rest
   } = props;
+
+  useEffect(() => {
+    // TODO
+  }, [value]);
 
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [rulesMap, setRulesMap] = useState<{ [key in keyof InputFormRule]: InputFormRule }>({});

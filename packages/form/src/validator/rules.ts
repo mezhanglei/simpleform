@@ -1,4 +1,4 @@
-import { isEmpty } from "./utils/type";
+import { isEmpty } from "../utils/type";
 
 // 必填校验
 function required(ruleValue: any, value: any) {

@@ -1,6 +1,6 @@
 import { isExitPrefix } from './utils/utils';
 import { deepClone, deepGet, deepSet } from './utils/object';
-import Validator, { FormRule, isCanTrigger } from './validator';
+import { handleRules, FormRule, isCanTrigger } from './validator';
 import { TriggerType } from './item-core';
 import { isObject } from './utils/type';
 
@@ -31,13 +31,11 @@ export class SimpleForm<T extends Object = any> {
   private formErrors: FormErrors = {};
 
   private fieldProps: FormFieldsProps = {};
-  private validator: Validator;
 
   public constructor(values?: Partial<T>) {
     this.initialValues = values;
     this.fieldProps = {};
     this.formErrors = {};
-    this.validator = new Validator();
     this.values = deepClone(values);
     this.getFieldValue = this.getFieldValue.bind(this);
     this.setFieldValue = this.setFieldValue.bind(this);
@@ -84,7 +82,6 @@ export class SimpleForm<T extends Object = any> {
       const lastField = this.fieldProps[path];
       const newField = Object.assign({}, lastField, field);
       this.fieldProps[path] = newField;
-      this.validator.addRules(path, field?.['rules']);
     };
   }
 
@@ -200,7 +197,8 @@ export class SimpleForm<T extends Object = any> {
       const ignore = fieldProps?.ignore;
       const canTrigger = isCanTrigger(eventName, fieldProps?.['validateTrigger']);
       if (canTrigger && ignore !== true) {
-        const error = await this.validator.start(path, value, eventName);
+        const rules = fieldProps['rules'] as FormRule[];
+        const error = await handleRules(rules, value, eventName);
         if (error) {
           this.setFieldError(path, error);
         }

@@ -251,6 +251,8 @@ export const DynamicSettingCheckbox = (props: DynamicSettingRulesProps & Checkbo
       setCheckboxValue(value);
     } else if (typeof value === 'string') {
       setRuleData(transformToRule(value));
+    } else {
+      // TODO
     }
   }, [value]);
 

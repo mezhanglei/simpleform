@@ -15,7 +15,7 @@ export interface ItemCoreProps {
   name?: string;
   ignore?: boolean;
   index?: number;
-  trigger?: TriggerType | TriggerType[]; // 设置收集字段值变更的时机
+  trigger?: TriggerType; // 设置收集字段值变更的时机
   validateTrigger?: TriggerType | TriggerType[];
   valueProp?: string | ((type: any) => string);
   valueGetter?: ((...args: any[]) => any);

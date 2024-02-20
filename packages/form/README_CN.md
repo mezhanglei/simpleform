@@ -213,4 +213,4 @@ export default function Demo() {
 
 - `useSimpleForm(defaultValues)`: 创建 `new SimpleForm()`
 - `useFormError(form: SimpleForm, path?: string)`: 使用 hooks 获取指定的报错信息。
-- 3.0.12 `useFormValues(form: SimpleForm, path?: string | string[])`: 使用 hooks 获取指定的表单值。
+- `useFormValues(form: SimpleForm, path?: string | string[])`: 使用 hooks 获取指定的表单值。

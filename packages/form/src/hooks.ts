@@ -1,16 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { SimpleForm } from './form-store';
 import { pickObject } from './utils/object';
-import Validator from './validator';
 
 export function useSimpleForm<T extends Object = any>(
   values?: Partial<T>
 ) {
   return useMemo(() => new SimpleForm(values), []);
-}
-
-export function useValidator() {
-  return useMemo(() => new Validator(), []);
 }
 
 // 获取error信息

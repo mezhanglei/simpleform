@@ -212,4 +212,4 @@ To create an instance of `form` via `useSimpleForm`, use the following:
 
 - `useSimpleForm(defaultValues)` create `new SimpleForm()`
 - `useFormError(form: SimpleForm, path?: string)` Use hooks to get the specified form error.
-- 3.0.12 `useFormValues(form: SimpleForm, path?: string | string[])` Use hooks to get the specified form values.
+- `useFormValues(form: SimpleForm, path?: string | string[])` Use hooks to get the specified form values.
