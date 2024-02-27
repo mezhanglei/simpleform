@@ -12,6 +12,8 @@ const ColorPicker = React.forwardRef<ChromePicker, ColorPickerProps>((props, ref
     value,
     onChange,
     disabled,
+    style,
+    className,
     ...rest
   } = props;
 
@@ -32,16 +34,17 @@ const ColorPicker = React.forwardRef<ChromePicker, ColorPickerProps>((props, ref
     return <ChromePicker ref={ref} {...rest} color={color} onChangeComplete={onColorChange} />;
   };
 
-  const style = {
+  const curStyle = {
     background: color,
-    width: '200px',
+    maxWidth: '400px',
     height: 32,
-    border: '1px solid #cacaca'
+    border: '1px solid #cacaca',
+    ...style
   };
 
   return (
-    <Tooltip title={renderTitle} trigger={disabled ? undefined : "click"}>
-      <div style={style} />
+    <Tooltip title={renderTitle} trigger={disabled ? undefined : "click"} >
+      <div style={curStyle} className={className} />
     </Tooltip>
   );
 });
