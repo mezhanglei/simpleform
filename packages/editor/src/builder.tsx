@@ -1,13 +1,13 @@
 import React, { CSSProperties } from 'react';
-import Provider from './provider';
-import EditorPanel from './config/panel';
+import Provider, { ProviderProps } from './provider';
+import EditorPanel from './panel';
 import EditorView from './view';
 import EditorSetting from './setting';
 import classnames from 'classnames';
 import { Col, Row } from 'antd';
 import './builder.less';
 
-export interface EasyFormEditorProps {
+export interface EasyFormEditorProps extends ProviderProps {
   className?: string;
   style?: CSSProperties;
 };

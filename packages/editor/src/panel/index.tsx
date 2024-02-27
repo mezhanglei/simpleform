@@ -1,7 +1,7 @@
 import React, { CSSProperties } from 'react';
 import classnames from 'classnames';
 import { message } from 'antd';
-import './panel.less';
+import './index.less';
 import SvgIcon from '../components/common/SvgIcon';
 import { CustomFormNodeProps } from '../components/formrender';
 import { getConfigItem, getSelectedIndex, insertFormItem } from '../utils/utils';

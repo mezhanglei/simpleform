@@ -1,6 +1,6 @@
 import FormBuilder from './builder';
 import bindRequest from './components/bind-request';
-import EditorPanel from './config/panel';
+import EditorPanel from './panel';
 import EditorView from './view';
 import EditorSetting from './setting';
 import Provider from './provider';

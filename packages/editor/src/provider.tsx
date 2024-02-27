@@ -1,15 +1,14 @@
 import React from 'react';
 import { useSimpleFormRender, useSimpleForm } from './components/formrender';
-import { FormEditorContext, useEditorReducer } from './context';
+import { FormEditorContext, FormEditorState, useEditorReducer } from './context';
 import { useEventBus } from './utils/hooks';
-import editorConfig from './config';
 
-export interface ProviderProps {
-  children: any;
+export interface ProviderProps extends FormEditorState {
+  children?: any;
 }
 function Provider(props: ProviderProps) {
 
-  const { children, ...rest } = props;
+  const { children, editorConfig, ...rest } = props;
   const editor = useSimpleFormRender();
   const editorForm = useSimpleForm();
   const eventBus = useEventBus();
