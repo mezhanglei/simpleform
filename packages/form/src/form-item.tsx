@@ -6,7 +6,6 @@ import { ItemCore, ItemCoreProps } from './item-core';
 
 export type FormItemProps<T = ItemProps> = T & ItemCoreProps & {
   className?: string;
-  children?: React.ReactNode;
   style?: CSSProperties;
   component?: any;
 }

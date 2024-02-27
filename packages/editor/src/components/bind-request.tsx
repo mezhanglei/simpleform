@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { objectToFormData } from '../utils/object';
-import { isEmpty, isObject } from '../utils/type';
+import { isObject } from '../utils/type';
 
 /**
  * 自动给目标组件某个数据来源字段绑定请求，默认该数据的字段为options
@@ -11,7 +11,7 @@ import { isEmpty, isObject } from '../utils/type';
 
 export default function bindRequest(component: any, codeStr: string = "options") {
   const Component = component;
-  return React.forwardRef<any, any>(({ optionsType, ...props }, ref) => {
+  return React.forwardRef<any, any>(({ optionType, ...props }, ref) => {
     // 目标参数
     const target = props?.[codeStr];
     // 是否为配置请求

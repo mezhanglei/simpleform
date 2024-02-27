@@ -15,7 +15,7 @@ export function isExitPrefix(prefix: string, path: string | string[]) {
 }
 
 // 表单值的键名
-export function getValuePropName(valueProp: string | ((type: any) => string), type: any) {
+export function getValuePropName(valueProp: string | ((type: any) => string), type?: any) {
   return typeof valueProp === 'function' ? valueProp(type) : valueProp;
 }
 

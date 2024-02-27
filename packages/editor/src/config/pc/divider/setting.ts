@@ -35,7 +35,7 @@ const baseSetting = {
 
 const operationSetting = {
   hidden: {
-    type: 'DynamicSettingCheckbox',
+    type: 'OperateCheckbox',
     inline: true,
     compact: true,
     props: { children: '隐藏' }

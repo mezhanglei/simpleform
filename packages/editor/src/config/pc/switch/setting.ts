@@ -25,7 +25,7 @@ const baseSetting = {
 
 const operationSetting = {
   hidden: {
-    type: 'DynamicSettingCheckbox',
+    type: 'OperateCheckbox',
     inline: true,
     compact: true,
     props: { children: '隐藏' }
@@ -33,7 +33,7 @@ const operationSetting = {
   props: {
     properties: {
       disabled: {
-        type: 'DynamicSettingCheckbox',
+        type: 'OperateCheckbox',
         inline: true,
         compact: true,
         props: { children: '禁用' }
@@ -44,7 +44,7 @@ const operationSetting = {
 
 const rulesSetting = {
   rules: {
-    type: 'RulesComponent',
+    type: 'RulesGroup',
     compact: true,
     props: {
       includes: ['required'],

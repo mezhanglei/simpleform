@@ -1,7 +1,6 @@
-import classnames from 'classnames';
-import React, { cloneElement, isValidElement, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { SimpleFormContext, FormInitialValuesContext } from './form-context';
-import { deepGet, getValueFromEvent, getValuePropName, toArray } from './utils/utils';
+import { deepGet, getValueFromEvent, toArray } from './utils/utils';
 import { FormRule } from './validator';
 import { isEmpty } from './utils/type';
 
@@ -29,11 +28,34 @@ export interface ItemCoreProps {
   children?: any
 }
 
+export function getRulesTriggers(rules?: ItemCoreProps['rules']) {
+  const result = [];
+  if (rules instanceof Array) {
+    if (rules instanceof Array) {
+      for (let i = 0; i < rules?.length; i++) {
+        const rule = rules?.[i];
+        if (rule?.validateTrigger) {
+          result.push(rule?.validateTrigger);
+        }
+      }
+    }
+  }
+  return result;
+}
+
+export function getTriggers(trigger: ItemCoreProps['trigger'], validateTrigger: ItemCoreProps['validateTrigger'], ruleTriggers: Array<string>) {
+  return new Set<string>([
+    ...toArray(trigger),
+    ...toArray(validateTrigger),
+    ...ruleTriggers
+  ]);
+}
+
 export const ItemCore = (props: ItemCoreProps) => {
   const { form, ...options } = useContext(SimpleFormContext);
   const initialValues = useContext(FormInitialValuesContext);
   const mergeProps = Object.assign({}, options, props);
-  const { children, ...fieldProps } = mergeProps;
+  const { children, ...restProps } = mergeProps;
   const {
     name,
     valueProp = 'value',
@@ -47,60 +69,24 @@ export const ItemCore = (props: ItemCoreProps) => {
     trigger = 'onChange',
     validateTrigger,
     ...rest
-  } = fieldProps;
+  } = restProps;
+
+  const fieldProps = { ...restProps, valueProp, valueGetter, trigger };
 
   const ignore = rest?.ignore || rest?.readOnly;
   const currentPath = (isEmpty(name) || ignore === true) ? undefined : name;
   const initValue = initialValue ?? deepGet(initialValues, currentPath);
   const storeValue = form && form.getFieldValue(currentPath);
   const initialItemValue = storeValue ?? initValue;
-  const [value, setValue] = useState(initialItemValue);
 
   // 初始化获取初始props
   currentPath && form?.setFieldProps(currentPath, fieldProps);
-
-  // 收集的rules中的validateTrigger
-  const ruleTriggers = useMemo(() => {
-    const rules = fieldProps?.['rules'];
-    const result = [];
-    if (rules instanceof Array) {
-      for (let i = 0; i < rules?.length; i++) {
-        const rule = rules?.[i];
-        if (rule?.validateTrigger) {
-          result.push(rule?.validateTrigger);
-        }
-      }
-    }
-    return result;
-  }, [fieldProps?.['rules']]);
-
-  // 可触发事件列表
-  const triggers = useMemo(() => new Set<string>([
-    ...toArray(trigger),
-    ...toArray(validateTrigger),
-    ...ruleTriggers
-  ]), [trigger, validateTrigger, ruleTriggers]);
-
-  // 给子元素绑定的onChange
-  const bindChange = useCallback(
-    (eventName: string, ...args: any[]) => {
-      const newValue = typeof valueGetter == 'function' ? valueGetter(...args) : undefined;
-      if (currentPath && form) {
-        // 设置值
-        form.setFieldValue(currentPath, newValue, eventName);
-        // 主动onchange事件
-        onFieldsChange && onFieldsChange({ name: currentPath, value: newValue }, form?.getFieldValue());
-      }
-    },
-    [JSON.stringify(currentPath), form, valueGetter, onFieldsChange]
-  );
 
   // 订阅更新值的函数
   useEffect(() => {
     if (!currentPath || !form) return;
     // 订阅目标控件
     form.subscribeFormItem(currentPath, (newValue, oldValue) => {
-      setValue(newValue);
       if (!(isEmpty(newValue) && isEmpty(oldValue))) {
         onValuesChange && onValuesChange({ name: currentPath, value: newValue }, form?.getFieldValue());
       }
@@ -126,49 +112,17 @@ export const ItemCore = (props: ItemCoreProps) => {
     };
   }, [JSON.stringify(currentPath)]);
 
-  const childValue = useMemo(() => typeof valueSetter === 'function' ? valueSetter(value) : (valueSetter ? undefined : value), [valueSetter, value]);
-
-  // 控件绑定value和onChange
-  const bindChild = (child: any) => {
-    if (!isEmpty(currentPath) && isValidElement(child)) {
-      const valuePropName = getValuePropName(valueProp, child && child.type);
-      const childProps = child?.props as any;
-      const { className } = childProps || {};
-      const valueResult = childValue;
-      const newChildProps = { className: classnames(className, errorClassName), [valuePropName]: valueResult };
-
-      triggers.forEach((eventName) => {
-        newChildProps[eventName] = (...args: any[]) => {
-          bindChange?.(eventName, ...args);
-          childProps[eventName]?.(...args);
-        };
-      });
-
-      return cloneElement(child, newChildProps);
+  // 对目标控件进行双向绑定
+  const bindChildren = (children: any) => {
+    if (typeof children === 'function') {
+      const bindProps = form && form.getBindProps(currentPath) || {};
+      return children({ className: errorClassName, form: form, bindProps: bindProps });
     } else {
-      return child;
+      return children;
     }
   };
 
-  // 遍历子组件绑定控件
-  const getChildren = (children: any): any => {
-    return React.Children.map(children, (child: any) => {
-      const nestChildren = child?.props?.children;
-      const dataType = child?.props?.['data-type']; // 标记的需要穿透的外层容器
-      const dataName = child?.props?.['data-name']; // 标记的符合value/onChange props的控件
-      const childType = child?.type;
-      if (nestChildren && (dataType === 'ignore' || typeof childType === 'string') && !dataName) {
-        return cloneElement(child, {
-          children: getChildren(nestChildren)
-        });
-      } else {
-        return bindChild(child);
-      }
-    });
-  };
-
-  const childs = getChildren(children);
-
+  const childs = bindChildren(children);
   return childs;
 };
 

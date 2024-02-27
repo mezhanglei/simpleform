@@ -11,8 +11,7 @@ import { CustomCol, CustomRow } from './components';
 const defaultComponents = {
   'row': CustomRow,
   'col': CustomCol,
-  'Form.Item': Form.Item,
-  'Form.List': Form.List,
+  'Form.Item': Form.Item
 };
 
 // 渲染表单children
@@ -186,12 +185,11 @@ export default function FormChildren(props: FormChildrenProps) {
     }
   };
 
-  const ignoreTag = { "data-type": "ignore" };
   // 目标套上其他组件
   const withSide = (children: any, side?: CustomUnionType, render?: CustomRenderType, commonProps?: GenerateParams) => {
-    const childs = typeof render === 'function' ? render?.(Object.assign({ children }, commonProps)) : children;
-    const sideInstance = side && formrender.createFormElement(side, Object.assign({}, commonProps, ignoreTag));
-    const childsWithSide = React.isValidElement(sideInstance) ? React.cloneElement(sideInstance, { children: childs } as Partial<unknown>) : childs;
+    const childs = typeof render === 'function' ? render(Object.assign({ children }, commonProps)) : children;
+    const renderSide = side && formrender.createFormElement(side, Object.assign({}, commonProps));
+    const childsWithSide = React.isValidElement(renderSide) ? React.cloneElement(renderSide, { children: childs } as Partial<unknown>) : childs;
     const cloneChilds = React.isValidElement(childsWithSide) ? React.cloneElement(childsWithSide, { key: commonProps?.path }) : childsWithSide;
     return cloneChilds;
   };
@@ -235,7 +233,7 @@ export default function FormChildren(props: FormChildrenProps) {
       name: name,
       footer: footerInstance,
       suffix: suffixInstance,
-      component: component !== undefined ? formrender.getFormComponent(component) : undefined,
+      component: formrender.getFormComponent(component),
     }, restField);
     let result;
     if (isReadOnly) {
@@ -250,7 +248,7 @@ export default function FormChildren(props: FormChildrenProps) {
     } else {
       // 其他表单节点
       const FormNodeWidget = formrender.createFormElement(typeRender || { type, props }, commonParams);
-      if (properties) {
+      if (haveProperties) {
         const FormNodeChildren = Object.entries(properties as PropertiesData || {}).map(([key, field], index: number) => {
           const joinPath = joinFormPath(path, key);
           const generateField = getEvalFieldProps(field, joinPath);
@@ -279,7 +277,7 @@ export default function FormChildren(props: FormChildrenProps) {
               onValuesChange && onValuesChange(...args);
               handleFieldProps();
             }}>
-            {FormNodeWidget}
+            {({ bindProps }: any) => React.isValidElement(FormNodeWidget) ? React.cloneElement(FormNodeWidget, bindProps) : FormNodeWidget}
           </Form.Item>
         );
       };

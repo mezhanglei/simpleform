@@ -57,3 +57,6 @@ export const validatorsMap = {
   'max': max,
   'min': min
 };
+
+export type ValidatorMap = typeof validatorsMap;
+export type ValidatorKey = keyof ValidatorMap;

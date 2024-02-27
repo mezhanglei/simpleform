@@ -1,9 +1,9 @@
 import React from "react";
-import { DynamicSettingBtn, DynamicSettingRulesCodeStr } from "../DynamicSetting";
+import AddSettingModal from "../SettingModal/add";
 
-const OptionsDynamicSetting: React.FC<DynamicSettingRulesCodeStr> = (props) => {
+const OptionsDynamicSetting: React.FC = (props) => {
 
-  return <DynamicSettingBtn {...props} controlField={{ type: 'CodeTextArea', }} />;
+  return <AddSettingModal {...props} setting={{ type: 'CodeTextArea', }} />;
 };
 
 export default OptionsDynamicSetting;

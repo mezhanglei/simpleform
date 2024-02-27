@@ -9,7 +9,7 @@ export interface ControlBaseProps {
   footer?: React.ReactNode | any; // 底部节点
 }
 export interface ControlProps extends ControlBaseProps {
-  children: any;
+  children?: any;
   style?: CSSProperties;
   className?: string;
 }

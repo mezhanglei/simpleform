@@ -1,9 +1,9 @@
 import React from "react";
-import RuleItem, { RuleItemProps, RuleItemRefs } from "./rule-item";
+import RuleItem, { RuleCoreProps, RuleCoreRefs } from "./core";
 
-const PatternComponent = React.forwardRef<RuleItemRefs, RuleItemProps>((props, ref) => {
+const PatternComponent = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
 
-  return <RuleItem {...props} ref={ref} ruleField={{
+  return <RuleItem {...props} ref={ref} setting={{
     label: '正则表达式',
     type: 'CodeTextArea',
     props: {

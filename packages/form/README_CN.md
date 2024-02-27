@@ -2,9 +2,9 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-1.0.12-green)](https://www.npmjs.com/package/@simpleform/form)
+[![](https://img.shields.io/badge/version-2.0.0-green)](https://www.npmjs.com/package/@simpleform/form)
 
-> 表单底层组件，自动注入`value`和`onChange`到目标控件中，完成表单值的显示和更新.
+> 表单底层组件，通过`getBindProps`方法或者回调函数方式实现表单值的显示和更新事件的绑定.
 
 # Matters
  - 在使用之前需要先引入css样式文件，例：`import '@simpleform/form/lib/css/main.css'`;
@@ -13,17 +13,9 @@
 
 表单域组件，用于双向绑定目标控件。
 
-- 双向绑定：`value`(或通过`valueProp`设置)和`onChange`双向绑定，`name`字段为目标属性。
-- 更新表单值：可通过`form.setFieldValue`等实例方法设置表单值。
-- 可以提供表单校验规则属性`rules`，进行自定义表单校验规则。
-- 当输入表单控件外面添加了非表单组件或节点，通过添加`data-type="ignore"`过滤非目标节点或设置`data-name`标记目标节点来绑定目标控件。
-
-# Form.List
-
-`Form.Item`组件作为`Form.List`数组类型中的项，组合形成一个数组
-
-- `Form.List`中只识别`Form.Item`项，`Form.Item`的`name`字段如果设置，则为数组中的字段属性，如果不设置，则默认为数组序号。
-- `Form.List`提供的`rules`校验规则，对数组中的所有输入项都有效，但优先级低于数组中的`Form.Item`的`rules`规则
+- 绑定：通过表单实例的`getBindProps`或者回调函数方式，对目标控件进行值和事件的绑定。
+- 更新：可通过`form.setFieldValue`等实例方法设置表单值。
+- 校验规则：可以提供表单校验规则属性`rules`，进行自定义表单校验规则。
 
 ## 安装
 - [Node.js](https://nodejs.org/en/) Version >= 14.0.0
@@ -63,15 +55,15 @@ export default function Demo() {
   return (
     <Form initialValues={{ name1: 1111 }} form={form} onSubmit={onSubmit}>
       <Form.Item label="Name1" name="name1" rules={[{ required: true, message: 'name1 is Empty' }, { validator: validator, message: 'validator error' }]}>
-        <div data-type="ignore">
-          <input />
+        <div>
+          <input  {...form.getBindProps("name1")} />
         </div>
       </Form.Item>
       <Form.Item label="object" name="name2.a" rules={[{ required: true, message: 'name2.a is empty' }]}>
-        <input />
+        <input  {...form.getBindProps("name2.a")} />
       </Form.Item>
       <Form.Item label="list" name="name3[0]" rules={[{ required: true, message: 'name3[0] is empty' }]}>
-        <input />
+        {({ bindProps }) =>  <input {...bindProps} />}
       </Form.Item>
       <Form.Item label="">
         <button>Submit</button>
@@ -80,56 +72,6 @@ export default function Demo() {
   );
 };
 ```
-
-## Form.List
-
-```javascript
-import React from "react";
-import { Form, useSimpleForm } from "@simpleform/form";
-import '@simpleform/form/lib/css/main.css';
-import { Input, Select } from "antd";
-
-export default function Demo() {
-
-  const form = useSimpleForm();
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const { error, values } = await form.validate();
-    console.log(error, values, 'error ang values');
-  };
-
-  const validator = async (value) => {
-    if (value?.length < 2) {
-      return Promise.reject(new Error('length is < 2'));
-    }
-  }
-
-  return (
-    <Form form={form} onSubmit={onSubmit}>
-      <Form.List name="list">
-        <Form.Item
-          rules={[
-            { required: true, message: "list's one is Empty" },
-            { validator: validator, message: "custome tips" },
-          ]}
-          >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          rules={[{ required: true, message: "list's two is Empty" }]}
-        >
-          <Input />
-        </Form.Item>
-      </Form.List>
-      <Form.Item label="">
-        <button>Submit</button>
-      </Form.Item>
-    </Form>
-  );
-};
-```
-
 ## APIs
 
 ### 默认的表单域显示组件的属性
@@ -179,15 +121,6 @@ export default function Demo() {
 - `onFieldsChange` 控件的值变化时的事件函数，只会被控件主动`onChange`触发，不会被`form.setFieldValue`和`form.setFieldsValue`触发, 避免循环调用。`可选`。
 - `onValuesChange` 监听表单值的变化。`可选`。
 - `errorClassName` 控件当有错误信息时，添加一个自定义类名，`可选`。
-
-### Form.List Props
-继承表单域显示组件(`component`)的props
-
-- `className` 表单域类名，`可选`。
-- `component` 表单域显示组件。
-- `name` 表单域字段名，`可选`。
-- `initialValue` 表单域的初始值，注意此值和`value`不同，只能初始化表单赋值`可选`。
-- `rules` 表单域的校验规则 `可选`。
 
 ### 表单的rules中的校验字段
 `rules`中的值的字段中的规则会按照顺序执行校验，`rules`中每一项只能设置一种规则。

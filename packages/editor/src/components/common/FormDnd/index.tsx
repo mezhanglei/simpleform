@@ -70,7 +70,6 @@ function FormDnd(props: ControlDndProps, ref: any) {
       ref={ref}
       onUpdate={onUpdate}
       onAdd={onAdd}
-      data-type="ignore"
       className='editor-dnd'
       options={{ hiddenFrom: true, disabledDrop: disabledDrop }}
       collection={{ path: currentPath }}

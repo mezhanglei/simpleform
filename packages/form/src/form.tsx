@@ -2,7 +2,6 @@ import React, { CSSProperties, useEffect } from 'react';
 import { FormItem } from './form-item';
 import { SimpleForm } from './form-store';
 import { SimpleFormContext, FormInitialValuesContext } from './form-context';
-import { FormList } from './form-list';
 import { ItemCoreProps } from './item-core';
 import { ItemProps } from './components/Item';
 import { isObject } from './utils/type';
@@ -78,4 +77,3 @@ export function Form(props: FormProps) {
 }
 
 Form.Item = FormItem;
-Form.List = FormList;

@@ -1,8 +1,7 @@
 import CodeInput from './CodeInput';
 import CodeTextArea from './CodeTextarea';
 import SetOptions from './SetOptions';
-import RulesComponent from './rules';
-import { DynamicSettingCheckbox } from './DynamicSetting';
+import RulesGroup from './rules';
 import { EditorCodeMirror } from './CodeMirror';
 import RichEditor, { RichEditorModalBtn } from './RichEditor';
 import { RichText } from './RichText';
@@ -11,15 +10,16 @@ import Collapse from './Collapse';
 import Table, { TableBody, TableCell, TableHead, TableRow } from './LayoutTable';
 import { GridCol, GridRow } from './grid';
 import SliderNumber from './SliderNumber';
+import OperateCheckbox from './SettingModal/checkbox';
 
 // 编辑器公共组件
 export default {
   SetOptions,
-  RulesComponent,
+  RulesGroup,
   CodeInput,
   CodeTextArea,
   EditorCodeMirror,
-  DynamicSettingCheckbox,
+  OperateCheckbox,
   RichEditor,
   RichText,
   RichEditorModalBtn,

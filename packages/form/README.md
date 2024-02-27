@@ -1,9 +1,9 @@
 # `@simpleform/form`
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-1.0.12-green)](https://www.npmjs.com/package/@simpleform/form)
+[![](https://img.shields.io/badge/version-2.0.0-green)](https://www.npmjs.com/package/@simpleform/form)
 
-> The underlying form component automatically injects `value` and `onChange` into the target control to display and update the form values.
+> The underlying form component, Binding of form values to display and update events is accomplished through the `getBindProps` method or callback functions.
 
 # Matters
 - The css style file needs to be introduced before it can be used, for example: `import '@simpleform/form/lib/css/main.css'`;
@@ -12,17 +12,9 @@ English | [中文说明](./README_CN.md)
 
 The smallest unit of a component in a form, and nodes as an object can be nested within each other.
 
-- Provides styles, as well as `value` (or set via `valueProp`) and `onChange` two-way bindings.
-- You can customize `onChange` in outside, but you can only set the form value via an instance method such as `form.setFieldValue`.
-- Custom form validation rules can be provided with the form validation rules property `rules`.
-- When a non-form component or node is added outside the input form control, bind the target control by adding `data-type="ignore"` to filter the non-target node or by setting `data-name` to mark the target input form.
-
-# Form.List
-
-The `Form.Item` component acts as an item in the `Form.List` array type and is combined to form an array
-
-- Only `Form.Item` items are recognised in `Form.List`, The `name` field of `Form.Item`, if set, is the field property in the array, if not, it defaults to the array serial number.
-- The `rules` provided by `Form.List` are valid for all input items in the array, but have a lower priority than the `rules` of the `Form.Item` in the array
+- Binding: Binds values and events to the target control by means of `getBindProps` or callback functions of the form instance.
+- Updating: the form value can be set by instance methods such as `form.setFieldValue`.
+- rules: You can provide form validation rules attribute `rules` for customizing form validation rules.
 
 ## install
 - [Node.js](https://nodejs.org/en/) Version >= 14.0.0
@@ -62,15 +54,15 @@ export default function Demo() {
   return (
     <Form initialValues={{ name1: 1111 }} form={form} onSubmit={onSubmit}>
       <Form.Item label="Name1" name="name1" rules={[{ required: true, message: 'name1 is Empty' }, { validator: validator, message: 'validator error' }]}>
-        <div data-type="ignore">
-          <input />
+        <div>
+          <input  {...form.getBindProps("name1")} />
         </div>
       </Form.Item>
       <Form.Item label="object" name="name2.a" rules={[{ required: true, message: 'name2.a is empty' }]}>
-        <input />
+        <input  {...form.getBindProps("name2.a")} />
       </Form.Item>
       <Form.Item label="list" name="name3[0]" rules={[{ required: true, message: 'name3[0] is empty' }]}>
-        <input />
+        {({ bindProps }) =>  <input {...bindProps} />}
       </Form.Item>
       <Form.Item label="">
         <button>Submit</button>
@@ -79,56 +71,6 @@ export default function Demo() {
   );
 };
 ```
-## Form.List
-
-```javascript
-import React from "react";
-import { Form, useSimpleForm } from "@simpleform/form";
-import '@simpleform/form/lib/css/main.css';
-import { Input, Select } from "antd";
-
-export default function Demo() {
-
-  const form = useSimpleForm();
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const { error, values } = await form.validate();
-    console.log(error, values, 'error ang values');
-  };
-
-  const validator = async (value) => {
-    if (value?.length < 2) {
-      return Promise.reject(new Error('length is < 2'));
-    }
-  }
-
-  return (
-    <Form form={form} onSubmit={onSubmit}>
-      <Form.List name="list">
-        <Form.Item
-          rules={[
-            { required: true, message: "list's one is Empty" },
-            { validator: validator, message: "custome tips" },
-          ]}
-          >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          rules={[{ required: true, message: "list's two is Empty" }]}
-        >
-          <Input />
-        </Form.Item>
-      </Form.List>
-      <Form.Item label="">
-        <button>Submit</button>
-      </Form.Item>
-    </Form>
-  );
-};
-
-```
-
 ## APIs
 
 ### Default field display component
@@ -178,15 +120,6 @@ Inherited field display component
 - `onFieldsChange` The event function when the value of the control changes will only be triggered by the control's active `onChange`, not by `form.setFieldValue` and `form.setFieldsValue`, avoiding circular calls. `optional`.
 - `onValuesChange` Listening for changes in form values.`optional`。
 - `errorClassName` add a custom class name when there is an error message, `optional`.
-
-### Form.List Props
-Inherited field display component
-
-- `className` Form field class name, `optional`.
-- `component` field display component. 
-- `name` Form field name, `optional`.
-- `initialValue` Form field initial value, Note that this value can only initialise the form `optional`.
-- `rules` Checksum rules for form fields `optional`.
 
 ### rules
 The rules in the fields of the values in `rules` perform the checks in order, and only one rule can be set for each item in `rules`.

@@ -23,20 +23,16 @@ export default function Demo() {
   console.log(formvalues, '监听表单值变化');
 
   return (
-    <Form initialValues={[{ name1: 1111 }]} form={form} onSubmit={onSubmit}>
-      <Form.List>
-        <Form.Item tooltip='11111' label="Name1" name="name1" rules={[{ required: true, message: 'name1 is Empty' }, { validator: validator, message: '自定义校验' }]}>
-          <div data-type="ignore">
-            <input />
-          </div>
-        </Form.Item>
-        <Form.Item label="Name2" name="name2.a" rules={[{ required: true, message: 'name2 is empty' }]}>
-          <input />
-        </Form.Item>
-        <Form.Item label="">
-          <button>Submit</button>
-        </Form.Item>
-      </Form.List>
+    <Form initialValues={{ name1: 1111 }} form={form} onSubmit={onSubmit}>
+      <Form.Item tooltip='11111' label="Name1" name="name1" rules={[{ required: true, message: 'name1 is Empty' }, { validator: validator, message: '自定义校验' }]}>
+        {<input {...form.getBindProps("name1")} />}
+      </Form.Item>
+      <Form.Item label="Name2" name="name2.a" rules={[{ required: true, message: 'name2 is empty' }]}>
+        {<input {...form.getBindProps("name2.a")} />}
+      </Form.Item>
+      <Form.Item label="">
+        <button>Submit</button>
+      </Form.Item>
     </Form>
   );
 };

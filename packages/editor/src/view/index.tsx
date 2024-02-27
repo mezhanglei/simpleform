@@ -134,7 +134,7 @@ const renderItem: CustomFormRenderProps['renderItem'] = (params) => {
   const isControl = params?.field?.properties ? false : true;
   // 只有输入控件才需要默认添加选区
   if (isControl) {
-    return <ComponentSelection {...params} data-type="ignore" />;
+    return <ComponentSelection {...params} />;
   }
   return children;
 };

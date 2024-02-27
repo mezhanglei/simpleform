@@ -1,5 +1,5 @@
 import { TriggerType } from "../item-core";
-import { validatorsMap } from "./rules";
+import { ValidatorKey, validatorsMap } from "./rules";
 export type FormRule = {
   required?: boolean;
   pattern?: RegExp;
@@ -22,12 +22,12 @@ const handleRule = async (rule?: FormRule | undefined, value?: any, eventName?: 
   // 参与校验的字段
   const entries = Object.entries(restRule || {});
   for (let [ruleKey, ruleValue] of entries) {
-    const configRule = validatorsMap[ruleKey];
+    const configRule = validatorsMap[ruleKey as ValidatorKey];
     // 自定义校验
     if (ruleKey === 'validator' && typeof ruleValue === 'function') {
       try {
         let msg;
-        await ruleValue(value, (err) => {
+        await ruleValue(value, (err: any) => {
           msg = err;
         });
         return msg;

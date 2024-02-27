@@ -1,7 +1,7 @@
-import { isExitPrefix } from './utils/utils';
+import { getValuePropName, isExitPrefix } from './utils/utils';
 import { deepClone, deepGet, deepSet } from './utils/object';
 import { handleRules, FormRule, isCanTrigger } from './validator';
-import { TriggerType } from './item-core';
+import { getRulesTriggers, getTriggers, TriggerType } from './item-core';
 import { isObject } from './utils/type';
 
 export type FormListener = { path: string, onChange: (newValue?: any, oldValue?: any) => void }
@@ -46,6 +46,7 @@ export class SimpleForm<T extends Object = any> {
 
     this.getFieldProps = this.getFieldProps.bind(this);
     this.setFieldProps = this.setFieldProps.bind(this);
+    this.getBindProps = this.getBindProps.bind(this);
 
     this.reset = this.reset.bind(this);
     this.validate = this.validate.bind(this);
@@ -65,12 +66,43 @@ export class SimpleForm<T extends Object = any> {
   }
 
   // 获取
+  public getFieldProps(): FieldProps
+  public getFieldProps(path: string): FieldProps[string]
   public getFieldProps(path?: string) {
     if (path === undefined) {
       return this.fieldProps;
     } else {
       return this.fieldProps?.[path];
     }
+  }
+
+  // 给目标控件绑定change事件
+  bindChange(path?: string, eventName?: string, ...args: any[]) {
+    if (!path) return;
+    const props = this.getFieldProps(path);
+    const { valueGetter, onFieldsChange } = props || {};
+    const newValue = typeof valueGetter == 'function' ? valueGetter(...args) : undefined;
+    this.setFieldValue(path, newValue, eventName);
+    // 主动onchange事件
+    onFieldsChange && onFieldsChange({ name: path, value: newValue }, this.getFieldValue());
+  }
+
+  // 给目标控件绑定的props
+  getBindProps(path?: string) {
+    if (!path) return;
+    const props = this.getFieldProps(path);
+    const currentValue = this.getFieldValue(path);
+    const { valueProp, valueSetter, trigger, validateTrigger, rules } = props || {};
+    const valuePropName = getValuePropName(valueProp);
+    const triggers = getTriggers(trigger, validateTrigger, getRulesTriggers(rules));
+    const childValue = typeof valueSetter === 'function' ? valueSetter(currentValue) : (valueSetter ? undefined : currentValue);
+    const bindProps = { [valuePropName]: childValue } as any;
+    triggers.forEach((eventName) => {
+      bindProps[eventName] = (...args: any[]) => {
+        this.bindChange(path, eventName, ...args);
+      };
+    });
+    return bindProps;
   }
 
   // 设置表单域

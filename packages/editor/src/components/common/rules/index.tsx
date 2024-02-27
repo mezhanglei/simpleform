@@ -4,21 +4,22 @@ import './index.less';
 import RequiredComponent from "./required";
 import MinOrMaxComponent from "./minOrMax";
 import PatternComponent from "./pattern";
-import { getArrMap } from "../../../utils/array";
 import { Checkbox } from "antd";
-import { InputFormRule } from "./rule-item";
+import { InputFormRule, InputFormRuleKey } from "./core";
 import { pickObject } from "../../../utils/object";
 
 
 /**
  * 校验规则的配置组件。
  */
-export interface RulesComponentProps {
-  includes?: Array<keyof InputFormRule>;
+
+export interface RulesGroupProps {
+  includes?: Array<InputFormRuleKey>;
   value?: Array<InputFormRule>;
   onChange?: (val?: Array<InputFormRule>) => void;
 }
-
+type RulesMap = { [key in InputFormRuleKey]: InputFormRule };
+type RulesKeys = Array<InputFormRuleKey>;
 const prefixCls = 'rules-add';
 const classes = {
   rules: prefixCls,
@@ -26,49 +27,75 @@ const classes = {
   rule: `${prefixCls}-rule`,
 };
 
-// 校验规则组件集合
-const RuleComponents = [
-  { name: 'required', label: '必填', component: RequiredComponent },
-  { name: 'pattern', label: '正则表达式', component: PatternComponent },
-  { name: 'max', label: '上限', component: MinOrMaxComponent },
-  { name: 'min', label: '下限', component: MinOrMaxComponent },
-];
-const RuleComponentsMap = getArrMap(RuleComponents, 'name');
+// 校验规则组件
+const RuleWidget = {
+  required: { label: '必填', component: RequiredComponent },
+  pattern: { label: '正则表达式', component: PatternComponent },
+  max: { label: '上限', component: MinOrMaxComponent },
+  min: { label: '下限', component: MinOrMaxComponent },
+};
+const RuleKeys = Object.keys(RuleWidget) as RulesKeys;
 
-const RulesComponent = React.forwardRef<HTMLElement, RulesComponentProps>((props, ref) => {
+const RulesGroup = React.forwardRef<HTMLElement, RulesGroupProps>((props, ref) => {
 
   const {
-    includes = ['required', 'pattern', 'max', 'min'],
+    includes = RuleKeys,
     value,
     onChange,
     ...rest
   } = props;
 
-  useEffect(() => {
-    // TODO
-  }, [value]);
-
-  const [checkedValues, setCheckedValues] = useState<string[]>([]);
-  const [rulesMap, setRulesMap] = useState<{ [key in keyof InputFormRule]: InputFormRule }>({});
   const ruleModalRefs = useRef<any>([]);
+  const [rulesMap, setRulesMap] = useState<RulesMap>();
+  const [checked, setChecked] = useState<RulesKeys>([]);
 
-  const tranformToRules = (checkedValues: string[]) => {
-    const result = pickObject(rulesMap, checkedValues);
+  const setRulesMapFormValue = (rules?: Array<InputFormRule>) => {
+    const data: any = {};
+    if (rules instanceof Array) {
+      rules.forEach((rule) => {
+        const keys = Object.keys(rule);
+        const code = RuleKeys.find((key) => keys.includes(key));
+        if (code) {
+          data[code] = rule;
+        }
+      });
+    }
+    setRulesMap(data);
+  };
+
+  const getRules = (rulesMap?: RulesMap, checked?: RulesKeys) => {
+    const result = pickObject(rulesMap, checked || []);
     const rules = Object.values(result || {});
     return rules;
   };
 
-  const handleCheckbox = (e: CheckboxChangeEvent, name: string, index: number) => {
-    const checked = e?.target?.checked;
-    const cloneCheckValues = [...checkedValues];
-    // 选中
-    if (checked) {
-      // @ts-ignore
-      if (rulesMap[name]) {
-        cloneCheckValues.push(name);
-        setCheckedValues(cloneCheckValues);
-        const rules = tranformToRules(cloneCheckValues);
-        onChange && onChange(rules);
+  const setCheckedFromValue = (rules?: Array<InputFormRule>) => {
+    const data: RulesKeys = [];
+    if (rules instanceof Array) {
+      rules.forEach((rule) => {
+        const keys = Object.keys(rule);
+        const code = RuleKeys.find((key) => keys.includes(key));
+        if (code) {
+          data.push(code);
+        }
+      });
+    }
+    setChecked(data);
+  };
+
+  useEffect(() => {
+    setRulesMapFormValue(value);
+    setCheckedFromValue(value);
+  }, [value]);
+
+  const handleCheckbox = (e: CheckboxChangeEvent, name: InputFormRuleKey, index: number) => {
+    const isChecked = e?.target?.checked;
+    const cloneChecked = [...checked];
+    if (isChecked) {
+      if (rulesMap && rulesMap[name]) {
+        cloneChecked.push(name);
+        setChecked(cloneChecked);
+        onChange && onChange(getRules(rulesMap, cloneChecked));
       } else {
         // 没有值则先弹窗编辑
         if (ruleModalRefs.current[index]) {
@@ -76,43 +103,34 @@ const RulesComponent = React.forwardRef<HTMLElement, RulesComponentProps>((props
         }
       }
     } else {
-      // 取消
-      const filterValues = cloneCheckValues.filter((str) => str !== name);
-      setCheckedValues(filterValues);
-      const rules = tranformToRules(filterValues);
-      onChange && onChange(rules);
+      const result = cloneChecked.filter((code) => code !== name);
+      setChecked(result);
+      onChange && onChange(getRules(rulesMap, result));
     }
   };
 
-  const ruleChange = (name: keyof InputFormRule, val?: InputFormRule) => {
+  const ruleChange = (name: InputFormRuleKey, val?: InputFormRule) => {
     const cloneRulesMap = { ...rulesMap };
-    if (val == undefined) {
-      delete cloneRulesMap[name];
-      const newCheckboxValue = checkedValues.filter((str) => str !== name);
-      setCheckedValues(newCheckboxValue);
-    } else {
+    if (val) {
       cloneRulesMap[name] = val;
+    } else {
+      delete cloneRulesMap[name];
     }
-    setRulesMap(cloneRulesMap);
-    // 如果有选中则更新
-    if (checkedValues.includes(name)) {
-      const result = Object.values(cloneRulesMap);
-      onChange && onChange(result);
-    }
+    const result = Object.values(cloneRulesMap);
+    onChange && onChange(result);
   };
 
   return (
     <div className={classes.rules}>
-      <Checkbox.Group value={checkedValues}>
+      <Checkbox.Group value={checked}>
         {
           includes.map((name, index) => {
-            const itemProps = RuleComponentsMap[name];
+            const itemProps = RuleWidget[name];
             const { label, component: Child } = itemProps || {};
             return (
               <div key={name} className={classes.item}>
-                <Child ref={(target) => ruleModalRefs.current[index] = target} className={classes.rule} ruleName={label} name={name} value={rulesMap[name]} onChange={(val) => ruleChange(name, val)} />
-                <Checkbox value={name} onChange={(e) => handleCheckbox(e, name, index)}>
-                </Checkbox>
+                <Checkbox value={name} onChange={(e) => handleCheckbox(e, name, index)} />
+                <Child ref={(target) => ruleModalRefs.current[index] = target} className={classes.rule} label={label} name={name} value={rulesMap && rulesMap[name]} onChange={(val) => ruleChange(name, val)} />
               </div>
             );
           })
@@ -122,4 +140,4 @@ const RulesComponent = React.forwardRef<HTMLElement, RulesComponentProps>((props
   );
 });
 
-export default RulesComponent;
+export default RulesGroup;

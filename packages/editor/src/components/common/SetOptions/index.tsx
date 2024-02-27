@@ -5,7 +5,6 @@ import OptionsRequest from './OptionsRequest';
 import './index.less';
 import OptionsDynamicSetting from "./OptionsDynamic";
 import { EditorCodeMirror } from "../CodeMirror";
-import { getArrMap } from "../../../utils/array";
 import { getFormItem } from "../../../utils/utils";
 import { joinFormPath, EditorSelection } from "../../formrender";
 
@@ -25,53 +24,61 @@ const classes = {
   component: `${prefixCls}-component`
 };
 
-const OptionsComponents = [
-  { value: 'list', label: '选项数据', component: OptionsList },
-  { value: 'json', label: '静态数据', component: EditorCodeMirror },
-  { value: 'request', label: '接口请求', component: OptionsRequest },
-  { value: 'dynamic', label: '联动设置', component: OptionsDynamicSetting },
-];
-
-const OptionsComponentsMap = getArrMap(OptionsComponents, 'value');
-
-// type OptionsTypes = (typeof OptionsComponents)[number]['value'];
+const OptionsWidget = {
+  list: { label: '选项数据', component: OptionsList },
+  json: { label: '静态数据', component: EditorCodeMirror },
+  request: { label: '接口请求', component: OptionsRequest },
+  dynamic: { label: '联动设置', component: OptionsDynamicSetting },
+};
+type OptionsData = typeof OptionsWidget;
+type OptionsKey = keyof OptionsData;
+type OptionsKeyList = Array<OptionsKey>;
+const OptionsKeys = Object.keys(OptionsWidget) as OptionsKeyList;
 
 const SetOptions: React.FC<SetOptionsProps> = (props) => {
 
   const {
-    includes = ['list', 'json', 'request', 'dynamic'],
+    includes = OptionsKeys,
     value,
     onChange,
+    field,
     ...rest
   } = props;
 
-  const context = rest?.field?.context;
+  const context = field?.context;
   const { selected, editor } = context?.state || {};
-  const buttons = useMemo(() => (OptionsComponents?.filter((item) => includes?.includes(item?.value))), [includes]);
-  const defaultKey = buttons[0]?.value;
-  const optionsType = getFormItem(editor, selected?.path, joinFormPath(selected?.attributeName, 'props.optionsType')) || defaultKey;
+  const buttons = useMemo(() => (OptionsKeys?.filter((key) => includes?.includes(key))), [includes]);
+  const optionSelect: OptionsKey = getFormItem(editor, selected?.path, joinFormPath(selected?.attributeName, 'props.optionSelect')) || buttons[0];
 
-  const selectTypeChange = (key?: string) => {
+  const selectTypeChange = (key?: OptionsKey) => {
     if (key) {
       onChange && onChange(undefined);
-      editor?.updateItemByPath(key, selected?.path, joinFormPath(selected?.attributeName, 'props.optionsType'));
+      editor?.updateItemByPath(key, selected?.path, joinFormPath(selected?.attributeName, 'props.optionSelect'));
     }
   };
 
   const handleChange = (value: unknown) => {
-    if (!optionsType) return;
+    if (!optionSelect) return;
     onChange && onChange(value);
   };
 
-  const Child = optionsType && OptionsComponentsMap[optionsType]?.component as any;
+  const Child = optionSelect && OptionsWidget[optionSelect]?.component;
 
   return (
     <>
       <div className={classes.type}>
-        <Select value={optionsType} style={{ width: "100%" }} options={buttons} onChange={selectTypeChange} />
+        <Select value={optionSelect} style={{ width: "100%" }} onChange={selectTypeChange}>
+          {
+            buttons.map((key) => (
+              <Select.Option key={key} value={key}>
+                {OptionsWidget[key].label}
+              </Select.Option>
+            ))
+          }
+        </Select>
       </div>
       <div className={classes.component}>
-        {Child ? <Child value={value} onChange={handleChange} {...rest} /> : null}
+        {Child ? <Child value={value} onChange={handleChange} /> : null}
       </div>
     </>
   );

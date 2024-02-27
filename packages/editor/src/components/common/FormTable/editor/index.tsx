@@ -58,7 +58,7 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
                   <div className={Classes.TableColBody}>
                     {column?.hidden === true ? null :
                       <Form.Item name={column?.dataIndex} onFieldsChange={({ value }) => onFieldsChange(colIndex, value)}>
-                        {columnInstance}
+                        {React.isValidElement(columnInstance) ? ({ bindProps }: any) => React.cloneElement(columnInstance, bindProps) : columnInstance}
                       </Form.Item>
                     }
                   </div>

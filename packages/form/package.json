@@ -1,11 +1,11 @@
 {
   "name": "@simpleform/form",
-  "version": "1.0.12",
+  "version": "2.0.0",
   "description": "simple form component",
   "author": "mezhanglei <496623925@qq.com>",
   "homepage": "https://github.com/mezhanglei/simpleform#readme",
   "license": "ISC",
-  "main": "src/index.ts",
+  "main": "lib/index.js",
   "types": "./lib/index.d.ts",
   "directories": {
     "lib": "lib",

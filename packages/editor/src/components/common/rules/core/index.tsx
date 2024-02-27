@@ -1,28 +1,30 @@
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
-import SvgIcon from "../SvgIcon";
-import './rule-item.less';
-import CustomModal from "../AntdModal";
-import { DynamicSettingBtn } from "../DynamicSetting";
+import SvgIcon from "../../SvgIcon";
+import './index.less';
+import CustomModal from "../../AntdModal";
 import classNames from "classnames";
-import FormRender, { CustomFormNodeProps, useSimpleForm, useFormValues } from "../../formrender";
+import FormRender, { Form, CustomFormNodeProps, useSimpleForm, matchExpression } from "../../../formrender";
+import { Radio } from "antd";
+import AddSettingModal from "../../SettingModal/add";
 
 export interface InputFormRule {
   max?: number | string;
   min?: number | string;
   pattern?: boolean | string;
   required?: boolean | string;
-  message?: string
+  message?: string;
 }
+export type InputFormRuleKey = keyof Omit<InputFormRule, 'message'>
 
-export interface RuleItemRefs {
+export interface RuleCoreRefs {
   showRuleModal: () => void
 }
 
-export interface RuleItemProps {
-  name?: keyof InputFormRule;
-  ruleName?: string;
-  ruleField?: CustomFormNodeProps;
+export interface RuleCoreProps {
+  name?: InputFormRuleKey;
   value?: InputFormRule;
+  label?: string;
+  setting?: CustomFormNodeProps;
   onChange?: (val?: InputFormRule) => void;
   className?: string;
 }
@@ -41,46 +43,34 @@ const SelectOptions = [
   { label: '联动设置', value: 'dynamic' }
 ];
 
-const RuleItem = React.forwardRef<RuleItemRefs, RuleItemProps>((props, ref) => {
+const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
 
   const {
-    ruleName,
-    value,
-    onChange,
     name,
-    ruleField,
+    value,
+    label,
+    setting,
+    onChange,
     className,
     ...rest
   } = props;
 
-  const { label, ...restField } = ruleField || {};
   const [ruleValue, setRuleValue] = useState<InputFormRule>();
+  const [selectType, setSelectType] = useState<string>('handle');
   const editRef = useRef<any>();
   const currentForm = useSimpleForm();
-  const { selectType } = useFormValues<{ selectType: string }>(currentForm, ['selectType']) || {};
 
   useImperativeHandle(ref, () => ({ showRuleModal: () => editRef.current.click() }));
 
   const properties = name ? {
-    selectType: {
-      label: '设置类型',
-      layout: 'horizontal',
-      labelWidth: 80,
-      initialValue: 'handle',
-      type: 'Select',
-      props: {
-        style: { width: '100%' },
-        options: SelectOptions
-      }
-    },
     [name]: selectType === 'dynamic' ? {
       label: '联动条件',
       layout: 'horizontal',
       rules: [{ required: true, message: '请输入' }],
       labelWidth: 80,
-      typeRender: <DynamicSettingBtn controlField={restField} />
+      typeRender: <AddSettingModal setting={{ ...setting, label: undefined }} />
     } : {
-      ...ruleField,
+      ...setting,
       rules: [{ required: true, message: '请输入' }],
       layout: 'horizontal',
       labelWidth: 80,
@@ -100,18 +90,28 @@ const RuleItem = React.forwardRef<RuleItemRefs, RuleItemProps>((props, ref) => {
     setRuleValue(value);
   }, [value]);
 
+  const selectTypeChange = (e: any) => {
+    setSelectType(e.target.value);
+  };
+
   // 给弹窗的表单赋值
   const setRuleModal = (data?: InputFormRule) => {
     if (name && data?.[name] !== undefined) {
       currentForm.setFieldsValue(data);
+      if (matchExpression(data[name])) {
+        setSelectType('dynamic');
+      } else {
+        setSelectType('handle');
+      }
     } else {
       currentForm.setFieldsValue({});
+      setSelectType('handle');
     }
   };
 
   const clickEdit = (showModal: () => void) => {
     showModal();
-    setRuleModal(value);
+    setRuleModal(ruleValue);
   };
 
   const handleOk = async (closeModal: () => void) => {
@@ -123,8 +123,8 @@ const RuleItem = React.forwardRef<RuleItemRefs, RuleItemProps>((props, ref) => {
   };
 
   const clearValue = () => {
-    onChange && onChange();
     setRuleValue(undefined);
+    onChange && onChange();
   };
 
   const cls = classNames(classes.item, className);
@@ -135,7 +135,7 @@ const RuleItem = React.forwardRef<RuleItemRefs, RuleItemProps>((props, ref) => {
         (showModal) => (
           <div className={classes.label}>
             <label className={classes.edit}>
-              {ruleName}
+              {label}
             </label>
             <span ref={editRef} onClick={() => clickEdit(showModal)}>
               <SvgIcon className={classes.icon} title="编辑" name="edit" />
@@ -144,6 +144,13 @@ const RuleItem = React.forwardRef<RuleItemRefs, RuleItemProps>((props, ref) => {
           </div>
         )
       }>
+        <Form.Item labelWidth="80" layout='horizontal' label="设置类型">
+          <Radio.Group
+            options={SelectOptions}
+            onChange={selectTypeChange}
+            value={selectType}
+          />
+        </Form.Item>
         <FormRender
           tagName="div"
           form={currentForm}
@@ -154,4 +161,4 @@ const RuleItem = React.forwardRef<RuleItemRefs, RuleItemProps>((props, ref) => {
   );
 });
 
-export default RuleItem;
+export default RuleCore;

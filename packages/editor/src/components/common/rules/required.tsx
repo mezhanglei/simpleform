@@ -1,9 +1,9 @@
 import React from "react";
-import RuleItem, { RuleItemProps, RuleItemRefs } from "./rule-item";
+import RuleItem, { RuleCoreProps, RuleCoreRefs } from "./core";
 
-const RequiredComponent = React.forwardRef<RuleItemRefs, RuleItemProps>((props, ref) => {
+const RequiredComponent = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
 
-  return <RuleItem {...props} ref={ref} ruleField={{ label: '启用', valueProp: 'checked', type: 'Switch', props: {} }} />;
+  return <RuleItem {...props} ref={ref} setting={{ label: '启用', valueProp: 'checked', type: 'Switch', props: {} }} />;
 });
 
 export default RequiredComponent;

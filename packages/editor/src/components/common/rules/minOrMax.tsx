@@ -1,9 +1,9 @@
 import React from "react";
-import RuleItem, { RuleItemProps, RuleItemRefs } from "./rule-item";
+import RuleItem, { RuleCoreProps, RuleCoreRefs } from "./core";
 
-const MinOrMaxComponent = React.forwardRef<RuleItemRefs, RuleItemProps>((props, ref) => {
+const MinOrMaxComponent = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
 
-  return <RuleItem {...props} ref={ref} ruleField={{
+  return <RuleItem {...props} ref={ref} setting={{
     label: '数值',
     type: 'InputNumber',
     props: {
