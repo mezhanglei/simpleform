@@ -36,6 +36,7 @@ export default {
       "ImageUpload",
       "RichEditor",
       "RichText",
-    ]
+    ],
+    '业务组件': ['example']
   },
 };

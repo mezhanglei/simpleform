@@ -2,13 +2,14 @@ import React from 'react';
 import { useSimpleFormRender, useSimpleForm } from './components/formrender';
 import { FormEditorContext, FormEditorState, useEditorReducer } from './context';
 import { useEventBus } from './utils/hooks';
+import EditorConfig from './config';
 
 export interface ProviderProps extends FormEditorState {
   children?: any;
 }
 function Provider(props: ProviderProps) {
 
-  const { children, editorConfig, ...rest } = props;
+  const { children, ...rest } = props;
   const editor = useSimpleFormRender();
   const editorForm = useSimpleForm();
   const eventBus = useEventBus();
@@ -20,7 +21,7 @@ function Provider(props: ProviderProps) {
     eventBus: eventBus,
     selected: {},
     properties: {},
-    editorConfig: editorConfig,
+    editorConfig: EditorConfig,
     historyData: {
       index: -1,
       maxStep: 20,
