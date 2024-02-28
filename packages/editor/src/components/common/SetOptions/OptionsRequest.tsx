@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { CSSProperties } from "react";
+import React, { CSSProperties, useEffect } from "react";
 import CodeTextArea from "../CodeTextarea";
 import { getFormItem } from '../../../utils/utils';
 import { EditorCodeMirrorModal } from "../CodeMirror";
@@ -45,10 +45,15 @@ const OptionsRequest = React.forwardRef<HTMLElement, OptionsRequestProps>((props
   } = props;
 
   const context = field?.context;
-  const { selected, editor } = context?.state || {};
   const FormRender = context?.state?.FormRender || DefaultFormRender;
-  const selectedPath = selected?.path;
   const requestForm = useSimpleForm();
+
+  useEffect(() => {
+    if (requestForm) {
+      requestForm.setFieldsValue(value);
+    }
+  }, [value]);
+
   const properties = {
     url: {
       label: '接口',
@@ -102,11 +107,9 @@ const OptionsRequest = React.forwardRef<HTMLElement, OptionsRequestProps>((props
     },
   };
 
-  const onFieldsChange: FormRenderProps['onFieldsChange'] = ({ name, value }) => {
+  const onFieldsChange: FormRenderProps['onFieldsChange'] = ({ name }) => {
     if (!name) return;
-    const oldProps = getFormItem(editor, selectedPath)?.props || {};
-    const newConfig = oldProps?.options || {};
-    newConfig[name] = value;
+    const newConfig = requestForm.getFieldValue();
     onChange && onChange(newConfig);
   };
 
