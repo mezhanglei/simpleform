@@ -19,16 +19,17 @@ export default function Demo() {
     }
   };
 
-  const formvalues = useFormValues(form);
-  console.log(formvalues, '监听表单值变化');
-
   return (
     <Form initialValues={{ name1: 1111 }} form={form} onSubmit={onSubmit}>
       <Form.Item tooltip='11111' label="Name1" name="name1" rules={[{ required: true, message: 'name1 is Empty' }, { validator: validator, message: '自定义校验' }]}>
-        {<input {...form.getBindProps("name1")} />}
+        {({ bindProps }) => (
+          <div>
+            <input {...bindProps} />
+          </div>
+        )}
       </Form.Item>
       <Form.Item label="Name2" name="name2.a" rules={[{ required: true, message: 'name2 is empty' }]}>
-        {<input {...form.getBindProps("name2.a")} />}
+        {({ bindProps }) => <input {...bindProps} />}
       </Form.Item>
       <Form.Item label="">
         <button>Submit</button>

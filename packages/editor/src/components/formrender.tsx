@@ -5,9 +5,9 @@ import '@simpleform/render/lib/css/main.css';
 import widgets from '.';
 import { ConfigSettingItem, FormEditorContextProps } from '../context';
 import createRequest from './common/request';
-import { CreateRequestParams } from './common/request/createRequest';
 
 export * from '@simpleform/render';
+export { createRequest };
 
 // 自定义传参
 export interface CustomOptions {
@@ -29,30 +29,26 @@ export type FormDesignData = { [key: string]: CustomFormNodeProps } | CustomForm
 // 选中项类型
 export type EditorSelection = { attributeName?: string } & GenerateParams<CustomOptions>;
 
-export interface CustomChildrenProps {
-  // 请求配置
-  requestConfig?: CreateRequestParams;
-}
-export type CustomFormChildrenProps = FormChildrenProps<CustomOptions> & CustomChildrenProps;
+export type CustomFormChildrenProps = FormChildrenProps<CustomOptions>;
 export function FormChildren(props: CustomFormChildrenProps) {
-  const { components, plugins, requestConfig, ...rest } = props;
+  const { components, plugins, ...rest } = props;
   return (
     <FormChildrenCore
       options={{ props: { autoComplete: 'off' } }}
       components={{ ...widgets, ...components }}
-      plugins={{ ...plugins, dayjs, request: createRequest(requestConfig) }}
+      plugins={{ ...plugins, dayjs }}
       {...rest}
     />
   );
 }
-export type CustomFormRenderProps = FormRenderProps<CustomOptions> & CustomChildrenProps;
+export type CustomFormRenderProps = FormRenderProps<CustomOptions>;
 export default function FormRender(props: CustomFormRenderProps) {
-  const { components, plugins, requestConfig, ...rest } = props;
+  const { components, plugins, ...rest } = props;
   return (
     <FormRenderCore
       options={{ props: { autoComplete: 'off' } }}
       components={{ ...widgets, ...components }}
-      plugins={{ ...plugins, dayjs, request: createRequest(requestConfig) }}
+      plugins={{ ...plugins, dayjs }}
       {...rest}
     />
   );

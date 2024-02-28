@@ -130,7 +130,7 @@ const RulesGroup = React.forwardRef<HTMLElement, RulesGroupProps>((props, ref) =
             return (
               <div key={name} className={classes.item}>
                 <Checkbox value={name} onChange={(e) => handleCheckbox(e, name, index)} />
-                <Child ref={(target) => ruleModalRefs.current[index] = target} className={classes.rule} label={label} name={name} value={rulesMap && rulesMap[name]} onChange={(val) => ruleChange(name, val)} />
+                <Child {...rest} ref={(target) => ruleModalRefs.current[index] = target} className={classes.rule} label={label} name={name} value={rulesMap && rulesMap[name]} onChange={(val) => ruleChange(name, val)} />
               </div>
             );
           })

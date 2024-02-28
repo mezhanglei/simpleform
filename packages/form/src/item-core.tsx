@@ -1,6 +1,6 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { SimpleFormContext, FormInitialValuesContext } from './form-context';
-import { deepGet, getValueFromEvent, toArray } from './utils/utils';
+import { deepGet, getValueFromEvent, getValuePropName, toArray } from './utils/utils';
 import { FormRule } from './validator';
 import { isEmpty } from './utils/type';
 
@@ -78,6 +78,7 @@ export const ItemCore = (props: ItemCoreProps) => {
   const initValue = initialValue ?? deepGet(initialValues, currentPath);
   const storeValue = form && form.getFieldValue(currentPath);
   const initialItemValue = storeValue ?? initValue;
+  const [value, setValue] = useState();
 
   // 初始化获取初始props
   currentPath && form?.setFieldProps(currentPath, fieldProps);
@@ -87,6 +88,7 @@ export const ItemCore = (props: ItemCoreProps) => {
     if (!currentPath || !form) return;
     // 订阅目标控件
     form.subscribeFormItem(currentPath, (newValue, oldValue) => {
+      setValue(newValue);
       if (!(isEmpty(newValue) && isEmpty(oldValue))) {
         onValuesChange && onValuesChange({ name: currentPath, value: newValue }, form?.getFieldValue());
       }
@@ -116,6 +118,9 @@ export const ItemCore = (props: ItemCoreProps) => {
   const bindChildren = (children: any) => {
     if (typeof children === 'function') {
       const bindProps = form && form.getBindProps(currentPath) || {};
+      const valuePropName = getValuePropName(valueProp);
+      const childValue = typeof valueSetter === 'function' ? valueSetter(value) : (valueSetter ? undefined : value);
+      bindProps[valuePropName] = childValue;
       return children({ className: errorClassName, form: form, bindProps: bindProps });
     } else {
       return children;

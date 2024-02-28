@@ -3,7 +3,7 @@ import React, { CSSProperties } from "react";
 import CodeTextArea from "../CodeTextarea";
 import { getFormItem } from '../../../utils/utils';
 import { EditorCodeMirrorModal } from "../CodeMirror";
-import FormRender, { useSimpleForm, FormRenderProps, EditorSelection } from "../../formrender";
+import DefaultFormRender, { useSimpleForm, FormRenderProps, EditorSelection } from "../../formrender";
 
 export interface RequestResponseConfig {
   url?: string; // 请求的路径
@@ -46,6 +46,7 @@ const OptionsRequest = React.forwardRef<HTMLElement, OptionsRequestProps>((props
 
   const context = field?.context;
   const { selected, editor } = context?.state || {};
+  const FormRender = context?.state?.FormRender || DefaultFormRender;
   const selectedPath = selected?.path;
   const requestForm = useSimpleForm();
   const properties = {

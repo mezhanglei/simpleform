@@ -3,7 +3,7 @@ import SvgIcon from "../../SvgIcon";
 import './index.less';
 import CustomModal from "../../AntdModal";
 import classNames from "classnames";
-import FormRender, { Form, CustomFormNodeProps, useSimpleForm, matchExpression } from "../../../formrender";
+import DefaultFormRender, { Form, CustomFormNodeProps, useSimpleForm, matchExpression, EditorSelection } from "../../../formrender";
 import { Radio } from "antd";
 import AddSettingModal from "../../SettingModal/add";
 
@@ -20,7 +20,7 @@ export interface RuleCoreRefs {
   showRuleModal: () => void
 }
 
-export interface RuleCoreProps {
+export interface RuleCoreProps extends EditorSelection {
   name?: InputFormRuleKey;
   value?: InputFormRule;
   label?: string;
@@ -52,6 +52,7 @@ const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
     setting,
     onChange,
     className,
+    field,
     ...rest
   } = props;
 
@@ -59,6 +60,8 @@ const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
   const [selectType, setSelectType] = useState<string>('handle');
   const editRef = useRef<any>();
   const currentForm = useSimpleForm();
+  const context = field?.context;
+  const FormRender = context?.state?.FormRender || DefaultFormRender;
 
   useImperativeHandle(ref, () => ({ showRuleModal: () => editRef.current.click() }));
 

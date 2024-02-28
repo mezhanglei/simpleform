@@ -1,7 +1,7 @@
 
 import Exmaple from './example/index';
 
-// 控件组
+// 注册组件
 export default {
   "example": Exmaple,
 };

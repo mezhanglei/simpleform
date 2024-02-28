@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import FormRender, { useSimpleForm, FormRenderProps } from '../../formrender';
+import FormRender, { useSimpleForm, FormRenderProps } from '../../../FormRender';
 import FormConfigs from './render';
 
 const ExampleGroup = (props: any) => {

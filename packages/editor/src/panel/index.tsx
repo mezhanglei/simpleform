@@ -16,6 +16,30 @@ export interface TagProps {
   icon?: string;
 }
 
+const defaultPanelData = {
+  '布局组件': ['Grid', 'Divider', 'Alert'],
+  '控件组合': ['FormTable'],
+  '基础控件': [
+    "Input",
+    "Radio.Group",
+    "Checkbox.Group",
+    "Select",
+    "Switch",
+    "TimePicker",
+    "TimePicker.RangePicker",
+    "DatePicker",
+    "DatePicker.RangePicker",
+    "Slider",
+    "Rate",
+    "ColorPicker",
+    "Cascader",
+    "FileUpload",
+    "ImageUpload",
+    "RichEditor",
+    "RichText",
+  ]
+};
+
 const Tag = React.forwardRef((props: TagProps, ref: any) => {
   const {
     style,
@@ -51,7 +75,7 @@ function EditorPanel(props: EditorPanelProps, ref: any) {
   } = props;
 
   const context = useEditorContext();
-  const { selected, editor, editorConfig } = context.state;
+  const { selected, editor, editorConfig, panelData } = context.state;
   const selectedParent = selected?.parent;
   const attributeName = selected?.attributeName;
   const cls = classnames(prefixCls, className);
@@ -59,7 +83,7 @@ function EditorPanel(props: EditorPanelProps, ref: any) {
   const onChange = (key: string, item: CustomFormNodeProps) => {
     if (attributeName) return;
     const newIndex = getSelectedIndex(editor, selected) + 1; // 插入位置序号
-    const initialField = getConfigItem(key, editorConfig.widgets, editorConfig.settings); // 提取默认值
+    const initialField = getConfigItem(key, editorConfig?.widgets, editorConfig?.settings); // 提取默认值
     const panel = selectedParent?.field?.panel;
     const includesIds = panel?.includes;
     if (includesIds && !includesIds.includes(key)) {
@@ -72,7 +96,7 @@ function EditorPanel(props: EditorPanelProps, ref: any) {
   return (
     <div ref={ref} className={cls} style={style}>
       {
-        Object.entries(editorConfig.panel).map(([title, list]) => {
+        Object.entries(panelData || defaultPanelData).map(([title, list]) => {
           return (
             <div key={title} className='panel-list'>
               <div className={`panel-list-title`}>{title}</div>
@@ -87,7 +111,7 @@ function EditorPanel(props: EditorPanelProps, ref: any) {
               >
                 {
                   list.map((key) => {
-                    const data = editorConfig.widgets?.[key] || {};
+                    const data = editorConfig?.widgets?.[key] || {};
                     const panel = data?.panel || {};
                     return <Tag key={key} data-id={key} icon={panel?.icon} onChange={() => onChange?.(key, data)}>{panel.label}</Tag>;
                   })

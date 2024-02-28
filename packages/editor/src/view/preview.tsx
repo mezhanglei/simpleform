@@ -7,10 +7,10 @@ import { showExportJsonModal } from './exportJson';
 import { CloseOutlined } from '@ant-design/icons';
 import ModalWrapper, { ModalWrapperProps } from '../components/common/GlobalModal/modalWrapper';
 import { create } from '../components/common/GlobalModal/createPromise';
-import FormRender, { FormDesignData, useSimpleForm } from '../components/formrender';
-
+import DefaultFormRender, { CustomOptions, FormDesignData, useSimpleForm } from '../components/formrender';
 export interface PreviewModalProps extends ModalWrapperProps {
   properties?: FormDesignData;
+  context?: CustomOptions['context'];
   plat?: PlatContainerProps['plat'];
 }
 
@@ -23,6 +23,7 @@ export const PreviewModal = React.forwardRef<HTMLDivElement, PreviewModalProps>(
     onClose,
     properties,
     plat,
+    context,
     ...rest
   } = props;
 
@@ -30,6 +31,7 @@ export const PreviewModal = React.forwardRef<HTMLDivElement, PreviewModalProps>(
   const [disabled, setDisabled] = useState<boolean>();
   const [platType, setPlatType] = useState<PlatContainerProps['plat']>('pc');
   const form = useSimpleForm();
+  const FormRender = context?.state?.FormRender || DefaultFormRender;
 
   useEffect(() => {
     setModalOpen(open);

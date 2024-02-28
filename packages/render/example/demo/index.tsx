@@ -27,7 +27,7 @@ export default function Demo(props) {
     }
   };
 
-  const [properties, setProperties] = useState({
+  const properties = {
     name1: {
       label: "readonly",
       readOnly: true,
@@ -35,8 +35,11 @@ export default function Demo(props) {
       readOnlyRender: "测试结果",
       initialValue: 1111,
       hidden: '{{formvalues.name6 == true}}',
+      rules: [{required: true, message: '空'}],
       type: 'Input',
-      props: {}
+      props: {
+        maxlength: 12
+      }
     },
     name11: {
       label: "readonly",
@@ -145,7 +148,7 @@ export default function Demo(props) {
         children: 'option'
       }
     },
-  });
+  }
 
   const form = useSimpleForm();
   // const formrender = useSimpleFormRender()

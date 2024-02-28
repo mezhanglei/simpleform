@@ -8,7 +8,7 @@ import PlatContainer, { PlatContainerProps, PlatOptions } from './platContainer'
 import { showImportModal } from './importModal';
 import { showPreviewModal } from './preview';
 import { showExportJsonModal } from './exportJson';
-import FormRender, { CustomFormRenderProps } from '../components/formrender';
+import DefaultFormRender, { CustomFormRenderProps } from '../components/formrender';
 import { useEventBusRef } from '../utils/hooks';
 import { setFormInitialValue } from '../utils/utils';
 import templates from '../templates';
@@ -24,6 +24,7 @@ function EditorView(props: EditorViewProps, ref: any) {
 
   const context = useEditorContext();
   const { editor, editorForm, settingForm, properties } = context.state;
+  const FormRender = context?.state?.FormRender || DefaultFormRender;
 
   const {
     style,
@@ -59,7 +60,7 @@ function EditorView(props: EditorViewProps, ref: any) {
   };
 
   const showPreview = () => {
-    showPreviewModal({ properties, plat: platType });
+    showPreviewModal({ properties, plat: platType, context });
   };
   const clearEditor = () => {
     context.dispatch({ properties: undefined });

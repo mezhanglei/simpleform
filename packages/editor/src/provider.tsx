@@ -9,7 +9,7 @@ export interface ProviderProps extends FormEditorState {
 }
 function Provider(props: ProviderProps) {
 
-  const { children, ...rest } = props;
+  const { children, editorConfig, ...rest } = props;
   const editor = useSimpleFormRender();
   const editorForm = useSimpleForm();
   const eventBus = useEventBus();
@@ -21,7 +21,10 @@ function Provider(props: ProviderProps) {
     eventBus: eventBus,
     selected: {},
     properties: {},
-    editorConfig: EditorConfig,
+    editorConfig: {
+      widgets: { ...EditorConfig.widgets, ...editorConfig?.widgets },
+      settings: { ...EditorConfig?.settings, ...editorConfig?.settings }
+    },
     historyData: {
       index: -1,
       maxStep: 20,

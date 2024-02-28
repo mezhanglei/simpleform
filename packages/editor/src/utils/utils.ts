@@ -21,7 +21,7 @@ export const getNameSetting = (selected?: EditorSelection) => {
   // 获取选中的字段值
   const endName = getPathEnd(selectedPath);
   // 非数组节点可以设置name
-  if (!isValidNumber(endName)) {
+  if (typeof endName === 'string') {
     return {
       name: {
         label: '字段名',

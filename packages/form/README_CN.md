@@ -2,9 +2,9 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-2.0.0-green)](https://www.npmjs.com/package/@simpleform/form)
+[![](https://img.shields.io/badge/version-2.0.1-green)](https://www.npmjs.com/package/@simpleform/form)
 
-> 表单底层组件，通过`getBindProps`方法或者回调函数方式实现表单值的显示和更新事件的绑定.
+> 表单底层组件，通过回调函数方式实现表单值的显示和更新事件的绑定.
 
 # Matters
  - 在使用之前需要先引入css样式文件，例：`import '@simpleform/form/lib/css/main.css'`;
@@ -13,7 +13,7 @@
 
 表单域组件，用于双向绑定目标控件。
 
-- 绑定：通过表单实例的`getBindProps`或者回调函数方式，对目标控件进行值和事件的绑定。
+- 绑定：通过回调函数方式，对目标控件进行值和事件的绑定。
 - 更新：可通过`form.setFieldValue`等实例方法设置表单值。
 - 校验规则：可以提供表单校验规则属性`rules`，进行自定义表单校验规则。
 
@@ -55,12 +55,14 @@ export default function Demo() {
   return (
     <Form initialValues={{ name1: 1111 }} form={form} onSubmit={onSubmit}>
       <Form.Item label="Name1" name="name1" rules={[{ required: true, message: 'name1 is Empty' }, { validator: validator, message: 'validator error' }]}>
+      {({ bindProps }) =>  (
         <div>
-          <input  {...form.getBindProps("name1")} />
+          <input  {...bindProps} />
         </div>
+      )}
       </Form.Item>
       <Form.Item label="object" name="name2.a" rules={[{ required: true, message: 'name2.a is empty' }]}>
-        <input  {...form.getBindProps("name2.a")} />
+        {({ bindProps }) =>  <input {...bindProps} />}
       </Form.Item>
       <Form.Item label="list" name="name3[0]" rules={[{ required: true, message: 'name3[0] is empty' }]}>
         {({ bindProps }) =>  <input {...bindProps} />}

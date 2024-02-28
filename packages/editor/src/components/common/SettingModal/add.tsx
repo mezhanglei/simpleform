@@ -9,6 +9,7 @@ const AddSettingModal = (props: SettingModalProps) => {
     value,
     onChange,
     setting,
+    ...rest
   } = props;
 
   const [codeStr, setCodeStr] = useState<string>();
@@ -23,7 +24,7 @@ const AddSettingModal = (props: SettingModalProps) => {
   };
 
   return (
-    <SettingModal title="添加联动" setting={setting} value={codeStr} onChange={handOk} displayElement={
+    <SettingModal title="添加联动" {...rest} setting={setting} value={codeStr} onChange={handOk} displayElement={
       (showModal) => (
         <div>
           <span>{typeof value === 'string' ? value : null}</span>

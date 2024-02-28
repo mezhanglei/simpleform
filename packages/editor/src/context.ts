@@ -19,7 +19,6 @@ export interface ConfigSettingItem {
 export interface EditorConfigType {
   widgets: { [type: string]: CustomFormNodeProps }, // 注册组件
   settings: { [type: string]: ConfigSettingItem } // 属性面板
-  panel: { [title: string]: Array<string> }, // 组件面板配置
 }
 // 表单编辑器的context
 export interface FormEditorState {
@@ -30,7 +29,9 @@ export interface FormEditorState {
   selected?: EditorSelection;
   properties?: FormDesignData;
   editorConfig?: EditorConfigType,
+  panelData?: { [title: string]: Array<string> }, // 组件面板配置
   templates?: Array<TemplateItem>;
+  FormRender?: any;
   historyData?: {
     index: number;
     maxStep: number;

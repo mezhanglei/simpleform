@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import './index.less';
 import { useTableData } from "../../../utils/hooks";
 import SvgIcon from "../SvgIcon";
-import FormRender, { CustomFormNodeProps, FieldChangedParams } from "../../formrender";
+import DefaultFormRender, { CustomFormNodeProps, EditorSelection, FieldChangedParams } from "../../formrender";
 import { codeToRule, ruleToCodeStr } from "./utils";
 import CustomModal, { CustomModalProps } from "../AntdModal";
 
@@ -15,7 +15,7 @@ export type RuleSettingItem = {
   code?: string;
   value?: unknown;
 }
-export interface SettingModalProps extends CustomModalProps {
+export interface SettingModalProps extends CustomModalProps, EditorSelection {
   value?: string;
   onChange?: (codeStr?: string) => void;
   setting?: CustomFormNodeProps;
@@ -48,6 +48,7 @@ const SettingModal = React.forwardRef<HTMLElement, SettingModalProps>((props, re
     setting,
     title,
     displayElement,
+    field,
     ...rest
   } = props;
 
@@ -60,6 +61,9 @@ const SettingModal = React.forwardRef<HTMLElement, SettingModalProps>((props, re
     updateItem,
     deleteItem
   } = useTableData<RuleSettingItem>(initialValue);
+
+  const context = field?.context;
+  const FormRender = context?.state?.FormRender || DefaultFormRender;
 
   useEffect(() => {
     const currentValue = typeof value === 'string' ? value : undefined;
@@ -113,7 +117,7 @@ const SettingModal = React.forwardRef<HTMLElement, SettingModalProps>((props, re
               tagName="div"
               initialValues={{ controlValue: value }}
               properties={{ controlValue: { compact: true, ...(setting || {}) } }}
-              onFieldsChange={(params) => valueChange(params, index)}
+              onFieldsChange={(params: any) => valueChange(params, index)}
             />
           </Col>
           <Col span={2}>

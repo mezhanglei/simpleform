@@ -1,9 +1,9 @@
 # `@simpleform/form`
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-2.0.0-green)](https://www.npmjs.com/package/@simpleform/form)
+[![](https://img.shields.io/badge/version-2.0.1-green)](https://www.npmjs.com/package/@simpleform/form)
 
-> The underlying form component, Binding of form values to display and update events is accomplished through the `getBindProps` method or callback functions.
+> The underlying form component, Binding of form values to display and update events is accomplished through callback functions.
 
 # Matters
 - The css style file needs to be introduced before it can be used, for example: `import '@simpleform/form/lib/css/main.css'`;
@@ -12,7 +12,7 @@ English | [中文说明](./README_CN.md)
 
 The smallest unit of a component in a form, and nodes as an object can be nested within each other.
 
-- Binding: Binds values and events to the target control by means of `getBindProps` or callback functions of the form instance.
+- Binding: Binds values and events to the target control by callback functions of the form instance.
 - Updating: the form value can be set by instance methods such as `form.setFieldValue`.
 - rules: You can provide form validation rules attribute `rules` for customizing form validation rules.
 
@@ -54,12 +54,14 @@ export default function Demo() {
   return (
     <Form initialValues={{ name1: 1111 }} form={form} onSubmit={onSubmit}>
       <Form.Item label="Name1" name="name1" rules={[{ required: true, message: 'name1 is Empty' }, { validator: validator, message: 'validator error' }]}>
+      {({ bindProps }) =>  (
         <div>
-          <input  {...form.getBindProps("name1")} />
+          <input  {...bindProps} />
         </div>
+      )}
       </Form.Item>
       <Form.Item label="object" name="name2.a" rules={[{ required: true, message: 'name2.a is empty' }]}>
-        <input  {...form.getBindProps("name2.a")} />
+        {({ bindProps }) =>  <input {...bindProps} />}
       </Form.Item>
       <Form.Item label="list" name="name3[0]" rules={[{ required: true, message: 'name3[0] is empty' }]}>
         {({ bindProps }) =>  <input {...bindProps} />}

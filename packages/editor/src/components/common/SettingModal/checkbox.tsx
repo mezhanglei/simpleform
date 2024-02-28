@@ -62,7 +62,7 @@ const OperateCheckbox = (props: SettingModalProps & CheckboxProps & { value?: bo
   };
 
   return (
-    <SettingModal title="添加联动" setting={setting} onChange={handOk} value={codeStr} displayElement={
+    <SettingModal {...rest} title="添加联动" setting={setting} onChange={handOk} value={codeStr} displayElement={
       (showModal) => (
         <div className="operate-setting-checkbox">
           <Checkbox checked={checked} onChange={checkboxChange} {...rest}>

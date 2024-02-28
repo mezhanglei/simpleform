@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import "./index.less";
-import FormEditor from '../../src';
+import FormEditor from './FormEditor';
 
 export default function Demo(props) {
 
