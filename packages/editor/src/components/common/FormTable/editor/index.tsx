@@ -48,19 +48,18 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
       <TableDnd {...rest}>
         {
           columns?.map((column, colIndex) => {
-            const columnInstance = rest?.formrender && rest.formrender.createFormElement({ type: column?.type, props: Object.assign({ disabled, form: rest?.form, formrender: rest?.formrender }, column?.props) });
+            const { dataIndex, title, type, props, ...restColumn } = column;
+            const columnInstance = rest?.formrender && rest.formrender.createFormElement({ type: type, props: Object.assign({ disabled, form: rest?.form, formrender: rest?.formrender }, props) });
             return (
-              <ColumnSelection key={column?.dataIndex} className={Classes.TableSelection} {...rest} column={column} colIndex={colIndex}>
+              <ColumnSelection key={dataIndex} className={Classes.TableSelection} {...rest} column={column} colIndex={colIndex}>
                 <div className={Classes.TableCol}>
                   <div className={Classes.TableColHead}>
-                    {column?.title}
+                    {title}
                   </div>
                   <div className={Classes.TableColBody}>
-                    {column?.hidden === true ? null :
-                      <Form.Item name={column?.dataIndex} onFieldsChange={({ value }) => onFieldsChange(colIndex, value)}>
-                        {React.isValidElement(columnInstance) ? ({ bindProps }: any) => React.cloneElement(columnInstance, bindProps) : columnInstance}
-                      </Form.Item>
-                    }
+                    <Form.Item {...restColumn} label="" name={dataIndex} onFieldsChange={({ value }) => onFieldsChange(colIndex, value)}>
+                      {React.isValidElement(columnInstance) ? ({ bindProps }: any) => React.cloneElement(columnInstance, bindProps) : columnInstance}
+                    </Form.Item>
                   </div>
                 </div>
               </ColumnSelection>

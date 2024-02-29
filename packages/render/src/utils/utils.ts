@@ -1,7 +1,6 @@
 import { arrayMove } from "./array";
 import { FormNodeProps, PropertiesData } from "../types";
 import { pathToArr, deepSet, joinFormPath, deepGet } from "@simpleform/form";
-import { isEmpty } from "./type";
 import { deepMergeObject } from "./object";
 
 // 匹配字符串表达式
@@ -35,15 +34,6 @@ export const endIsListItem = (path?: string) => {
   if (typeof path === 'string') {
     const endReg = new RegExp('\\[\\d+\\]$');
     return endReg.test(path);
-  }
-};
-
-// 更改当前的表单字段
-export const changePathEnd = (oldPath: string, endName: string | number) => {
-  if (!isEmpty(endName) && oldPath) {
-    const parent = getParent(oldPath);
-    const newPath = joinFormPath(parent, endName);
-    return newPath;
   }
 };
 
@@ -150,14 +140,14 @@ export const getItemByPath = (properties?: PropertiesData, path?: string, attrib
 
 // 根据index获取目标项
 export const getKeyValueByIndex = (properties: PropertiesData, index?: number, parent?: { path?: string; attributeName?: string }) => {
-  if (!properties || typeof index !== 'number') return [];
+  if (!properties || typeof index !== 'number') return;
   const { path, attributeName } = parent || {};
   const parentItem = getItemByPath(properties, path, attributeName);
   const childs = attributeName ? parentItem : (path ? parentItem?.properties : parentItem);
   const childKeys = Object.keys(childs || {});
   const isList = childs instanceof Array;
   const key = isList ? index : childKeys[index];
-  return [key, childs[key]];
+  return [key, childs[key]] as [string | number, any];
 };
 
 // 转化为有序列表
@@ -175,24 +165,18 @@ export const toEntries = (data: any) => {
 };
 
 // 从有序列表中还原源数据
-const parseEntries = (entriesData?: { entries: Array<[string, any]>, isList?: boolean }) => {
+const parseEntries = (entriesData?: { entries: Array<[string | number, any]>, isList?: boolean }) => {
   const { isList, entries = [] } = entriesData || {};
-  const temp = isList ? [] : {};
-  for (let key of Object.keys(entries || {})) {
-    // @ts-ignore
-    const item = entries[key];
-    const itemKey = item?.[0];
-    const itemData = item?.[1];
-    // 还原数据
-    if (isList) {
-      // @ts-ignore
-      temp[key] = itemData;
-    } else if (typeof itemKey === 'string') {
-      // @ts-ignore
-      temp[itemKey] = itemData;
+  if (isList) {
+    const temp = [];
+    for (let i = 0; i < entries.length; i++) {
+      const item = entries[i];
+      temp[i] = item && item[1];
     }
+    return temp;
+  } else {
+    return Object.fromEntries(entries);
   }
-  return temp;
 };
 
 // 更新指定路径的name
@@ -221,22 +205,13 @@ export const updateName = (properties: PropertiesData, newName?: string, pathStr
 };
 
 // 插入数据
-export type InsertItemType = Array<any> | Object | any;
-export const insertItemByIndex = (properties: PropertiesData, data: InsertItemType, index?: number, parent?: { path?: string; attributeName?: string }) => {
+export const insertItemByIndex = (properties: PropertiesData, data?: Partial<PropertiesData> | Array<FormNodeProps>, index?: number, parent?: { path?: string; attributeName?: string }) => {
   const { path, attributeName } = parent || {};
   const parentItem = getItemByPath(properties, path, attributeName);
   const childs = attributeName ? parentItem : (path ? parentItem?.properties : parentItem);
   const entriesData = toEntries(childs);
   const isList = entriesData?.isList;
-  let addItems: Array<[string, any]> = [];
-  if (isList) {
-    // 数组类型
-    const dataList = data instanceof Array ? data : [data];
-    addItems = dataList?.map((item, i) => [`${i}`, item]);
-  } else {
-    // 对象类型
-    addItems = Object.entries(data || {});
-  }
+  const addItems = isList ? Object.entries(data instanceof Array ? data : [data]) : Object.entries(data || {});
   if (typeof index === 'number') {
     entriesData?.entries?.splice(index, 0, ...addItems);
   } else {
@@ -289,14 +264,14 @@ export const moveDiffLevel = (properties: PropertiesData, from: { parent?: strin
   const fromParentPath = from?.parent;
   const fromIndex = from?.index;
   const fromParentPathArr = pathToArr(fromParentPath);
-  const [fromKey, fromValue] = getKeyValueByIndex(properties, fromIndex, { path: fromParentPath });
-  const insertItem = typeof fromKey === 'number' ? fromValue : (fromKey && { [fromKey]: fromValue });
-  const fromPath = joinFormPath(fromParentPath, fromKey);
+  const keyValue = getKeyValueByIndex(properties, fromIndex, { path: fromParentPath });
+  if (!keyValue) return properties;
+  const insertItem = parseEntries({ isList: typeof keyValue[0] === 'number', entries: [keyValue] });
+  const fromPath = joinFormPath(fromParentPath, keyValue[0]);
   // 拖放源
   const toParentPath = to?.parent;
   const toIndex = to?.index;
   const toParentPathArr = pathToArr(toParentPath);
-  if (typeof fromPath !== 'string') return properties;
   // 先计算内部变动，再计算外部变动
   if (fromParentPathArr?.length > toParentPathArr?.length || !toParentPathArr?.length) {
     setItemByPath(properties, undefined, fromPath);
@@ -314,7 +289,7 @@ export const getInitialValues = (properties?: PropertiesData) => {
   if (!properties) return;
   let initialValues = {};
   // 遍历处理对象树中的非properties字段
-  const deepHandle = (formNode: FormNodeProps, path: string) => {
+  const deepHandle = (formNode: FormNodeProps, path?: string) => {
     for (const propsKey of Object.keys(formNode)) {
       if (propsKey !== 'properties') {
         // @ts-ignore
@@ -324,12 +299,13 @@ export const getInitialValues = (properties?: PropertiesData) => {
         }
       } else {
         const childProperties = formNode[propsKey];
+        const isList = childProperties instanceof Array;
         if (childProperties) {
           for (const childKey of Object.keys(childProperties)) {
             // @ts-ignore
             const childField = childProperties[childKey];
-            const childName = childKey;
-            if (typeof childName === 'number' || typeof childName === 'string') {
+            const childName = isList ? `[${childKey}]` : childKey;
+            if (typeof childName === 'string') {
               const childPath = childField?.ignore === true ? path : joinFormPath(path, childName) as string;
               deepHandle(childField, childPath);
             }
@@ -339,53 +315,15 @@ export const getInitialValues = (properties?: PropertiesData) => {
     }
   };
 
+  const isList = properties instanceof Array;
   for (const key of Object.keys(properties)) {
     // @ts-ignore
     const childField = properties[key];
-    const childName = key;
-    if (typeof childName === 'number' || typeof childName === 'string') {
-      const childPath = joinFormPath(childField?.ignore ? undefined : childName) as string;
+    const childName = isList ? `[${key}]` : key;
+    if (typeof childName === 'string') {
+      const childPath = joinFormPath(childField?.ignore ? undefined : childName);
       deepHandle(childField, childPath);
     }
   }
   return initialValues;
-};
-
-// 展平properties中的控件，键为表单路径
-export const setExpandComponents = (properties?: PropertiesData): { [key: string]: FormNodeProps } | undefined => {
-  if (!properties) return;
-  let componentsMap = {};
-  // 遍历处理对象树中的非properties字段
-  const deepHandle = (formNode: FormNodeProps, path: string) => {
-    if (isEmpty(formNode['properties'])) {
-      if (path) {
-        // @ts-ignore
-        componentsMap[path] = formNode;
-      }
-    } else {
-      const childProperties = formNode['properties'];
-      if (childProperties) {
-        for (const key of Object.keys(childProperties)) {
-          // @ts-ignore
-          const childField = childProperties[key];
-          const childName = key;
-          if (typeof childName === 'string') {
-            const childPath = childField?.ignore === true ? path : joinFormPath(path, childName) as string;
-            deepHandle(childField, childPath);
-          }
-        }
-      }
-    }
-  };
-
-  for (const key of Object.keys(properties)) {
-    // @ts-ignore
-    const childField = properties[key];
-    const childName = key;
-    if (typeof childName === 'string') {
-      const childPath = joinFormPath(childField?.ignore ? undefined : childName) as string;
-      deepHandle(childField, childPath);
-    }
-  }
-  return componentsMap;
 };

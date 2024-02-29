@@ -1,5 +1,5 @@
 import { pathToArr, deepGet, deepSet } from "./object";
-import { isEmpty, isNumberStr } from "./type";
+import { isEmpty } from "./type";
 export { pathToArr, deepGet, deepSet };
 
 // 是否存在前缀
@@ -30,21 +30,18 @@ export const isWithBracket = (part?: any) => {
   return typeof part === 'string' && (/\[(\d+)\]/gi.test(part));
 };
 
-// 是否为数组索引项
-export const isValidNumber = (item?: any) => isNumberStr(item);
-
 // 由前到后拼接当前项的表单的path
-export function joinFormPath(...args: Array<any>) {
+export function joinFormPath(...args: Array<string | number | undefined>) {
   const result = args?.reduce((pre, cur) => {
-    const curName = isEmpty(cur) ? '' : (isValidNumber(cur) ? `[${cur}]` : cur);
-    const parent = isEmpty(pre) ? '' : (isValidNumber(pre) ? `[${pre}]` : pre);
+    const curName = isEmpty(cur) ? '' : (typeof cur === 'number' ? `[${cur}]` : cur);
+    const parent = isEmpty(pre) ? '' : (typeof pre === 'number' ? `[${pre}]` : pre);
     if (isWithBracket(curName)) {
       return parent && curName ? `${parent}${curName}` : (curName || parent);
     } else {
       return parent && curName ? `${parent}.${curName}` : (curName || parent);
     }
   });
-  return result;
+  return result as string;
 };
 
 export function toArray<T>(list?: T | T[]): T[] {

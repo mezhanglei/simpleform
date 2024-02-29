@@ -60,12 +60,13 @@ export function deepGet(obj: object | undefined, keys?: string | string[]): any 
 }
 
 // 给对象目标属性添加值, path：['a', 0] 等同于 'a[0]'
-export function deepSet<T = any>(obj: T, path: string | string[], value: any) {
+export function deepSet<T = any>(obj: T, path?: string | string[], value?: any) {
   const parts = pathToArr(path);
   if (!parts?.length) return obj;
 
   // 是否为数组序号
   const isIndex = (str?: string) => {
+    if (!path) return;
     return Array.isArray(path) ? isNumberStr(str) : path?.indexOf(`[${str}]`) > -1;
   };
 

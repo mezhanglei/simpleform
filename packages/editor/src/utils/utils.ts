@@ -1,6 +1,6 @@
 import { deepMergeObject } from './object';
 import { nanoid } from 'nanoid';
-import { SimpleForm, isValidNumber, EditorSelection, SimpleFormRender, getInitialValues, getPathEnd, joinFormPath } from '../components/formrender';
+import { SimpleForm, EditorSelection, SimpleFormRender, getInitialValues, getPathEnd, joinFormPath } from '../components/formrender';
 import { EditorConfigType } from '../context';
 
 export const defaultGetId = (key?: string) => {

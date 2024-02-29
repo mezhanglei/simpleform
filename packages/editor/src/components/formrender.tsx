@@ -23,7 +23,7 @@ export interface CustomOptions {
   setting?: ConfigSettingItem;
 }
 // 自定义表单节点信息
-export type CustomFormNodeProps = FormNodeProps & CustomOptions;
+export type CustomFormNodeProps<T = FormNodeProps> = T & CustomOptions;
 // 表单渲染数据的类型
 export type FormDesignData = { [key: string]: CustomFormNodeProps } | CustomFormNodeProps[];
 // 选中项类型

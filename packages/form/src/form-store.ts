@@ -88,7 +88,7 @@ export class SimpleForm<T extends Object = any> {
   }
 
   // 给目标控件绑定的props
-  getBindProps(path?: string) {
+  getBindProps(path?: string, newValue?: any) {
     if (!path) return;
     const props = this.getFieldProps(path);
     const currentValue = this.getFieldValue(path);
@@ -102,6 +102,9 @@ export class SimpleForm<T extends Object = any> {
         this.bindChange(path, eventName, ...args);
       };
     });
+    if (newValue !== undefined) {
+      bindProps[valuePropName] = newValue;
+    }
     return bindProps;
   }
 

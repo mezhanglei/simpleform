@@ -106,12 +106,13 @@ export default function FormChildren(props: FormChildrenProps) {
             fieldPropsMap[propsPath] = result;
           } else {
             const childProperties = formNode[propsKey];
+            const isList = childProperties instanceof Array;
             if (childProperties) {
-              for (const childKey of Object.keys(childProperties)) {
+              for (const key of Object.keys(childProperties)) {
                 // @ts-ignore
-                const childField = childProperties[childKey];
-                const childName = childKey;
-                if (typeof childName === 'number' || typeof childName === 'string') {
+                const childField = childProperties[key];
+                const childName = isList ? `[${key}]` : key;
+                if (typeof childName === 'string') {
                   const childPath = joinFormPath(path, childName) as string;
                   deepHandle(childField, childPath);
                 }
@@ -250,9 +251,11 @@ export default function FormChildren(props: FormChildrenProps) {
       const FormNodeWidget = formrender.createFormElement(typeRender || { type, props }, commonParams);
       if (haveProperties) {
         const FormNodeChildren = Object.entries(properties as PropertiesData || {}).map(([key, field], index: number) => {
-          const joinPath = joinFormPath(path, key);
+          const isList = properties instanceof Array;
+          const childKey = isList ? `[${key}]` : key;
+          const joinPath = joinFormPath(path, childKey);
           const generateField = getEvalFieldProps(field, joinPath);
-          const joinName = generateField?.ignore === true ? name : joinFormPath(name, key);
+          const joinName = generateField?.ignore === true ? name : joinFormPath(name, childKey);
           if (generateField) {
             generateField['index'] = index;
           }
@@ -285,13 +288,15 @@ export default function FormChildren(props: FormChildrenProps) {
     return withSide(result, outside, renderItem, commonParams);
   };
 
+  const isList = properties instanceof Array;
   const childs = Object.entries(properties || {}).map(([key, field], index: number) => {
-    const generateField = getEvalFieldProps(field, key);
+    const childKey = isList ? `[${key}]` : key;
+    const generateField = getEvalFieldProps(field, childKey);
     if (generateField) {
       generateField['index'] = index;
     }
-    const joinName = generateField?.ignore === true ? '' : key;
-    return renderChild({ name: joinName, path: key, field: generateField });
+    const joinName = generateField?.ignore === true ? '' : childKey;
+    return renderChild({ name: joinName, path: childKey, field: generateField });
   });
 
   return withSide(childs, inside, renderList, { formrender: formrender, form: form });

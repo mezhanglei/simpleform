@@ -1,6 +1,6 @@
 import { deepClone } from "./utils/object";
-import { CustomUnionType, GenerateParams, PropertiesData } from "./types";
-import { getItemByPath, setItemByPath, updateItemByPath, moveSameLevel, moveDiffLevel, updateName, getKeyValueByIndex, InsertItemType, insertItemByIndex } from "./utils/utils";
+import { CustomUnionType, FormNodeProps, GenerateParams, PropertiesData } from "./types";
+import { getItemByPath, setItemByPath, updateItemByPath, moveSameLevel, moveDiffLevel, updateName, getKeyValueByIndex, insertItemByIndex } from "./utils/utils";
 import { createFormElement, getFormComponent } from "./utils/transform";
 import { joinFormPath } from "@simpleform/form";
 
@@ -80,9 +80,9 @@ export class SimpleFormRender {
   setItemByIndex = (data?: any, index?: number, parent?: { path?: string, attributeName?: string }) => {
     const cloneProperties = this.getProperties();
     if (cloneProperties) {
-      const [key] = getKeyValueByIndex(cloneProperties, index, parent);
+      const keyValue = getKeyValueByIndex(cloneProperties, index, parent);
       const { path, attributeName } = parent || {};
-      const formPath = attributeName ? path : joinFormPath(path, key);
+      const formPath = attributeName ? path : joinFormPath(path, keyValue && keyValue[0]);
       let newProperties = setItemByPath(cloneProperties, data, formPath, attributeName);
       this.setProperties(newProperties);
     }
@@ -98,7 +98,7 @@ export class SimpleFormRender {
   };
 
   // 插入值，默认末尾
-  insertItemByIndex = (data: InsertItemType, index?: number, parent?: { path?: string, attributeName?: string }) => {
+  insertItemByIndex = (data: Partial<PropertiesData> | Array<FormNodeProps>, index?: number, parent?: { path?: string, attributeName?: string }) => {
     const cloneProperties = this.getProperties();
     if (cloneProperties) {
       let newProperties = insertItemByIndex(cloneProperties, data, index, parent);
@@ -127,8 +127,8 @@ export class SimpleFormRender {
   getItemByIndex = (index: number, parent: { path?: string, attributeName?: string }) => {
     const cloneProperties = this.getProperties();
     if (cloneProperties) {
-      const [, value] = getKeyValueByIndex(cloneProperties, index, parent);
-      return value;
+      const keyValue = getKeyValueByIndex(cloneProperties, index, parent);
+      return keyValue && keyValue[1];
     }
   };
 

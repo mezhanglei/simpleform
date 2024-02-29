@@ -1,6 +1,6 @@
 import { ColumnType, TableProps } from 'antd/lib/table';
 import React, { CSSProperties } from 'react';
-import { EditorSelection, CustomFormNodeProps } from '../../formrender';
+import { EditorSelection, CustomFormNodeProps, GenerateFormNodeProps } from '../../formrender';
 import EditorTable from './editor';
 import FormTable from './render';
 
@@ -16,7 +16,7 @@ export interface FormTableProps extends Omit<TableProps<any>, 'title'>, EditorSe
   onChange?: (val?: any) => void;
 }
 
-export interface CustomColumnType<T = any> extends ColumnType<T>, CustomFormNodeProps {
+export interface CustomColumnType<T = any> extends ColumnType<T>, CustomFormNodeProps<GenerateFormNodeProps> {
   key?: string;
   title: string;
   dataIndex: string;
