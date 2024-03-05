@@ -134,7 +134,7 @@ The rules in the fields of the values in `rules` perform the checks in order, an
 - `max` `number` Maximum length for string type; maximum length for number type; maximum length for array type `optional`.
 - `min` `number` minimum length for `string` type; minimum value for `number` type; minimum length for `array` type. `optional`.
 
-### SimpleForm
+### SimpleForm Method
 To create an instance of `form` via `useSimpleForm`, use the following:
 - `form.getFieldValue(path?: string)` Returns the value of the form field for which `path` is specified, or the value of the whole form without `name`.
 - `form.setFieldValue(path, value)` Update the value of a form field

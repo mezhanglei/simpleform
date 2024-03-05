@@ -56,9 +56,10 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
       onSelect(nextSelected);
       return;
     }
-    context?.dispatch && context?.dispatch({
+    context?.dispatch && context?.dispatch((old) => ({
+      ...old,
       selected: nextSelected
-    });
+    }));
     // 订阅选中事件
     eventBus && eventBus.emit('select', nextSelected);
   };

@@ -1,18 +1,18 @@
 import { getValuePropName, isExitPrefix } from './utils/utils';
 import { deepClone, deepGet, deepSet } from './utils/object';
 import { handleRules, FormRule, isCanTrigger } from './validator';
-import { getRulesTriggers, getTriggers, TriggerType } from './item-core';
+import { getRulesTriggers, getTriggers, ItemCoreProps, TriggerType } from './item-core';
 import { isObject } from './utils/type';
 
 export type FormListener = { path: string, onChange: (newValue?: any, oldValue?: any) => void }
 
-export type FormErrors<T = any> = { [key in keyof T]?: T[key] }
+export type FormErrors<T = any> = Partial<T>;
 
-export type ValidateResult<T> = { error?: string, values: T }
+export type ValidateResult<T> = { error?: string, values: T };
 
-export type FieldProps = { rules?: FormRule[], [other: string]: any };
+export type FieldProps = ItemCoreProps & Record<string, any>;
 
-export type FormFieldsProps<T = any> = { [key in keyof T]: FieldProps };
+export type FormFieldsProps<T = any> = Record<keyof T, FieldProps>;
 
 export class SimpleForm<T extends Object = any> {
   private initialValues?: Partial<T>;
@@ -38,8 +38,11 @@ export class SimpleForm<T extends Object = any> {
     this.formErrors = {};
     this.values = deepClone(values);
     this.getFieldValue = this.getFieldValue.bind(this);
+    this.getLastValue = this.getLastValue.bind(this);
     this.setFieldValue = this.setFieldValue.bind(this);
     this.setFieldsValue = this.setFieldsValue.bind(this);
+    this.getInitialValues = this.getInitialValues.bind(this);
+    this.setInitialValues = this.setInitialValues.bind(this);
     this.getFieldError = this.getFieldError.bind(this);
     this.setFieldError = this.setFieldError.bind(this);
     this.setFieldsError = this.setFieldsError.bind(this);
@@ -47,22 +50,27 @@ export class SimpleForm<T extends Object = any> {
     this.getFieldProps = this.getFieldProps.bind(this);
     this.setFieldProps = this.setFieldProps.bind(this);
     this.getBindProps = this.getBindProps.bind(this);
+    this.bindChange = this.bindChange.bind(this);
 
     this.reset = this.reset.bind(this);
     this.validate = this.validate.bind(this);
+
     this.subscribeError = this.subscribeError.bind(this);
     this.unsubscribeError = this.unsubscribeError.bind(this);
+    this.notifyError = this.notifyError.bind(this);
+
     this.subscribeFormItem = this.subscribeFormItem.bind(this);
     this.unsubscribeFormItem = this.unsubscribeFormItem.bind(this);
+    this.notifyFormItem = this.notifyFormItem.bind(this);
+
     this.subscribeFormValue = this.subscribeFormValue.bind(this);
     this.unsubscribeFormValue = this.unsubscribeFormValue.bind(this);
+    this.notifyFormValue = this.notifyFormValue.bind(this);
+
     this.subscribeFormValues = this.subscribeFormValues.bind(this);
     this.unsubscribeFormValues = this.unsubscribeFormValues.bind(this);
-
-    this.notifyError = this.notifyError.bind(this);
-    this.notifyFormItem = this.notifyFormItem.bind(this);
-    this.notifyFormValue = this.notifyFormValue.bind(this);
     this.notifyFormValues = this.notifyFormValues.bind(this);
+
   }
 
   // 获取
@@ -97,26 +105,31 @@ export class SimpleForm<T extends Object = any> {
     const triggers = getTriggers(trigger, validateTrigger, getRulesTriggers(rules));
     const childValue = typeof valueSetter === 'function' ? valueSetter(currentValue) : (valueSetter ? undefined : currentValue);
     const bindProps = { [valuePropName]: childValue } as any;
+    if (newValue !== undefined) {
+      const newChildValue = typeof valueSetter === 'function' ? valueSetter(newValue) : (valueSetter ? undefined : newValue);
+      bindProps[valuePropName] = newChildValue;
+    }
     triggers.forEach((eventName) => {
       bindProps[eventName] = (...args: any[]) => {
         this.bindChange(path, eventName, ...args);
       };
     });
-    if (newValue !== undefined) {
-      bindProps[valuePropName] = newValue;
-    }
     return bindProps;
   }
 
   // 设置表单域
   public setFieldProps(path: string, field?: FieldProps) {
     if (!path) return;
+    const lastField = this.fieldProps[path];
     if (field === undefined) {
-      delete this.fieldProps[path];
+      if (lastField !== undefined) {
+        delete this.fieldProps[path];
+      }
     } else {
-      const lastField = this.fieldProps[path];
-      const newField = Object.assign({}, lastField, field);
-      this.fieldProps[path] = newField;
+      if (JSON.stringify(lastField || {}) !== JSON.stringify(field)) {
+        const newField = Object.assign({}, lastField, field);
+        this.fieldProps[path] = newField;
+      }
     };
   }
 
@@ -139,7 +152,7 @@ export class SimpleForm<T extends Object = any> {
     this.values = deepSet(this.values, path, initialValue);
     this.notifyFormItem(path);
     this.notifyFormValue(path);
-    this.notifyFormValues();
+    this.notifyFormValues(path);
   }
 
   // 获取初始值
@@ -168,7 +181,7 @@ export class SimpleForm<T extends Object = any> {
       setFormItemValue(path, value, eventName);
       this.notifyFormItem(path);
       this.notifyFormValue(path);
-      this.notifyFormValues();
+      this.notifyFormValues(path);
     } else if (isObject(path)) {
       // @ts-ignore
       Promise.all(Object.keys(path).map((n) => setFormItemValue(n, path?.[n])));
@@ -261,6 +274,24 @@ export class SimpleForm<T extends Object = any> {
     }
   }
 
+  // 订阅当前表单域值的变动(当表单域消失时会卸载)
+  public subscribeFormItem(path: string, listener: FormListener['onChange']) {
+    this.formItemListeners.push({
+      onChange: listener,
+      path: path
+    });
+    return () => {
+      this.formItemListeners = this.formItemListeners.filter((sub) => sub.path !== path);
+    };
+  }
+  // 卸载
+  public unsubscribeFormItem(path?: string) {
+    if (path === undefined) {
+      this.formItemListeners = [];
+    } else if (typeof path === 'string') {
+      this.formItemListeners = this.formItemListeners.filter((sub) => sub.path !== path);
+    }
+  }
   // 同步当前表单域值的变化
   private notifyFormItem(path?: string) {
     if (path) {
@@ -274,6 +305,24 @@ export class SimpleForm<T extends Object = any> {
     }
   }
 
+  // 主动订阅路径上所有表单控件的变动(表单控件消失不会卸载)
+  public subscribeFormValue(path: string, listener: FormListener['onChange']) {
+    this.formValueListeners.push({
+      onChange: listener,
+      path: path
+    });
+    return () => {
+      this.formValueListeners = this.formValueListeners.filter((sub) => sub.path !== path);
+    };
+  }
+  // 卸载
+  public unsubscribeFormValue(path?: string) {
+    if (path === undefined) {
+      this.formValueListeners = [];
+    } else if (typeof path === 'string') {
+      this.formValueListeners = this.formValueListeners.filter((sub) => sub.path !== path);
+    }
+  }
   // 同步路径上任意节点的变化
   private notifyFormValue(path?: string) {
     if (path) {
@@ -287,52 +336,20 @@ export class SimpleForm<T extends Object = any> {
     }
   }
 
-  // 同步
-  private notifyFormValues() {
-    this.formValuesListeners.forEach((onChange) => onChange(this.getFieldValue(), this.getLastValue()));
-  }
-
-  // 同步错误的变化
-  private notifyError(path?: string) {
-    if (path) {
-      this.errorListeners.forEach((listener) => {
-        if (listener?.path === path) {
-          listener?.onChange && listener?.onChange();
-        }
-      });
-    } else {
-      this.errorListeners.forEach((listener) => listener.onChange());
-    }
-  }
-
-  // 订阅当前表单域值的变动(当表单域消失时会卸载)
-  public subscribeFormItem(path: string, listener: FormListener['onChange']) {
-    this.formItemListeners.push({
-      onChange: listener,
-      path: path
-    });
-    return () => {
-      this.formItemListeners = this.formItemListeners.filter((sub) => sub.path !== path);
-    };
-  }
-
-  // 主动订阅路径上所有表单控件的变动(表单控件消失不会卸载)
-  public subscribeFormValue(path: string, listener: FormListener['onChange']) {
-    this.formValueListeners.push({
-      onChange: listener,
-      path: path
-    });
-    return () => {
-      this.formValueListeners = this.formValueListeners.filter((sub) => sub.path !== path);
-    };
-  }
-
   // 订阅整个表单值(表单控件消失不会卸载)
   public subscribeFormValues(listener: FormListener['onChange']) {
     this.formValuesListeners.push(listener);
     return () => {
       this.formValuesListeners = [];
     };
+  }
+  // 卸载
+  public unsubscribeFormValues() {
+    this.formValuesListeners = [];
+  }
+  // 同步
+  private notifyFormValues(path?: string) {
+    this.formValuesListeners.forEach((onChange) => onChange(this.getFieldValue(), this.getLastValue()));
   }
 
   // 订阅表单错误的变动
@@ -345,36 +362,24 @@ export class SimpleForm<T extends Object = any> {
       this.errorListeners = this.errorListeners.filter((sub) => sub.path !== path);
     };
   }
-
-  // 卸载
-  public unsubscribeFormItem(path?: string) {
-    if (path === undefined) {
-      this.formItemListeners = [];
-    } else if (typeof path === 'string') {
-      this.formItemListeners = this.formItemListeners.filter((sub) => sub.path !== path);
-    }
-  }
-
-  // 卸载
-  public unsubscribeFormValue(path?: string) {
-    if (path === undefined) {
-      this.formValueListeners = [];
-    } else if (typeof path === 'string') {
-      this.formValueListeners = this.formValueListeners.filter((sub) => sub.path !== path);
-    }
-  }
-
-  // 卸载
-  public unsubscribeFormValues() {
-    this.formValuesListeners = [];
-  }
-
   // 卸载
   public unsubscribeError(path?: string) {
     if (path === undefined) {
       this.errorListeners = [];
     } else if (typeof path === 'string') {
       this.errorListeners = this.errorListeners.filter((sub) => sub.path !== path);
+    }
+  }
+  // 同步错误的变化
+  private notifyError(path?: string) {
+    if (path) {
+      this.errorListeners.forEach((listener) => {
+        if (listener?.path === path) {
+          listener?.onChange && listener?.onChange(this.getFieldError(path));
+        }
+      });
+    } else {
+      this.errorListeners.forEach((listener) => listener.onChange(this.getFieldError(listener.path)));
     }
   }
 }

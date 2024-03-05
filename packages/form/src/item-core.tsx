@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { SimpleFormContext, FormInitialValuesContext } from './form-context';
-import { deepGet, getValueFromEvent, getValuePropName, toArray } from './utils/utils';
+import { deepGet, getValueFromEvent, toArray } from './utils/utils';
 import { FormRule } from './validator';
 import { isEmpty } from './utils/type';
 
@@ -80,7 +80,7 @@ export const ItemCore = (props: ItemCoreProps) => {
   const initialItemValue = storeValue ?? initValue;
   const [value, setValue] = useState();
 
-  // 初始化获取初始props
+  // 初始化fieldProps
   currentPath && form?.setFieldProps(currentPath, fieldProps);
 
   // 订阅更新值的函数
@@ -96,7 +96,7 @@ export const ItemCore = (props: ItemCoreProps) => {
     return () => {
       form.unsubscribeFormItem(currentPath);
     };
-  }, [JSON.stringify(currentPath), form, onValuesChange]);
+  }, [JSON.stringify(currentPath), onValuesChange]);
 
   // 表单域初始化值
   useEffect(() => {
@@ -117,10 +117,7 @@ export const ItemCore = (props: ItemCoreProps) => {
   // 对目标控件进行双向绑定
   const bindChildren = (children: any) => {
     if (typeof children === 'function') {
-      const bindProps = form && form.getBindProps(currentPath) || {};
-      const valuePropName = getValuePropName(valueProp);
-      const childValue = typeof valueSetter === 'function' ? valueSetter(value) : (valueSetter ? undefined : value);
-      bindProps[valuePropName] = childValue;
+      const bindProps = form && form.getBindProps(currentPath, value) || {};
       return children({ className: errorClassName, form: form, bindProps: bindProps });
     } else {
       return children;

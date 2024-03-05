@@ -28,16 +28,20 @@ function ControlSelection(props: ControlSelectionProps, ref: any) {
   } = props;
 
   const currentPath = path;
+  const context = field?.context;
+  const { historyRecord } = context?.state || {};
 
   const copyItem = () => {
     const nextIndex = (field?.index as number) + 1;
     const newField = currentPath && editor?.getItemByPath(currentPath);
     insertFormItem(editor, newField, nextIndex, { path: parent?.path });
+    historyRecord?.save();
   };
 
   const deleteItem = (e: any) => {
     e.stopPropagation();
     currentPath && editor?.delItemByPath(currentPath);
+    historyRecord?.save();
   };
 
   return (

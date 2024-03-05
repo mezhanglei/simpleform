@@ -135,7 +135,7 @@ export default function Demo() {
 - `max` `number` 表单值为`string`类型时字符串最大长度；`number` 类型时为最大值；`array` 类型时为数组最大长度 `可选`。
 - `min` `number` 表单值为`string`类型时字符串最小长度；`number` 类型时为最小值；`array` 类型时为数组最小长度 `可选`。
 
-### SimpleForm
+### SimpleForm Method
  通过`useSimpleForm`创建`form`实例, 可使用以下方法:
 - `form.getFieldValue(path?: string)` 返回指定`path`的表单域的值，不指定`path`返回整个表单的值。
 - `form.setFieldValue(path, value)` 更新表单域的值

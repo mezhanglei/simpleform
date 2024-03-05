@@ -54,7 +54,7 @@ export function Form(props: FormProps) {
         form?.unsubscribeFormValue(key);
       });
     };
-  }, [form, watch]);
+  }, [watch]);
 
   return (
     <CreateForm

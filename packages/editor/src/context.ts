@@ -1,7 +1,7 @@
-import React, { useContext, useReducer } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { CustomFormNodeProps, EditorSelection, FormDesignData, SimpleFormRender, SimpleForm } from './components/formrender';
 import EventBus from './utils/event-bus';
-import { isObject } from './utils/type';
+import SimpleUndo from './utils/simple-undo';
 
 // 模板类型
 export interface TemplateItem {
@@ -32,39 +32,51 @@ export interface FormEditorState {
   panelData?: { [title: string]: Array<string> }, // 组件面板配置
   templates?: Array<TemplateItem>;
   FormRender?: any;
-  historyData?: {
-    index: number;
-    maxStep: number;
-    steps: Array<EditorSelection>;
-  }
+  historyRecord: SimpleUndo;
 }
 export interface FormEditorContextProps {
   state: FormEditorState;
-  dispatch: (state?: Partial<FormEditorState>) => void
+  dispatch: (state: React.SetStateAction<FormEditorState>) => void
 }
 
-function reducer(state: FormEditorState, action: any) {
-  // 函数类型参数
-  if (typeof action === 'function') {
-    const newState = action(state);
-    return Object.assign({}, state, newState);
+export function useMethod<T extends (...args: any[]) => any>(method: T) {
+  const { current } = React.useRef<{ method: T, func: T | undefined }>({
+    method,
+    func: undefined,
+  });
+  current.method = method;
+
+  // 只初始化一次
+  if (!current.func) {
+    // 返回给使用方的变量
+    current.func = ((...args: unknown[]) => current.method.call(current.method, ...args)) as T;
   }
-  // {type: string, payload: unknown} 传参
-  if (typeof action.type == 'string' && action.payload) {
-    const newVal = action.payload;
-    return Object.assign({}, state, { [action.type]: newVal });
-  }
-  if (isObject(action)) {
-    return Object.assign({}, state, action);
-  }
-  return state;
-};
+
+  return current.func;
+}
+
 
 // 初始化reducer
-export function useEditorReducer(initialState: FormEditorState) {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  return [state, dispatch];
-}
+export function useEditorState(initialState: FormEditorState) {
+  const [state, setState] = useState(initialState);
+  const stateRef = useRef(state);
+  const historyRef = useRef(new SimpleUndo({
+    maxLength: 10,
+    provider: (done) => {
+      const properties = stateRef.current.properties;
+      done(JSON.stringify(properties));
+    }
+  }));
+  // 更新state
+  const dispatch: FormEditorContextProps['dispatch'] = useMethod((newState) => {
+    const newData = typeof newState === 'function' ? newState(stateRef.current) : newState;
+    setState(newData);
+    stateRef.current = newData;
+  });
+
+  return [Object.assign({ historyRecord: historyRef.current }, state), dispatch] as const;
+};
+
 
 // 编辑器的context
 export const FormEditorContext = React.createContext<FormEditorContextProps>({});

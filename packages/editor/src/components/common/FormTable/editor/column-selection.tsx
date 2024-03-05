@@ -45,9 +45,10 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
     const mergeSetting = Object.assign({}, FormTableColSetting, controlSetting);
     const { field, ...rest } = selected;
     const newField = Object.assign({ setting: mergeSetting }, field);
-    context?.dispatch && context?.dispatch({
+    context?.dispatch && context?.dispatch((old) => ({
+      ...old,
       selected: Object.assign({ field: newField }, rest)
-    });
+    }));
   };
 
   const copyItem = () => {
@@ -65,7 +66,7 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
 
   const deleteColumn = (e: any) => {
     e.stopPropagation();
-    context?.dispatch && context?.dispatch({ selected: {} });
+    context?.dispatch && context?.dispatch((old) => ({ ...old, selected: {} }));
     setFormItem(editor, undefined, currentPath, attributeName);
   };
 

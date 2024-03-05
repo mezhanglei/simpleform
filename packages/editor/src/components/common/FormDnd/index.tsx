@@ -12,7 +12,7 @@ export interface ControlDndProps extends EditorSelection {
 function FormDnd(props: ControlDndProps, ref: any) {
   const { children, formrender, path, field, ...rest } = props;
   const context = field?.context;
-  const { editorConfig } = context?.state || {};
+  const { editorConfig, historyRecord } = context?.state || {};
 
   const currentPath = path;
 
@@ -31,6 +31,7 @@ function FormDnd(props: ControlDndProps, ref: any) {
     const dropCollection = dropGroup?.collection;
     const dropIndex = to?.index;
     formrender?.moveItemByPath({ index: fromIndex, parent: fromCollection?.path }, { index: dropIndex, parent: dropCollection?.path });
+    historyRecord?.save();
   };
 
   const onAdd: DndSortableProps['onAdd'] = (params) => {
@@ -55,6 +56,7 @@ function FormDnd(props: ControlDndProps, ref: any) {
     } else {
       formrender?.moveItemByPath({ index: fromIndex, parent: fromCollection?.path }, { index: dropIndex, parent: dropCollection?.path });
     }
+    historyRecord?.save();
   };
 
   const disabledDrop: DndCondition = (param) => {

@@ -123,6 +123,7 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
       <Table
         columns={newColumns}
         dataSource={tableData}
+        tableLayout="auto"
         ref={ref}
         rowKey="key"
         scroll={{ y: 400 }}

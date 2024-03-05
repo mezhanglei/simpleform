@@ -27,6 +27,7 @@ export default function Demo() {
             <input {...bindProps} />
           </div>
         )}
+        <input {...form.getBindProps('name1')} />
       </Form.Item>
       <Form.Item label="Name2" name="name2.a" rules={[{ required: true, message: 'name2 is empty' }]}>
         {({ bindProps }) => <input {...bindProps} />}

@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import './index.less';
 import RootDnd from './RootDnd';
 import ComponentSelection from './selection';
-import { Button, Divider, Radio } from 'antd';
+import { Button, Divider, Radio, Tooltip } from 'antd';
 import PlatContainer, { PlatContainerProps, PlatOptions } from './platContainer';
 import { showImportModal } from './importModal';
 import { showPreviewModal } from './preview';
@@ -13,6 +13,7 @@ import { useEventBusRef } from '../utils/hooks';
 import { setFormInitialValue } from '../utils/utils';
 import templates from '../templates';
 import { useEditorContext } from '../context';
+import SvgIcon from '../components/common/SvgIcon';
 
 export interface EditorViewProps {
   className?: string;
@@ -23,7 +24,7 @@ const prefixCls = `simple-form-editor`;
 function EditorView(props: EditorViewProps, ref: any) {
 
   const context = useEditorContext();
-  const { editor, editorForm, settingForm, properties } = context.state;
+  const { editor, editorForm, settingForm, properties, historyRecord } = context.state;
   const FormRender = context?.state?.FormRender || DefaultFormRender;
 
   const {
@@ -38,7 +39,7 @@ function EditorView(props: EditorViewProps, ref: any) {
 
   const onPropertiesChange: CustomFormRenderProps['onPropertiesChange'] = (newData) => {
     console.log(newData, '表单');
-    context.dispatch({ properties: newData });
+    context.dispatch((old) => ({ ...old, properties: newData }));
   };
 
   // 监听选中项改动
@@ -54,7 +55,7 @@ function EditorView(props: EditorViewProps, ref: any) {
     showImportModal({
       data: templates,
       onSelect: (item) => {
-        context.dispatch({ properties: item?.data });
+        context.dispatch((old) => ({ ...old, properties: item?.data }));
       }
     });
   };
@@ -63,11 +64,28 @@ function EditorView(props: EditorViewProps, ref: any) {
     showPreviewModal({ properties, plat: platType, context });
   };
   const clearEditor = () => {
-    context.dispatch({ properties: undefined });
+    context.dispatch((old) => ({ ...old, properties: undefined }));
   };
   const showExportJson = () => {
     showExportJsonModal({ data: properties, title: '渲染JSON' });
   };
+
+  // 撤销
+  const undo = () => {
+    historyRecord.undo((serialized) => {
+      context.dispatch((old) => ({ ...old, properties: JSON.parse(serialized || '{}') }));
+    });
+  };
+
+  // 重做
+  const redo = () => {
+    historyRecord.redo((serialized) => {
+      context.dispatch((old) => ({ ...old, properties: JSON.parse(serialized || '{}') }));
+    });
+  };
+
+  const canUndo = historyRecord.canUndo();
+  const canRedo = historyRecord.canRedo();
 
   return (
     <div
@@ -79,25 +97,21 @@ function EditorView(props: EditorViewProps, ref: any) {
       }}>
       <header className="editor-header">
         <div className="left-toolbar">
-          {/* <Tooltip
-            appendTo={document.body}
-            theme="light"
-            content="撤销"
+          <Tooltip
+            title="撤销"
           >
-            <Button className="undo-btn" type='link'>
-              <Icon name="undo" />
+            <Button disabled={!canUndo} className="undo-btn" type='link' onClick={undo}>
+              <SvgIcon name="undo" />
             </Button>
           </Tooltip>
           <Tooltip
-            appendTo={document.body}
-            theme="light"
-            content="重做"
+            title="重做"
           >
-            <Button className="redo-btn" type='link'>
-              <Icon name="redo" />
+            <Button disabled={!canRedo} className="redo-btn" type='link' onClick={redo}>
+              <SvgIcon name="redo" />
             </Button>
           </Tooltip>
-          <Divider className="left-divid" type='vertical' /> */}
+          <Divider className="left-divid" type='vertical' />
           <Radio.Group
             options={PlatOptions}
             onChange={(e) => setPlatType(e?.target?.value)}

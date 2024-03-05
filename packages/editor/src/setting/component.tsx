@@ -36,7 +36,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   }, [editor, selectedPath, attributeName, editorConfig.settings]);
   const nameSetting = useMemo(() => getNameSetting(selected), [selectedPath, attributeName]); // 表单节点字段设置
   useEffect(() => {
-    context.dispatch({ settingForm: form });
+    context.dispatch((old) => ({ ...old, settingForm: form }));
   }, []);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
       if (!attributeName) {
         const joinName = joinFormPath(selected?.parent?.name, value);
         const joinPath = joinFormPath(selected?.parent?.path, value);
-        context.dispatch({ selected: { ...selected, name: joinName, path: joinPath } });
+        context.dispatch((old) => ({ ...old, selected: { ...selected, name: joinName, path: joinPath } }));
       }
     } else {
       editor?.updateItemByPath(value, selectedPath, joinFormPath(attributeName, name));

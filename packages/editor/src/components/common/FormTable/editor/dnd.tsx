@@ -18,7 +18,7 @@ function TableDnd(props: TableDndProps, ref: any) {
   const { settingForm, editorConfig } = context?.state || {};
 
   const removeSelect = () => {
-    context?.dispatch && context.dispatch({ selected: {} });
+    context?.dispatch && context.dispatch((old) => ({ ...old, selected: {} }));
     settingForm && settingForm.reset();
   };
 

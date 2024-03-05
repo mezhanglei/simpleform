@@ -75,7 +75,7 @@ function EditorPanel(props: EditorPanelProps, ref: any) {
   } = props;
 
   const context = useEditorContext();
-  const { selected, editor, editorConfig, panelData } = context.state;
+  const { selected, editor, editorConfig, panelData, historyRecord } = context.state;
   const selectedParent = selected?.parent;
   const attributeName = selected?.attributeName;
   const cls = classnames(prefixCls, className);
@@ -91,6 +91,7 @@ function EditorPanel(props: EditorPanelProps, ref: any) {
       return;
     };
     insertFormItem(editor, initialField, newIndex, { path: selectedParent?.path });
+    historyRecord.save();
   };
 
   return (

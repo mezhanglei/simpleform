@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSimpleFormRender, useSimpleForm } from './components/formrender';
-import { FormEditorContext, FormEditorState, useEditorReducer } from './context';
+import { FormEditorContext, FormEditorState, useEditorState } from './context';
 import { useEventBus } from './utils/hooks';
 import EditorConfig from './config';
 
@@ -14,7 +14,7 @@ function Provider(props: ProviderProps) {
   const editorForm = useSimpleForm();
   const eventBus = useEventBus();
 
-  const [state, dispatch] = useEditorReducer({
+  const [state, dispatch] = useEditorState({
     editor: editor,
     editorForm: editorForm,
     settingForm: null,
@@ -25,13 +25,9 @@ function Provider(props: ProviderProps) {
       widgets: { ...EditorConfig.widgets, ...editorConfig?.widgets },
       settings: { ...EditorConfig?.settings, ...editorConfig?.settings }
     },
-    historyData: {
-      index: -1,
-      maxStep: 20,
-      steps: []
-    },
     ...rest
   });
+  
   return (
     <FormEditorContext.Provider value={{ state, dispatch }}>
       {children}

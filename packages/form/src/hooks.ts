@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { SimpleForm } from './form-store';
 import { pickObject } from './utils/object';
 
 export function useSimpleForm<T extends Object = any>(
   values?: Partial<T>
 ) {
-  return useMemo(() => new SimpleForm(values), []);
+  const formRef = useRef(new SimpleForm(values));
+  useFormValues(formRef.current);
+  return formRef.current;
 }
 
 // 获取error信息
@@ -14,23 +16,21 @@ export function useFormError(form?: SimpleForm, path?: string) {
 
   const subscribeError = () => {
     if (!path || !form) return;
-    form.subscribeError(path, () => {
-      const error = form?.getFieldError(path);
-      setError(error);
+    form.subscribeError(path, (newVal) => {
+      setError(newVal);
     });
   };
 
   useMemo(() => {
     subscribeError();
-  }, []);
+  }, [JSON.stringify(path)]);
 
   // 订阅组件更新错误的函数
   useEffect(() => {
-    subscribeError();
     return () => {
       form && form.unsubscribeError(path);
     };
-  }, [form, JSON.stringify(path)]);
+  }, [JSON.stringify(path)]);
 
   return [error, setError];
 }
@@ -54,14 +54,13 @@ export function useFormValues<T = unknown>(form: SimpleForm, path?: string | str
 
   useMemo(() => {
     subscribeForm();
-  }, []);
+  }, [JSON.stringify(path)]);
 
   useEffect(() => {
-    subscribeForm();
     return () => {
-      form.unsubscribeFormValues();
+      form && form.unsubscribeFormValues();
     };
-  }, [form, JSON.stringify(path)]);
+  }, [JSON.stringify(path)]);
 
   return formValues;
 }
