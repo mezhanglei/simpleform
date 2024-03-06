@@ -1,7 +1,7 @@
 export default {
   panel: {
     icon: '',
-    label: 'demo',
+    label: '控件组示例',
   },
   label: '',
   type: 'example',

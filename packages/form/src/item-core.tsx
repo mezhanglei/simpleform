@@ -96,7 +96,7 @@ export const ItemCore = (props: ItemCoreProps) => {
     return () => {
       form.unsubscribeFormItem(currentPath);
     };
-  }, [JSON.stringify(currentPath), onValuesChange]);
+  }, [JSON.stringify(currentPath), form, onValuesChange]);
 
   // 表单域初始化值
   useEffect(() => {

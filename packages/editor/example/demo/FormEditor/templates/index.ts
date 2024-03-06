@@ -1,6 +1,6 @@
 import demo from './demo';
 
-// JSON模板
+// 导入模板
 const templates = [{
   name: 'demo',
   img: '',

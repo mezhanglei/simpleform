@@ -66,7 +66,7 @@ export function useTableData<T = any>(intialValue?: T[], onChange?: (data: T[]) 
 }
 
 // 监听eventBus的值
-export function useEventBusRef<T = any>(type: string) {
+export function useEventBusValue<T = any>(type: string) {
   const context = useEditorContext();
   const { eventBus } = context?.state || {};
   const dataRef = useRef<T>();

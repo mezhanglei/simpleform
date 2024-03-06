@@ -1,5 +1,6 @@
 import React, { useContext, useRef, useState } from 'react';
 import { CustomFormNodeProps, EditorSelection, FormDesignData, SimpleFormRender, SimpleForm } from './components/formrender';
+import { PlatType } from './tools/platContainer';
 import EventBus from './utils/event-bus';
 import SimpleUndo from './utils/simple-undo';
 
@@ -32,11 +33,13 @@ export interface FormEditorState {
   panelData?: { [title: string]: Array<string> }, // 组件面板配置
   templates?: Array<TemplateItem>;
   FormRender?: any;
-  historyRecord: SimpleUndo;
+  platType?: PlatType;
+  historyRecord?: SimpleUndo;
 }
+
 export interface FormEditorContextProps {
   state: FormEditorState;
-  dispatch: (state: React.SetStateAction<FormEditorState>) => void
+  dispatch: (state: React.SetStateAction<Partial<FormEditorContextProps['state']>>) => void
 }
 
 export function useMethod<T extends (...args: any[]) => any>(method: T) {

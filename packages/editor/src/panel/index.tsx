@@ -91,7 +91,7 @@ function EditorPanel(props: EditorPanelProps, ref: any) {
       return;
     };
     insertFormItem(editor, initialField, newIndex, { path: selectedParent?.path });
-    historyRecord.save();
+    historyRecord?.save();
   };
 
   return (

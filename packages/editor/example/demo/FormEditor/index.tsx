@@ -2,6 +2,7 @@ import React from 'react';
 import FormEditorCore from '../../../src';
 import FormRender from '../FormRender';
 import EditorConfig from './config';
+import templates from './templates';
 
 const panelData = {
   '布局组件': ['Grid', 'Divider', 'Alert'],
@@ -29,5 +30,5 @@ const panelData = {
 };
 
 export default function FormEditor(props) {
-  return <FormEditorCore {...props} panelData={panelData} editorConfig={EditorConfig} FormRender={FormRender} />;
+  return <FormEditorCore {...props} templates={templates} panelData={panelData} editorConfig={EditorConfig} FormRender={FormRender} />;
 }

@@ -4,7 +4,6 @@ import './platContainer.less';
 
 export const PlatOptions = [
   { label: 'PC', value: 'pc' },
-  { label: 'Pad', value: 'pad' },
   { label: 'Phone', value: 'phone' }
 ];
 
@@ -19,9 +18,6 @@ function PlatContainer(props: PlatContainerProps, ref: any) {
     className,
     children
   } = props;
-  const isPc = plat === 'pc';
-  const isPad = plat === 'pad';
-  const isPhone = plat === 'phone';
 
   const renderPhone = (
     <>
@@ -38,11 +34,9 @@ function PlatContainer(props: PlatContainerProps, ref: any) {
 
   return (
     <div ref={ref} className={classnames('form-container', className, {
-      'pc': isPc,
-      'pad': isPad,
-      'phone': isPhone
+      [plat]: plat
     })}>
-      {isPhone ? renderPhone : children}
+      {plat === 'phone' ? renderPhone : children}
     </div>
   );
 };

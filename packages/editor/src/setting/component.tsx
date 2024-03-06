@@ -29,11 +29,11 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   const configSetting = useMemo(() => {
     if (!selected) return;
     const field = selected.field;
-    const type = field?.type;
-    const defaultSetting = type && editorConfig.settings ? editorConfig.settings[type] : undefined;
+    const type = field?.type || '';
+    const defaultSetting = editorConfig && editorConfig.settings[type];
     const selectedSetting = selected.field && selected.field.setting; // 如果有setting则优先
     return selectedSetting || defaultSetting;
-  }, [editor, selectedPath, attributeName, editorConfig.settings]);
+  }, [editor, selectedPath, attributeName, editorConfig?.settings]);
   const nameSetting = useMemo(() => getNameSetting(selected), [selectedPath, attributeName]); // 表单节点字段设置
   useEffect(() => {
     context.dispatch((old) => ({ ...old, settingForm: form }));
@@ -53,7 +53,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
     if (typeof name !== 'string') return;
     if (name == 'name') {
       editor?.updateNameByPath(value, selectedPath);
-      // 选中项同步新字段
+      // 更新selected
       if (!attributeName) {
         const joinName = joinFormPath(selected?.parent?.name, value);
         const joinPath = joinFormPath(selected?.parent?.path, value);
@@ -62,7 +62,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
     } else {
       editor?.updateItemByPath(value, selectedPath, joinFormPath(attributeName, name));
       if (!attributeName) {
-        // 同步编辑区域表单值
+        // 更新editorForm
         if (name === 'initialValue') {
           setFormValue(editorForm, selectedName, value);
         }

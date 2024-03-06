@@ -1,6 +1,22 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { SimpleForm } from './form-store';
 import { pickObject } from './utils/object';
+
+export function useMethod<T extends (...args: any[]) => any>(method: T) {
+  const { current } = React.useRef<{ method: T, func: T | undefined }>({
+    method,
+    func: undefined,
+  });
+  current.method = method;
+
+  // 只初始化一次
+  if (!current.func) {
+    // 返回给使用方的变量
+    current.func = ((...args: unknown[]) => current.method.call(current.method, ...args)) as T;
+  }
+
+  return current.func;
+}
 
 export function useSimpleForm<T extends Object = any>(
   values?: Partial<T>

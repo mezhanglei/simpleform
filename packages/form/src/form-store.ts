@@ -126,10 +126,8 @@ export class SimpleForm<T extends Object = any> {
         delete this.fieldProps[path];
       }
     } else {
-      if (JSON.stringify(lastField || {}) !== JSON.stringify(field)) {
-        const newField = Object.assign({}, lastField, field);
-        this.fieldProps[path] = newField;
-      }
+      const newField = Object.assign({}, lastField, field);
+      this.fieldProps[path] = newField;
     };
   }
 
