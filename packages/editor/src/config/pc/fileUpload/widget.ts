@@ -6,7 +6,7 @@ export default {
   },
   label: '文件上传',
   type: 'FileUpload',
-  ignore: true,
   props: {
+    uploadCallback: "{{(data) => ({ fileId: data.fileId })}}"
   },
 };

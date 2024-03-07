@@ -5,7 +5,7 @@ export default {
   },
   label: '图片上传',
   type: 'ImageUpload',
-  ignore: true,
   props: {
+    uploadCallback: "{{(data) => ({ fileId: data.fileId })}}"
   },
 };
