@@ -1,5 +1,5 @@
 import { convertToString, evalString } from '../../../utils/string';
-import { AssembleType, RuleSettingItem } from ".";
+import { AssembleType, RuleSettingItem } from "./modal";
 
 // 字符串转化为规则列表
 export const codeToRule = (codeStr?: string) => {

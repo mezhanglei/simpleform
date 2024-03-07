@@ -5,7 +5,7 @@ import CustomModal from "../../AntdModal";
 import classNames from "classnames";
 import DefaultFormRender, { Form, CustomFormNodeProps, useSimpleForm, matchExpression, EditorSelection } from "../../../formrender";
 import { Radio } from "antd";
-import AddSettingModal from "../../SettingModal/add";
+import ShowSettingModal from "../../LinkageSetting/ShowSettingModal";
 
 export interface InputFormRule {
   max?: number | string;
@@ -71,7 +71,7 @@ const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
       layout: 'horizontal',
       rules: [{ required: true, message: '请输入' }],
       labelWidth: 80,
-      typeRender: <AddSettingModal setting={{ ...setting, label: undefined }} />
+      typeRender: <ShowSettingModal setting={{ ...setting, label: undefined }} />
     } : {
       ...setting,
       rules: [{ required: true, message: '请输入' }],

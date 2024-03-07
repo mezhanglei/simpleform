@@ -1,9 +1,9 @@
 import { Button } from "antd";
 import React, { useEffect, useState } from "react";
-import SettingModal, { SettingModalProps } from ".";
+import LinkageSettingModal, { SettingModalProps } from "./modal";
 
-// 按钮点击联动弹窗
-const AddSettingModal = (props: SettingModalProps) => {
+// 展示联动弹窗
+const ShowSettingModal = (props: SettingModalProps) => {
 
   const {
     value,
@@ -24,7 +24,7 @@ const AddSettingModal = (props: SettingModalProps) => {
   };
 
   return (
-    <SettingModal title="添加联动" {...rest} setting={setting} value={codeStr} onChange={handOk} displayElement={
+    <LinkageSettingModal title="添加联动" {...rest} setting={setting} value={codeStr} onChange={handOk} displayElement={
       (showModal) => (
         <div>
           <span>{typeof value === 'string' ? value : null}</span>
@@ -35,4 +35,4 @@ const AddSettingModal = (props: SettingModalProps) => {
   );
 };
 
-export default AddSettingModal;
+export default ShowSettingModal;

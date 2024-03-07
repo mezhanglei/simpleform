@@ -2,7 +2,7 @@ import { Checkbox, CheckboxProps } from "antd";
 import React, { useEffect, useState } from "react";
 import SvgIcon from "../SvgIcon";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
-import SettingModal, { SettingModalProps } from ".";
+import LinkageSettingModal, { SettingModalProps } from "./modal";
 import './checkbox.less';
 
 // checkbox点击联动弹窗
@@ -20,10 +20,12 @@ const OperateCheckbox = (props: SettingModalProps & CheckboxProps & { value?: bo
   const [codeStr, setCodeStr] = useState<string>();
 
   useEffect(() => {
-    if (typeof value === 'string' && value) {
+    if (typeof value === 'string') {
+      setChecked(true);
       setCodeStr(value);
     } else {
       setChecked(typeof value === 'boolean' ? value : false);
+      setCodeStr(undefined);
     }
   }, [value]);
 
@@ -62,7 +64,7 @@ const OperateCheckbox = (props: SettingModalProps & CheckboxProps & { value?: bo
   };
 
   return (
-    <SettingModal {...rest} title="添加联动" setting={setting} onChange={handOk} value={codeStr} displayElement={
+    <LinkageSettingModal {...rest} title="添加联动" setting={setting} onChange={handOk} value={codeStr} displayElement={
       (showModal) => (
         <div className="operate-setting-checkbox">
           <Checkbox checked={checked} onChange={checkboxChange} {...rest}>

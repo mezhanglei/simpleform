@@ -1,9 +1,9 @@
 import React from "react";
-import AddSettingModal from "../SettingModal/add";
+import ShowSettingModal from "../LinkageSetting/ShowSettingModal";
 
 const OptionsDynamicSetting: React.FC = (props) => {
 
-  return <AddSettingModal {...props} setting={{ type: 'CodeTextArea', }} />;
+  return <ShowSettingModal {...props} setting={{ type: 'CodeTextArea', }} />;
 };
 
 export default OptionsDynamicSetting;

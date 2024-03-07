@@ -1,6 +1,6 @@
 import { Col, Select, Input, Row } from "antd";
 import React, { useEffect } from "react";
-import './index.less';
+import './modal.less';
 import { useTableData } from "../../../utils/hooks";
 import SvgIcon from "../SvgIcon";
 import DefaultFormRender, { CustomFormNodeProps, EditorSelection, FieldChangedParams } from "../../formrender";
@@ -38,9 +38,9 @@ const assembleOptions = [{
 }];
 
 /**
- * 联动规则设置
+ * 联动规则设置弹窗
  */
-const SettingModal = React.forwardRef<HTMLElement, SettingModalProps>((props, ref) => {
+const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((props, ref) => {
 
   const {
     value,
@@ -142,4 +142,4 @@ const SettingModal = React.forwardRef<HTMLElement, SettingModalProps>((props, re
   );
 });
 
-export default SettingModal;
+export default LinkageSettingModal;
