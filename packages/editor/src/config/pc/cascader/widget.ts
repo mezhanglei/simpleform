@@ -6,6 +6,7 @@ export default {
   label: '级联选择器',
   type: 'Cascader',
   props: {
+    style: { width: '100%' },
     options: [
       {
         value: 'zhejiang',

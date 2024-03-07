@@ -9,6 +9,6 @@ export default {
   valueSetter: "{{(value) => typeof value === 'string' ? dayjs(value, 'HH:mm:ss') : undefined}}",
   valueGetter: "{{(value) => dayjs.isDayjs(value) ? value.format(formvalues.props && formvalues.props.format || 'HH:mm:ss') : undefined}}",
   props: {
-
+    style: { maxWidth: '300px', width: '100%' },
   },
 };

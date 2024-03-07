@@ -9,6 +9,7 @@ export default {
   valueGetter: "{{(value) => value instanceof Array ? value.map((item) => dayjs.isDayjs(item) ? item.format(formvalues.props && formvalues.props.format || 'YYYY-MM-DD') : undefined) : undefined}}",
   type: 'DatePicker.RangePicker',
   props: {
+    style: { maxWidth: '300px', width: '100%' },
   },
 };
 

@@ -9,5 +9,6 @@ export default {
   valueGetter: "{{(value) => (dayjs.isDayjs(value) ? value.format(formvalues.props && formvalues.props.format || 'YYYY-MM-DD') : undefined)}}",
   type: 'DatePicker',
   props: {
+    style: { maxWidth: '300px', width: '100%' },
   },
 };
