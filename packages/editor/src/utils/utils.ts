@@ -20,8 +20,8 @@ export const getNameSetting = (selected?: EditorSelection) => {
   if (typeof selected?.path !== 'string') return;
   // 获取选中的字段值
   const endName = getPathEnd(selectedPath);
-  // 非数组节点可以设置name
-  if (typeof endName === 'string') {
+  // 表单节点才允许展示
+  if (typeof endName === 'string' && selected?.field?.ignore !== true) {
     return {
       name: {
         label: '字段名',
