@@ -3,7 +3,7 @@ import Setting from './setting';
 export default {
   panel: {
     icon: '',
-    label: '控件组示例',
+    label: 'example-demo',
   },
   label: '',
   type: 'example',

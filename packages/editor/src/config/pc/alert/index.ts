@@ -12,5 +12,6 @@ export default {
     message: '警告提示',
     description: '警告提示描述'
   },
+  ignore: true,
   setting: { ...Setting }
 };

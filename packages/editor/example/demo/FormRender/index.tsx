@@ -4,7 +4,7 @@ import widgets from './components';
 
 export * from '../../../src';
 
-// 请求配置，根据项目需要配置
+// TODO axios请求配置
 const axiosConfig = {
 
 };

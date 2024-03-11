@@ -16,7 +16,6 @@ import Cascader from './cascader';
 import RichEditor from "./richEditor";
 import RichText from "./richText";
 // 布局组件
-// import tableLayout from './layout/table';
 import Grid from './grid';
 import GridRow from './grid/row';
 import GridCol from './grid/col';

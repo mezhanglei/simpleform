@@ -13,5 +13,6 @@ export default {
     orientation: 'left',
     type: 'horizontal',
   },
+  ignore: true,
   setting: { ...Setting },
 };
