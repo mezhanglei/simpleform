@@ -36,11 +36,9 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
   const attributeName = `${columnsPath}[${colIndex}]`;
   const currentPath = path;
   const context = field?.context;
-  const { editorConfig } = context?.state || {};
 
   const onSelect = (selected: EditorSelection) => {
-    const type = column?.type;
-    const appendSetting = type && editorConfig?.settings ? editorConfig?.settings[type] : undefined;
+    const appendSetting = selected.field?.setting;
     const controlSetting = pickObject(appendSetting, (key) => key !== '公共属性');
     const mergeSetting = Object.assign({}, FormTableColSetting, controlSetting);
     const { field, ...rest } = selected;

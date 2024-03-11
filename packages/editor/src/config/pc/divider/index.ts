@@ -1,3 +1,4 @@
+import Setting from './setting';
 
 export default {
   panel: {
@@ -11,5 +12,6 @@ export default {
     children: '分割线',
     orientation: 'left',
     type: 'horizontal',
-  }
+  },
+  setting: { ...Setting },
 };

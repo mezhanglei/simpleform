@@ -1,3 +1,5 @@
+import Setting from './setting';
+
 export default {
   panel: {
     icon: 'table',
@@ -8,5 +10,6 @@ export default {
   props: {
     showBtn: true,
     columns: [],
-  }
+  },
+  setting: { ...Setting },
 };

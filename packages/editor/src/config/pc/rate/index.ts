@@ -1,3 +1,5 @@
+import Setting from './setting';
+import FieldSetting from '../../fieldSetting';
 
 export default {
   panel: {
@@ -8,4 +10,5 @@ export default {
   type: 'Rate',
   props: {
   },
+  setting: { ...Setting, ...FieldSetting },
 };

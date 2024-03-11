@@ -83,7 +83,7 @@ function EditorPanel(props: EditorPanelProps, ref: any) {
   const onChange = (key: string, item: CustomFormNodeProps) => {
     if (attributeName) return;
     const newIndex = getSelectedIndex(editor, selected) + 1; // 插入位置序号
-    const initialField = getConfigItem(key, editorConfig?.widgets, editorConfig?.settings); // 提取默认值
+    const initialField = getConfigItem(key, editorConfig); // 提取默认值
     const panel = selectedParent?.field?.panel;
     const includesIds = panel?.includes;
     if (includesIds && !includesIds.includes(key)) {
@@ -112,7 +112,7 @@ function EditorPanel(props: EditorPanelProps, ref: any) {
               >
                 {
                   list.map((key) => {
-                    const data = editorConfig?.widgets?.[key] || {};
+                    const data = editorConfig?.[key] || {};
                     const panel = data?.panel || {};
                     return <Tag key={key} data-id={key} icon={panel?.icon} onChange={() => onChange?.(key, data)}>{panel.label}</Tag>;
                   })

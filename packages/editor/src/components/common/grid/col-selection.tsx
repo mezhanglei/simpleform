@@ -27,13 +27,14 @@ function ColSelection(props: CustomColProps, ref: any) {
   } = props;
 
   const currentPath = path;
+  const context = field?.context;
+  const { editorConfig } = context?.state || {};
 
   const addCol = () => {
     const nextIndex = (field?.index as number) + 1;
     const newField = {
-      type: 'GridCol',
+      ...editorConfig?.['GridCol'],
       props: { span: 12 },
-      ignore: true,
       properties: {
       }
     };

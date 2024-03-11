@@ -2,7 +2,7 @@ import React from 'react';
 import FormEditorCore from '../../../src';
 import FormRender from '../FormRender';
 import EditorConfig from './config';
-import templates from './templates';
+import ImportModal from './template';
 
 const panelData = {
   '布局组件': ['Grid', 'Divider', 'Alert'],
@@ -29,6 +29,16 @@ const panelData = {
   '业务组件': ['example']
 };
 
+const renderTools = (context) => {
+  return <ImportModal context={context} />;
+};
+
 export default function FormEditor(props) {
-  return <FormEditorCore {...props} templates={templates} panelData={panelData} editorConfig={EditorConfig} FormRender={FormRender} />;
+  return <FormEditorCore
+    {...props}
+    renderTools={renderTools}
+    panelData={panelData}
+    editorConfig={EditorConfig}
+    FormRender={FormRender}
+  />;
 }

@@ -16,11 +16,6 @@ export interface ConfigSettingItem {
   [title: string]: FormDesignData
 }
 
-// 编辑器配置类型
-export interface EditorConfigType {
-  widgets: { [type: string]: CustomFormNodeProps }, // 注册组件
-  settings: { [type: string]: ConfigSettingItem } // 属性面板
-}
 // 表单编辑器的context
 export interface FormEditorState {
   editorForm?: SimpleForm;
@@ -29,9 +24,9 @@ export interface FormEditorState {
   eventBus?: EventBus;
   selected?: EditorSelection;
   properties?: FormDesignData;
-  editorConfig?: EditorConfigType,
-  panelData?: { [title: string]: Array<string> }, // 组件面板配置
-  templates?: Array<TemplateItem>;
+  editorConfig?: Record<string, CustomFormNodeProps & { setting?: ConfigSettingItem }>;
+  renderTools?: (context: FormEditorContextProps) => Array<any>;
+  panelData?: { [title: string]: Array<string> }; // 组件面板配置
   FormRender?: any;
   platType?: PlatType;
   historyRecord?: SimpleUndo;

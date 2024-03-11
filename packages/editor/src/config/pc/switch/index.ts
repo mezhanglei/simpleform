@@ -1,3 +1,6 @@
+import Setting from './setting';
+import FieldSetting from '../../fieldSetting';
+
 export default {
   panel: {
     icon: 'switch-field',
@@ -8,4 +11,5 @@ export default {
   valueProp: 'checked',
   props: {
   },
+  setting: { ...Setting, ...FieldSetting },
 };

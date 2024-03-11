@@ -1,3 +1,6 @@
+import Setting from './setting';
+import FieldSetting from '../../fieldSetting';
+
 export default {
   panel: {
     icon: 'picture-upload-field',
@@ -8,4 +11,5 @@ export default {
   props: {
     uploadCallback: "{{(data) => ({ fileId: data.fileId })}}"
   },
+  setting: { ...Setting, ...FieldSetting },
 };

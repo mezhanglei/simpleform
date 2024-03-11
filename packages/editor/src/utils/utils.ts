@@ -1,7 +1,7 @@
 import { deepMergeObject } from './object';
 import { nanoid } from 'nanoid';
 import { SimpleForm, EditorSelection, SimpleFormRender, getInitialValues, getPathEnd, joinFormPath } from '../components/formrender';
-import { EditorConfigType } from '../context';
+import { FormEditorState } from '../context';
 
 export const defaultGetId = (key?: string) => {
   return typeof key == 'string' ? `${key.replace(/\./g, '')}_${nanoid(6)}` : '';
@@ -52,12 +52,12 @@ export const getSettingInitial = (setting?: any) => {
 };
 
 // 根据配置键名获取默认值
-export const getConfigItem = (key: string | undefined, widgets?: EditorConfigType['widgets'], settings?: EditorConfigType['settings']) => {
-  if (!key || !widgets) return;
-  const item = widgets[key];
-  const itemSetting = settings?.[key];
-  const initialValues = getSettingInitial(itemSetting);
-  const field = deepMergeObject(initialValues, item);
+export const getConfigItem = (key: string | undefined, editorConfig?: FormEditorState['editorConfig']) => {
+  if (!key || !editorConfig) return;
+  const item = editorConfig[key];
+  const { setting, ...rest } = item;
+  const initialValues = getSettingInitial(setting);
+  const field = deepMergeObject(initialValues, rest);
   return field;
 };
 

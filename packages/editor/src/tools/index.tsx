@@ -5,7 +5,6 @@ import { Button, Divider, Radio, Tooltip } from 'antd';
 import { useEditorContext } from '../context';
 import SvgIcon from '../components/common/SvgIcon';
 import { PlatOptions } from './platContainer';
-import { showImportModal } from './importModal';
 import { showPreviewModal } from './preview';
 import { showExportJsonModal } from './exportJson';
 
@@ -17,7 +16,7 @@ export interface EditorToolsProps {
 function EditorTools(props: EditorToolsProps, ref: any) {
 
   const context = useEditorContext();
-  const { templates, platType, properties, historyRecord } = context.state;
+  const { renderTools, platType, properties, historyRecord } = context.state;
 
   const {
     style,
@@ -25,21 +24,15 @@ function EditorTools(props: EditorToolsProps, ref: any) {
     ...restProps
   } = props;
 
-  const importJson = () => {
-    showImportModal({
-      data: templates,
-      onSelect: (item) => {
-        context.dispatch((old) => ({ ...old, properties: item?.data }));
-      }
-    });
-  };
-
   const showPreview = () => {
     showPreviewModal({ properties, plat: platType, context });
   };
+
   const clearEditor = () => {
     context.dispatch((old) => ({ ...old, properties: undefined }));
+    historyRecord?.save();
   };
+
   const showExportJson = () => {
     showExportJsonModal({ data: properties, title: '渲染JSON' });
   };
@@ -92,10 +85,12 @@ function EditorTools(props: EditorToolsProps, ref: any) {
           buttonStyle="solid"
         />
       </div>
-      {templates?.length ? <Button type='link' onClick={importJson}>导入模板</Button> : null}
-      <Button type='link' onClick={showPreview}>预览</Button>
-      <Button type='link' onClick={clearEditor}>清空</Button>
-      <Button type='link' onClick={showExportJson}>生成JSON</Button>
+      <div>
+        {renderTools ? renderTools(context) : null}
+        <Button type='link' onClick={showPreview}>预览</Button>
+        <Button type='link' onClick={clearEditor}>清空</Button>
+        <Button type='link' onClick={showExportJson}>生成JSON</Button>
+      </div>
     </header>
   );
 };

@@ -27,14 +27,15 @@ function RowSelection(props: CustomRowProps, ref: any) {
   } = props;
 
   const currentPath = path;
+  const context = field?.context;
+  const { editorConfig } = context?.state || {};
 
   const addCol = () => {
     const currentItem = editor?.getItemByPath(currentPath);
     const nextIndex = Object.keys(currentItem?.properties || {})?.length;
     const newField = {
-      type: 'GridCol',
+      ...editorConfig?.['GridCol'],
       props: { span: 12 },
-      ignore: true,
       properties: {
       }
     };

@@ -1,3 +1,6 @@
+import Setting from './setting';
+import FieldSetting from '../../fieldSetting';
+
 export default {
   panel: {
     icon: 'cascader-field',
@@ -41,5 +44,6 @@ export default {
         ],
       },
     ]
-  }
+  },
+  setting: { ...Setting, ...FieldSetting },
 };

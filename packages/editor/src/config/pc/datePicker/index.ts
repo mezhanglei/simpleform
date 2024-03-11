@@ -1,3 +1,5 @@
+import Setting from './setting';
+import FieldSetting from '../../fieldSetting';
 
 export default {
   panel: {
@@ -11,4 +13,5 @@ export default {
   props: {
     style: { maxWidth: '300px', width: '100%' },
   },
+  setting: { ...Setting, ...FieldSetting },
 };

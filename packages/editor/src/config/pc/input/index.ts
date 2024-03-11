@@ -1,3 +1,5 @@
+import Setting from './setting';
+import FieldSetting from '../../fieldSetting';
 
 export default {
   panel: {
@@ -6,4 +8,5 @@ export default {
   },
   label: '输入框',
   type: 'Input',
+  setting: { ...Setting, ...FieldSetting },
 };

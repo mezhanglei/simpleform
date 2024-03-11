@@ -1,3 +1,5 @@
+import Setting from './setting';
+
 export default {
   panel: {
     icon: '',
@@ -6,5 +8,6 @@ export default {
   label: '',
   type: 'example',
   props: {
-  }
+  },
+  setting: { ...Setting }
 };

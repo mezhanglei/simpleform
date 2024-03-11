@@ -1,3 +1,5 @@
+import Setting from './setting';
+import FieldSetting from '../../fieldSetting';
 
 export default {
   panel: {
@@ -9,4 +11,5 @@ export default {
   props: {
     uploadCallback: "{{(data) => ({ fileId: data.fileId })}}"
   },
+  setting: { ...Setting, ...FieldSetting },
 };

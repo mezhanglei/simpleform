@@ -15,11 +15,12 @@ function TableDnd(props: TableDndProps, ref: any) {
   const attributeName = `props.columns`;
   const currentPath = path;
   const context = field?.context;
-  const { settingForm, editorConfig } = context?.state || {};
+  const { settingForm, editorConfig, historyRecord } = context?.state || {};
 
-  const removeSelect = () => {
+  const updateContext = () => {
     context?.dispatch && context.dispatch((old) => ({ ...old, selected: {} }));
     settingForm && settingForm.reset();
+    historyRecord?.save();
   };
 
   const onUpdate: DndSortableProps['onUpdate'] = (params) => {
@@ -32,7 +33,7 @@ function TableDnd(props: TableDndProps, ref: any) {
     const oldColumns = [...columns];
     const newColumns = arrayMove(oldColumns, fromIndex, dropIndex);
     setFormItem(formrender, newColumns, currentPath, attributeName);
-    removeSelect();
+    updateContext();
   };
 
   const onAdd: DndSortableProps['onAdd'] = (params) => {
@@ -53,7 +54,7 @@ function TableDnd(props: TableDndProps, ref: any) {
     // 从侧边栏插入进来
     if (fromCollection?.type === 'panel') {
       const type = from?.id as string;
-      controlField = getConfigItem(type, editorConfig?.widgets, editorConfig?.settings);
+      controlField = getConfigItem(type, editorConfig);
       // 从表单节点中插入
     } else {
       controlField = formrender && formrender.getItemByIndex(fromIndex, { path: fromCollection?.path });
@@ -66,7 +67,7 @@ function TableDnd(props: TableDndProps, ref: any) {
       dataIndex: defaultGetId(controlField.type)
     };
     insertFormItem(formrender, newColumn, dropIndex, { path: currentPath, attributeName: attributeName });
-    removeSelect();
+    updateContext();
   };
 
   const disabledDrop: DndCondition = (param) => {

@@ -4,7 +4,7 @@ import { FormEditorContext, FormEditorState, useEditorState } from './context';
 import { useEventBus } from './utils/hooks';
 import EditorConfig from './config';
 
-export interface ProviderProps extends Pick<FormEditorState, 'editor' | 'editorForm' | 'platType' | 'editorConfig' | 'panelData' | 'templates' | 'FormRender'> {
+export interface ProviderProps extends Pick<FormEditorState, 'editor' | 'editorForm' | 'platType' | 'editorConfig' | 'panelData' | 'renderTools' | 'FormRender'> {
   children?: any;
 }
 function Provider(props: ProviderProps) {
@@ -24,10 +24,7 @@ function Provider(props: ProviderProps) {
   const [state, dispatch] = useEditorState({
     editor: editor,
     editorForm: editorForm,
-    editorConfig: {
-      widgets: { ...EditorConfig.widgets, ...editorConfig?.widgets },
-      settings: { ...EditorConfig?.settings, ...editorConfig?.settings }
-    },
+    editorConfig: { ...EditorConfig, ...editorConfig },
     settingForm: null,
     eventBus: eventBus,
     platType: platType,

@@ -1,3 +1,4 @@
+import FieldSetting from '../../fieldSetting';
 
 export default {
   panel: {
@@ -8,5 +9,6 @@ export default {
   type: 'RichEditor',
   props: {
     style: { width: '100%' },
-  }
+  },
+  setting: { ...FieldSetting }
 };

@@ -1,23 +1,23 @@
+import GridCol from './col';
+import GridRow from './row';
+
 export default {
   panel: {
     icon: 'grid',
     label: '栅格布局',
     includes: ['GridCol'],
   },
-  ignore: true,
-  type: 'GridRow',
+  ...GridRow,
   properties: {
     col1: {
-      type: 'GridCol',
+      ...GridCol,
       props: { span: 12 },
-      ignore: true,
       properties: {
       }
     },
     col2: {
-      type: 'GridCol',
+      ...GridCol,
       props: { span: 12 },
-      ignore: true,
       properties: {
       }
     },

@@ -1,3 +1,4 @@
+import Setting from './setting';
 
 export default {
   panel: {
@@ -10,5 +11,6 @@ export default {
     style: { width: '100%' },
     message: '警告提示',
     description: '警告提示描述'
-  }
+  },
+  setting: { ...Setting }
 };
