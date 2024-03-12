@@ -3,7 +3,7 @@ English | [中文说明](./README_CN.md)
 
 > Based on `React`, lightweight, easy and powerful form development solution.
 
-* [Documentation](https://mezhanglei.github.io/simpleform/)
+* [Documentation](https://mezhanglei.github.io/simpleform/docs/#/)
 
 ## npm libs
 
@@ -30,7 +30,7 @@ npm run start
 If you think it's awesome, sponsor the author with a cup of coffee!
 |  WeChatPay  | Alipay |
 |---|---|
-|<img src="https://cdn.jsdelivr.net/gh/mezhanglei/myImages@master/mine/weixin_pay.png" width="200" />| <img src="https://cdn.jsdelivr.net/gh/mezhanglei/myImages@master/mine/ali_pay.png" width="200" /> | -->
+|<img src="https://cdn.jsdelivr.net/gh/mezhanglei/myWebsite@master/mine/weixin_pay.png" width="200" />| <img src="https://cdn.jsdelivr.net/gh/mezhanglei/myWebsite@master/mine/ali_pay.png" width="200" /> | -->
 
 ## License
 The MIT License (MIT), Please enjoy it.

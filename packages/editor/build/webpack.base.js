@@ -6,8 +6,8 @@ const webpack = require("webpack");
 // css文件指纹插件提取css，作用是缓存css并解决样式闪动问题 因为只在编译阶段作用 所以不适用于热更新 但在生产环境无需配置热更新也没多大问题
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-// 通过CopyWebpackPlugin将目标文件夹里的静态资源拷贝到目标文件夹
-// const CopyWebpackPlugin = require("copy-webpack-plugin");
+// 通过CopyPlugin将目标文件夹里的静态资源拷贝到目标文件夹
+const CopyPlugin = require("copy-webpack-plugin");
 // (构建过程优化)webpack体积分析插件(会单独打开一个端口8888的页面显示体积构造图)
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 // eslint格式检查
@@ -191,6 +191,11 @@ module.exports = {
   },
   // 插件
   plugins: [
+    isDist && new CopyPlugin({
+      patterns: [
+        { from: paths.resolveApp('dist'), to: paths.resolveApp('../../docs/demo') },
+      ],
+    }),
     // 设置项目的全局变量,String类型, 如果值是个字符串会被当成一个代码片段来使用, 如果不是,它会被转化为字符串(包括函数)
     new webpack.DefinePlugin({
       'process.env': {

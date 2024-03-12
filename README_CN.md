@@ -3,7 +3,7 @@
 
 > 基于`React`, 轻量、简易、强大的表单开发解决方案。
 
-* [文档](https://mezhanglei.github.io/simpleform/)
+* [文档](https://mezhanglei.github.io/simpleform/docs/#/)
 
 ## 分类
 
@@ -30,7 +30,7 @@ npm run start
 如果你觉得很赞，可以赞助作者一杯咖啡.
 |  WeChatPay  | Alipay |
 |---|---|
-|<img src="https://cdn.jsdelivr.net/gh/mezhanglei/myImages@master/mine/weixin_pay.png" width="200" />| <img src="https://cdn.jsdelivr.net/gh/mezhanglei/myImages@master/mine/ali_pay.png" width="200" /> |
+|<img src="https://cdn.jsdelivr.net/gh/mezhanglei/myWebsite@master/mine/weixin_pay.png" width="200" />| <img src="https://cdn.jsdelivr.net/gh/mezhanglei/myWebsite@master/mine/ali_pay.png" width="200" /> |
 
 ## License
 The MIT License (MIT). Please enjoy it

@@ -140,7 +140,7 @@ To create an instance of `form` via `useSimpleForm`, use the following:
 - `form.setFieldValue(path, value)` Update the value of a form field
 - `form.setFieldsValue(obj: Partial<T>)` Set the value of the form field (override).
 - `form.reset(values?: Partial<T>)` Reset the form.The value can be passed to reset to the target value.
-- `form.validate(path?: string)` Checks form and returns error messages and form values.
+- `form.validate(path?: string | string[])` Checks form and returns error messages and form values.
 - `form.getFieldError(path?: string)` Returns the target's error message or all error messages.
 
 ### Hooks

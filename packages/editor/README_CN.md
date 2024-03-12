@@ -6,8 +6,8 @@
 
 > 基于`react`实现的表单设计器，支持自定义组件，模板导入导出，可视化设计等表单设计功能，二次开发非常简单。
 
-* [在线预览](https://mezhanglei.github.io/simpleform/)
-* [开发指南](https://mezhanglei.github.io/simpleform/)
+* [在线预览](https://mezhanglei.github.io/simpleform/demo/#/)
+* [开发指南](https://mezhanglei.github.io/simpleform/docs/#/)
 * [默认组件库](https://ant.design/index-cn/) `antd@5.x`，设计器默认注册了基础的表单控件.
 
 ## 简介

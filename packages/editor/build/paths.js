@@ -40,5 +40,6 @@ module.exports = {
   // 访问静态资源的路径：当为'./'路径时则相对于index.html，/开头时则相对于服务器根路径, 完整域名时则是以域名为前缀访问
   publicPath: isDev ? '/' : './',
   babelrcPath: path.join(appRoot, './.babelrc'),
-  mockPath: path.join(srcPath, 'mock')
+  mockPath: path.join(srcPath, 'mock'),
+  resolveApp
 };

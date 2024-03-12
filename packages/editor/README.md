@@ -6,8 +6,8 @@ English | [中文说明](./README_CN.md)
 
 > Based on `react` implementation of the form designer , support for custom components , template import and export , visual design and other form design features , the secondary development is very simple .
 
-* [Online Preview](https://mezhanglei.github.io/simpleform/)
-* [Guide](https://mezhanglei.github.io/simpleform/)
+* [Online Preview](https://mezhanglei.github.io/simpleform/demo/#/)
+* [Guide](https://mezhanglei.github.io/simpleform/docs/#/)
 * [UI widgets](https://ant.design/index-cn/) `antd@5.x`, the designer registers the base form control by default.
 
 ## Introduction
