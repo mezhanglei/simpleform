@@ -10,7 +10,7 @@ const config: Config = {
   url: 'https://mezhanglei.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: '/simpleform/docs/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 
