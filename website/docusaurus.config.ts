@@ -1,10 +1,10 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'simpleform',
-  tagline: 'Dinosaurs are cool',
+  tagline: 'Updating',
   favicon: 'img/favicon.ico',
   // Set the production url of your site here
   url: 'https://mezhanglei.github.io',
@@ -19,7 +19,24 @@ const config: Config = {
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en', 'zh'],
+    locales: ['en', 'fa'],
+    path: 'i18n',
+    localeConfigs: {
+      en: {
+        label: 'English',
+        direction: 'ltr',
+        htmlLang: 'en-US',
+        calendar: 'gregory',
+        path: 'en',
+      },
+      fa: {
+        label: 'فارسی',
+        direction: 'rtl',
+        htmlLang: 'fa-IR',
+        calendar: 'persian',
+        path: 'fa',
+      },
+    },
   },
 
   presets: [
@@ -61,60 +78,22 @@ const config: Config = {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Docs',
         },
         {to: '/blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/facebook/docusaurus',
+          to: 'https://mezhanglei.github.io/simpleform/demo/#/',
+          label: '预览',
+          position: 'right',
+        },
+        {
+          href: 'https://github.com/mezhanglei/simpleform#readme',
           label: 'GitHub',
           position: 'right',
         },
       ],
     },
     footer: {
-      style: 'dark',
-      links: [
-        {
-          title: 'Docs',
-          items: [
-            {
-              label: 'Tutorial',
-              to: '/docs/intro',
-            },
-          ],
-        },
-        {
-          title: 'Community',
-          items: [
-            {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-            },
-            {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/docusaurus',
-            },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'Blog',
-              to: '/blog',
-            },
-            {
-              label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
-            },
-          ],
-        },
-      ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,

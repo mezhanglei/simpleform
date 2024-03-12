@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FormNodeProps, GenerateParams, CustomUnionType, PropertiesData, CustomRenderType, FormChildrenProps } from './types';
-import { Form, joinFormPath } from '@simpleform/form';
+import { Form, joinFormPath, SimpleFormContext } from '@simpleform/form';
 import { isEqual } from './utils/object';
 import '@simpleform/form/lib/css/main.css';
 import { matchExpression } from './utils/utils';
@@ -17,6 +17,7 @@ const defaultComponents = {
 // 渲染表单children
 export default function FormChildren(props: FormChildrenProps) {
   const curFormrender = useSimpleFormRender();
+  const { form: curForm } = useContext(SimpleFormContext);
   const {
     uneval,
     components,
@@ -26,7 +27,7 @@ export default function FormChildren(props: FormChildrenProps) {
     renderList,
     inside,
     properties: propsProperties,
-    form,
+    form = curForm,
     formrender = curFormrender,
     options,
     evalPropNames = ['props', 'rules'],
