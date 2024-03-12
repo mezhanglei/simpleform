@@ -36,16 +36,16 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
   const attributeName = `${columnsPath}[${colIndex}]`;
   const currentPath = path;
   const context = field?.context;
+  const { editorConfig } = context?.state || {};
 
   const onSelect = (selected: EditorSelection) => {
-    const appendSetting = selected.field?.setting;
-    const controlSetting = pickObject(appendSetting, (key) => key !== '公共属性');
+    const selectedItem = editor?.getItemByPath(selected?.path, selected?.attributeName);
+    const configSetting = editorConfig?.[selectedItem?.type || ''].setting;
+    const controlSetting = pickObject(configSetting, (key) => key !== '公共属性');
     const mergeSetting = Object.assign({}, FormTableColSetting, controlSetting);
-    const { field, ...rest } = selected;
-    const newField = Object.assign({ setting: mergeSetting }, field);
     context?.dispatch && context?.dispatch((old) => ({
       ...old,
-      selected: Object.assign({ field: newField }, rest)
+      selected: Object.assign({ appendSetting: mergeSetting }, selected)
     }));
   };
 

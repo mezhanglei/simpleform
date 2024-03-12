@@ -32,13 +32,13 @@ function ColSelection(props: CustomColProps, ref: any) {
 
   const addCol = () => {
     const nextIndex = (field?.index as number) + 1;
-    const newField = {
+    const newItem = {
       ...editorConfig?.['GridCol'],
       props: { span: 12 },
       properties: {
       }
     };
-    insertFormItem(editor, newField, nextIndex, { path: parent?.path });
+    insertFormItem(editor, newItem, nextIndex, { path: parent?.path });
   };
 
   const deleteItem = () => {
@@ -52,7 +52,7 @@ function ColSelection(props: CustomColProps, ref: any) {
     <BaseSelection
       ref={ref}
       {...props}
-      configLabel="栅格列"
+      configLabel={field?.panel?.label}
       className={cls}
       tools={[<SvgIcon key="add" name="add" onClick={addCol} />, <SvgIcon key="shanchu" name="shanchu" onClick={deleteItem} />]}>
       {children}

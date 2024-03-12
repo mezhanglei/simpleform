@@ -1,7 +1,6 @@
 import classNames from "classnames";
 import React, { CSSProperties, useEffect } from "react";
 import CodeTextArea from "../CodeTextarea";
-import { getFormItem } from '../../../utils/utils';
 import { EditorCodeMirrorModal } from "../CodeMirror";
 import DefaultFormRender, { useSimpleForm, FormRenderProps, EditorSelection } from "../../formrender";
 

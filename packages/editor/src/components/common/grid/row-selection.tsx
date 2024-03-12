@@ -53,7 +53,7 @@ function RowSelection(props: CustomRowProps, ref: any) {
     <BaseSelection
       ref={ref}
       {...props}
-      configLabel="栅格布局"
+      configLabel={field?.panel?.label}
       className={cls}
       tools={[<SvgIcon key="add" name="add" onClick={addCol} />, <SvgIcon key="shanchu" name="shanchu" onClick={deleteItem} />]}>
       {children}

@@ -28,11 +28,10 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   const cls = classnames(prefixCls, className);
   const configSetting = useMemo(() => {
     if (!selected) return;
-    const field = selected.field;
-    const type = field?.type || '';
-    const defaultSetting = editorConfig?.[type] && editorConfig[type].setting;
-    const selectedSetting = selected.field && selected.field.setting; // 如果有setting则优先
-    return selectedSetting || defaultSetting;
+    const selectedItem = editor?.getItemByPath(selected?.path, selected?.attributeName);
+    const configSetting = editorConfig?.[selectedItem?.type || '']?.setting;
+    const appendSetting = selected.appendSetting;
+    return appendSetting || configSetting;
   }, [editor, selectedPath, attributeName, editorConfig]);
   const nameSetting = useMemo(() => getNameSetting(selected), [selectedPath, attributeName]); // 表单节点字段设置
   useEffect(() => {

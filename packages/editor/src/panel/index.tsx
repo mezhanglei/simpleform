@@ -83,14 +83,8 @@ function EditorPanel(props: EditorPanelProps, ref: any) {
   const onChange = (key: string, item: CustomFormNodeProps) => {
     if (attributeName) return;
     const newIndex = getSelectedIndex(editor, selected) + 1; // 插入位置序号
-    const initialField = getConfigItem(key, editorConfig); // 提取默认值
-    const panel = selectedParent?.field?.panel;
-    const includesIds = panel?.includes;
-    if (includesIds && !includesIds.includes(key)) {
-      message.warning("当前不可插入");
-      return;
-    };
-    insertFormItem(editor, initialField, newIndex, { path: selectedParent?.path });
+    const configItem = getConfigItem(key, editorConfig); // 提取默认值
+    insertFormItem(editor, configItem, newIndex, { path: selectedParent?.path });
     historyRecord?.save();
   };
 

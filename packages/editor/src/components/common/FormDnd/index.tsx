@@ -51,8 +51,8 @@ function FormDnd(props: ControlDndProps, ref: any) {
     // 从侧边栏插入进来
     if (fromCollection?.type === 'panel') {
       const type = from?.id as string;
-      const field = getConfigItem(type, editorConfig);
-      insertFormItem(formrender, field, dropIndex, { path: dropCollection?.path });
+      const configItem = getConfigItem(type, editorConfig);
+      insertFormItem(formrender, configItem, dropIndex, { path: dropCollection?.path });
     } else {
       formrender?.moveItemByPath({ index: fromIndex, parent: fromCollection?.path }, { index: dropIndex, parent: dropCollection?.path });
     }

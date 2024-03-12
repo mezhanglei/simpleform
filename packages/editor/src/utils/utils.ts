@@ -21,7 +21,7 @@ export const getNameSetting = (selected?: EditorSelection) => {
   // 获取选中的字段值
   const endName = getPathEnd(selectedPath);
   // 表单节点才允许展示
-  if (typeof endName === 'string' && selected?.field?.ignore !== true) {
+  if (typeof endName === 'string') {
     return {
       name: {
         label: '字段名',
@@ -36,7 +36,8 @@ export const getSelectedIndex = (editor?: SimpleFormRender | null, selected?: Ed
   if (!editor) return -1;
   const len = Object.keys(editor.getProperties() || {}).length || 0;
   if (isNoSelected(selected?.path)) return len;
-  const index = selected?.field?.index as number;
+  const item = editor.getItemByPath(selected?.path, selected?.attributeName);
+  const index = item?.index as number;
   return typeof index === 'number' ? index : -1;
 };
 
@@ -51,10 +52,10 @@ export const getSettingInitial = (setting?: any) => {
   return initialValues;
 };
 
-// 根据配置键名获取默认值
-export const getConfigItem = (key: string | undefined, editorConfig?: FormEditorState['editorConfig']) => {
-  if (!key || !editorConfig) return;
-  const item = editorConfig[key];
+// 获取控件的配置属性
+export const getConfigItem = (type: string | undefined, editorConfig?: FormEditorState['editorConfig']) => {
+  if (!type || !editorConfig) return;
+  const item = editorConfig[type];
   const { setting, ...rest } = item;
   const initialValues = getSettingInitial(setting);
   const field = deepMergeObject(initialValues, rest);
@@ -140,8 +141,10 @@ export const setFormInitialValue = (formrender?: SimpleFormRender | null, settin
 // 同步目标的编辑区域值到属性面板回显
 export const asyncSettingForm = (editor?: SimpleFormRender | null, settingForm?: SimpleForm | null, selected?: EditorSelection) => {
   if (isNoSelected(selected?.path) || !settingForm) return;
-  const currentField = getFormItem(editor, selected?.path, selected?.attributeName);
+  const item = getFormItem(editor, selected?.path, selected?.attributeName);
+  const attributeName = selected?.attributeName;
   // 非属性节点需要该节点的字段名
-  const settingValues = selected?.attributeName ? currentField : { ...currentField, name: selected?.name };
+  const name = getPathEnd(selected?.path);
+  const settingValues = attributeName ? item : { ...item, name: name };
   settingForm.setFieldsValue(settingValues);
 };

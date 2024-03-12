@@ -27,7 +27,7 @@ export type CustomFormNodeProps<T = FormNodeProps> = T & CustomOptions;
 // 表单渲染数据的类型
 export type FormDesignData = { [key: string]: CustomFormNodeProps } | CustomFormNodeProps[];
 // 选中项类型
-export type EditorSelection = { attributeName?: string } & GenerateParams<CustomOptions>;
+export type EditorSelection = { attributeName?: string, appendSetting?: ConfigSettingItem } & GenerateParams<CustomOptions>;
 
 export type CustomFormChildrenProps = FormChildrenProps<CustomOptions>;
 export function FormChildren(props: CustomFormChildrenProps) {

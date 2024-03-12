@@ -38,9 +38,9 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
   const [isOver, setIsOver] = useState<boolean>(false);
   const context = field?.context;
   const { selected, eventBus } = context?.state || {};
-  const completePath = joinFormPath(path, attributeName) as string;
-  const currentPath = joinFormPath(selected?.path, selected?.attributeName);
-  const isSelected = completePath ? completePath === currentPath : false;
+  const currentPath = joinFormPath(path, attributeName) as string;
+  const selectedPath = joinFormPath(selected?.path, selected?.attributeName);
+  const isSelected = currentPath ? currentPath === selectedPath : false;
 
   const nextSelected = {
     name: name,
