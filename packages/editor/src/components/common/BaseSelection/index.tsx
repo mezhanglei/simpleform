@@ -37,7 +37,7 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
 
   const [isOver, setIsOver] = useState<boolean>(false);
   const context = field?.context;
-  const { selected, eventBus } = context?.state || {};
+  const { selected } = context?.state || {};
   const currentPath = joinFormPath(path, attributeName) as string;
   const selectedPath = joinFormPath(selected?.path, selected?.attributeName);
   const isSelected = currentPath ? currentPath === selectedPath : false;
@@ -60,8 +60,6 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
       ...old,
       selected: nextSelected
     }));
-    // 订阅选中事件
-    eventBus && eventBus.emit('select', nextSelected);
   };
 
   const prefixCls = "editor-selection";
@@ -74,6 +72,10 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
       setIsOver(true);
     }
     onMouseOver && onMouseOver(e);
+    context?.dispatch && context?.dispatch((old) => ({
+      ...old,
+      beforeSelected: nextSelected
+    }));
   };
 
   const handleMouseOut = (e: any) => {

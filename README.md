@@ -3,7 +3,8 @@ English | [中文说明](./README_CN.md)
 
 > Based on `React`, lightweight, easy and powerful form development solution.
 
-* [Documentation](https://mezhanglei.github.io/simpleform/docs/#/)
+* [Preview](https://mezhanglei.github.io/simpleform/demo/#/)
+<!-- * [Documentation](https://mezhanglei.github.io/simpleform/docs/#/) -->
 
 ## npm libs
 

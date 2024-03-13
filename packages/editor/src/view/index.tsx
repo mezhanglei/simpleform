@@ -4,7 +4,6 @@ import './index.less';
 import RootDnd from './RootDnd';
 import ComponentSelection from './selection';
 import DefaultFormRender, { CustomFormRenderProps } from '../components/formrender';
-import { useEventBusValue } from '../utils/hooks';
 import { setFormInitialValue } from '../utils/utils';
 import { useEditorContext } from '../context';
 import PlatContainer from '../tools/platContainer';
@@ -17,7 +16,7 @@ export interface EditorViewProps {
 function EditorView(props: EditorViewProps, ref: any) {
 
   const context = useEditorContext();
-  const { platType, editor, editorForm, settingForm, properties } = context.state;
+  const { platType = 'pc', beforeSelected, editor, editorForm, settingForm, properties } = context.state;
   const FormRender = context?.state?.FormRender || DefaultFormRender;
 
   const {
@@ -26,8 +25,6 @@ function EditorView(props: EditorViewProps, ref: any) {
     ...restProps
   } = props;
 
-  const selectedRef = useEventBusValue('select');
-
   const onPropertiesChange: CustomFormRenderProps['onPropertiesChange'] = (newData) => {
     console.log(newData, '表单');
     context.dispatch((old) => ({ ...old, properties: newData }));
@@ -35,10 +32,7 @@ function EditorView(props: EditorViewProps, ref: any) {
 
   // 监听选中项改动
   const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = ({ value }) => {
-    // 必须延时，防止在选中之前变更值
-    setTimeout(() => {
-      setFormInitialValue(editor, settingForm, selectedRef.current, value);
-    }, 50);
+    setFormInitialValue(editor, settingForm, beforeSelected, value);
   };
 
   const cls = classnames("editor-view", className);

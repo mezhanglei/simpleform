@@ -33,10 +33,7 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
   const { editor, settingForm } = context?.state || {};
 
   const onFieldsChange = (colIndex: number, newVal: any) => {
-    // 设置初始值
-    setTimeout(() => {
-      setFormInitialValue(editor, settingForm, { path: rest?.path, attributeName: `props.columns[${colIndex}]` }, newVal);
-    }, 0);
+    setFormInitialValue(editor, settingForm, { path: rest?.path, attributeName: `props.columns[${colIndex}]` }, newVal);
   };
 
   return (

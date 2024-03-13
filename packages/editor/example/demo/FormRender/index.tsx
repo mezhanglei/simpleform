@@ -2,8 +2,6 @@ import React from 'react';
 import { FormRender as DefaultFormRender, FormChildren as DefaultFormChildren, createRequest, CustomFormChildrenProps, CustomFormRenderProps } from '../../../src';
 import widgets from './components';
 
-export * from '../../../src';
-
 // TODO axios请求配置
 const axiosConfig = {
 

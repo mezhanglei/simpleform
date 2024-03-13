@@ -2,24 +2,28 @@
 
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-2.0.5-green)](https://www.npmjs.com/package/@simpleform/editor)
+[![](https://img.shields.io/badge/version-2.1.0-green)](https://www.npmjs.com/package/@simpleform/editor)
 
 > Based on `react` implementation of the form designer , support for custom components , template import and export , visual design and other form design features , the secondary development is very simple .
 
-* [Online Preview](https://mezhanglei.github.io/simpleform/demo/#/)
-* [Guide](https://mezhanglei.github.io/simpleform/docs/#/)
+* [Preview](https://mezhanglei.github.io/simpleform/demo/#/)
+<!-- * [Guide](https://mezhanglei.github.io/simpleform/docs/#/) -->
 * [UI widgets](https://ant.design/index-cn/) `antd@5.x`, the designer registers the base form control by default.
 
 ## Introduction
-- Designer Composition: The designer consists of five main modules
-  * Configuration Panel `EditorPanel`: Configuration components can be selected for editing.
+- Designer Composition: The designer consists of six modules
+  * Configuration context `EditorProvider`: provides the context of the editor
+  * Configuration panel `EditorPanel`: configuration components can be selected to the editor area
   * Operation area `EditorTools`: the operation area of the designer.
-  * Edit area `EditorView`: the editing area of the designer.
+  * Edit area `EditorView`: the designer's editing area
   * Configuration property component `EditorSetting`: displays the corresponding property configuration form when the component is selected by the mouse.
   * Renderer `FormRender`: the core component for form rendering in the designer, you need to configure the registered component and related properties before using it.
 - Customization features: The designer allows two types of customization
   * Custom Component: By customizing a component and registering it in the designer and renderer, you can then configure the control for use in the component panel.
   * Import Templates: You need to add an import template entry from outside the designer component via the `renderTools` function, so that you can customize the rendering interface of the `JSON` template list.
+
+
+Translated with DeepL.com (free version)
 
 ## install
 - [Node.js](https://nodejs.org/en/) Version >= 14.0.0
@@ -123,29 +127,54 @@ const panelData = {
   '业务组件': ['example']
 };
 ```
-* 引入`EditorConfig`和`FormRender`
+* Building the editor component
 ```javascript
-import React from 'react';
-import FormEditorCore from '@simpleform/editor';
+import { Col, Row } from 'antd';
+import classnames from 'classnames';
+import React, { CSSProperties } from 'react';
+import { EditorPanel, EditorProvider, EditorProviderProps, EditorSetting, EditorTools, EditorView } from '@simpleform/editor';
 import FormRender from '../FormRender';
 import EditorConfig from './config';
 import panelData from './config/panelData';
 // import ImportModal from './template';
+import './index.less';
 
 // // import template
 // const renderTools = (context) => {
 //   return <ImportModal context={context} />;
 // };
 
-export default function FormEditor(props) {
-  return <FormEditorCore
-    {...props}
-    // renderTools={renderTools}
-    panelData={panelData}
-    editorConfig={EditorConfig}
-    FormRender={FormRender}
-  />;
-}
+export type EasyFormEditorProps = EditorProviderProps & {
+  className?: string;
+  style?: CSSProperties;
+};
+
+const FormEditor = ({ className, style, ...props }: EasyFormEditorProps) => {
+
+  return (
+    <Row className={classnames('simple-form-container', className)}>
+      <EditorProvider
+        editorConfig={EditorConfig}
+        FormRender={FormRender}
+      >
+        <Col className='panel' xs={24} sm={24} md={5} lg={5}>
+          <EditorPanel panelData={panelData} />
+        </Col>
+        <Col className='editor' xs={24} sm={24} md={14} lg={14}>
+          <EditorTools
+            // renderTools={renderTools}
+          />
+          <EditorView />
+        </Col>
+        <Col className='setting' xs={24} sm={24} md={5} lg={5}>
+          <EditorSetting />
+        </Col>
+      </EditorProvider>
+    </Row>
+  );
+};
+
+export default FormEditor;
 ```
 ### 3. Using the above configured editor FormEditor and renderer FormRender
 * Example of using the FormEditor

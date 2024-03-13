@@ -2,17 +2,18 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-2.0.5-green)](https://www.npmjs.com/package/@simpleform/editor)
+[![](https://img.shields.io/badge/version-2.1.0-green)](https://www.npmjs.com/package/@simpleform/editor)
 
 > 基于`react`实现的表单设计器，支持自定义组件，模板导入导出，可视化设计等表单设计功能，二次开发非常简单。
 
 * [在线预览](https://mezhanglei.github.io/simpleform/demo/#/)
-* [开发指南](https://mezhanglei.github.io/simpleform/docs/#/)
+<!-- * [开发指南](https://mezhanglei.github.io/simpleform/docs/#/) -->
 * [默认组件库](https://ant.design/index-cn/) `antd@5.x`，设计器默认注册了基础的表单控件.
 
 ## 简介
-- 设计器组成：设计器包含五大模块
-  * 配置面板`EditorPanel`：配置组件可选择到编辑
+- 设计器组成：设计器包含六大模块
+  * 配置上下文`EditorProvider`：提供编辑器的上下文环境
+  * 配置面板`EditorPanel`：配置组件可选择到编辑区
   * 操作区域 `EditorTools`：设计器的操作区域
   * 编辑区域`EditorView`：设计器的编辑区域
   * 配置属性组件`EditorSetting`：鼠标选中组件时展示对应的属性配置表单
@@ -123,29 +124,54 @@ const panelData = {
   '业务组件': ['example']
 };
 ```
-* 引入`EditorConfig`和`FormRender`
+* 构建编辑器界面
 ```javascript
-import React from 'react';
-import FormEditorCore from '@simpleform/editor';
+import { Col, Row } from 'antd';
+import classnames from 'classnames';
+import React, { CSSProperties } from 'react';
+import { EditorPanel, EditorProvider, EditorProviderProps, EditorSetting, EditorTools, EditorView } from '@simpleform/editor';
 import FormRender from '../FormRender';
 import EditorConfig from './config';
 import panelData from './config/panelData';
 // import ImportModal from './template';
+import './index.less';
 
 // // import template
 // const renderTools = (context) => {
 //   return <ImportModal context={context} />;
 // };
 
-export default function FormEditor(props) {
-  return <FormEditorCore
-    {...props}
-    // renderTools={renderTools}
-    panelData={panelData}
-    editorConfig={EditorConfig}
-    FormRender={FormRender}
-  />;
-}
+export type EasyFormEditorProps = EditorProviderProps & {
+  className?: string;
+  style?: CSSProperties;
+};
+
+const FormEditor = ({ className, style, ...props }: EasyFormEditorProps) => {
+
+  return (
+    <Row className={classnames('simple-form-container', className)}>
+      <EditorProvider
+        editorConfig={EditorConfig}
+        FormRender={FormRender}
+      >
+        <Col className='panel' xs={24} sm={24} md={5} lg={5}>
+          <EditorPanel panelData={panelData} />
+        </Col>
+        <Col className='editor' xs={24} sm={24} md={14} lg={14}>
+          <EditorTools
+            // renderTools={renderTools}
+          />
+          <EditorView />
+        </Col>
+        <Col className='setting' xs={24} sm={24} md={5} lg={5}>
+          <EditorSetting />
+        </Col>
+      </EditorProvider>
+    </Row>
+  );
+};
+
+export default FormEditor;
 ```
 ### 3. 使用上述配置好的编辑器FormEditor和渲染器FormRender
 * 使用编辑器示例

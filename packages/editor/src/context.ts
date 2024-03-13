@@ -1,7 +1,6 @@
 import React, { useContext, useRef, useState } from 'react';
 import { CustomFormNodeProps, EditorSelection, FormDesignData, SimpleFormRender, SimpleForm } from './components/formrender';
 import { PlatType } from './tools/platContainer';
-import EventBus from './utils/event-bus';
 import SimpleUndo from './utils/simple-undo';
 
 // 模板类型
@@ -21,13 +20,11 @@ export interface FormEditorState {
   editorForm?: SimpleForm;
   editor?: SimpleFormRender;
   settingForm?: SimpleForm | null;
-  eventBus?: EventBus;
+  FormRender?: React.ComponentType<any> | React.ForwardRefExoticComponent<any>;
   selected?: EditorSelection;
+  beforeSelected?: EditorSelection;
   properties?: FormDesignData;
   editorConfig?: Record<string, CustomFormNodeProps & { setting?: ConfigSettingItem }>;
-  renderTools?: (context: FormEditorContextProps) => Array<any>;
-  panelData?: { [title: string]: Array<string> }; // 组件面板配置
-  FormRender?: any;
   platType?: PlatType;
   historyRecord?: SimpleUndo;
 }

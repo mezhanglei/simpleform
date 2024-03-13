@@ -1,12 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { deepSet } from "../components/formrender";
-import EventBus from "./event-bus";
 import { useEditorContext } from "../context";
-
-
-export function useEventBus() {
-  return useMemo(() => new EventBus(), []);
-}
 
 // 处理列表型的数据
 export function useTableData<T = any>(intialValue?: T[], onChange?: (data: T[]) => void) {
@@ -63,22 +57,4 @@ export function useTableData<T = any>(intialValue?: T[], onChange?: (data: T[]) 
     dataSource,
     setDataSource
   };
-}
-
-// 监听eventBus的值
-export function useEventBusValue<T = any>(type: string) {
-  const context = useEditorContext();
-  const { eventBus } = context?.state || {};
-  const dataRef = useRef<T>();
-
-  useEffect(() => {
-    eventBus && eventBus.on(type, (val: T) => {
-      dataRef.current = val;
-    });
-    return () => {
-      eventBus && eventBus.remove(type);
-    };
-  }, []);
-
-  return dataRef;
 }

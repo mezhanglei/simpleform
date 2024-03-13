@@ -1,6 +1,5 @@
 import React, { CSSProperties } from 'react';
 import classnames from 'classnames';
-import { message } from 'antd';
 import './index.less';
 import SvgIcon from '../components/common/SvgIcon';
 import { CustomFormNodeProps } from '../components/formrender';
@@ -65,6 +64,7 @@ const Tag = React.forwardRef((props: TagProps, ref: any) => {
 export interface EditorPanelProps {
   className?: string
   style?: CSSProperties
+  panelData?: { [title: string]: Array<string> }; // 组件面板配置
 }
 
 const prefixCls = `simple-form-panel`;
@@ -72,10 +72,11 @@ function EditorPanel(props: EditorPanelProps, ref: any) {
   const {
     style,
     className,
+    panelData
   } = props;
 
   const context = useEditorContext();
-  const { selected, editor, editorConfig, panelData, historyRecord } = context.state;
+  const { selected, editor, editorConfig, historyRecord } = context.state;
   const selectedParent = selected?.parent;
   const attributeName = selected?.attributeName;
   const cls = classnames(prefixCls, className);

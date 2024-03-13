@@ -9,9 +9,8 @@ export interface FormComponent {
 }
 
 export type UnionComponent<P> =
-  | React.ComponentType<P>
+  React.ComponentType<P>
   | React.ForwardRefExoticComponent<P>
-  | React.FC<P>
   | keyof React.ReactHTML;
 
 // 表单上的组件联合类型

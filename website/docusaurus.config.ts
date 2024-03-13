@@ -3,7 +3,7 @@ import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'simpleform',
+  title: 'simpleform2.x',
   tagline: 'Updating',
   favicon: 'img/favicon.ico',
   // Set the production url of your site here

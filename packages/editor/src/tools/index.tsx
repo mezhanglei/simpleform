@@ -2,7 +2,7 @@ import React, { CSSProperties } from 'react';
 import classnames from 'classnames';
 import './index.less';
 import { Button, Divider, Radio, Tooltip } from 'antd';
-import { useEditorContext } from '../context';
+import { FormEditorContextProps, useEditorContext } from '../context';
 import SvgIcon from '../components/common/SvgIcon';
 import { PlatOptions } from './platContainer';
 import { showPreviewModal } from './preview';
@@ -11,16 +11,18 @@ import { showExportJsonModal } from './exportJson';
 export interface EditorToolsProps {
   className?: string;
   style?: CSSProperties;
+  renderTools?: (context: FormEditorContextProps) => React.ReactNode;
 }
 
 function EditorTools(props: EditorToolsProps, ref: any) {
 
   const context = useEditorContext();
-  const { renderTools, platType, properties, historyRecord } = context.state;
+  const { platType = 'pc', properties, historyRecord } = context.state;
 
   const {
     style,
     className,
+    renderTools,
     ...restProps
   } = props;
 
