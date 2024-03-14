@@ -75,7 +75,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
       Object.entries(configSetting)?.map(([name, data]) => {
         return (
           <CustomCollapse header={name} key={name} isOpened>
-            <FormChildren form={form} properties={data} options={{ context: context }} />
+            <FormChildren properties={data} options={{ context: context }} />
           </CustomCollapse>
         );
       })
@@ -85,7 +85,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   return (
     <div ref={ref} className={cls} style={style}>
       <Form layout="vertical" form={form} onFieldsChange={onFieldsChange}>
-        <FormChildren form={form} properties={nameSetting} uneval />
+        <FormChildren properties={nameSetting} uneval />
         {renderCommonList()}
       </Form>
     </div>

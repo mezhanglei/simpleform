@@ -36,9 +36,11 @@ export const getSelectedIndex = (editor?: SimpleFormRender | null, selected?: Ed
   if (!editor) return -1;
   const len = Object.keys(editor.getProperties() || {}).length || 0;
   if (isNoSelected(selected?.path)) return len;
-  const item = editor.getItemByPath(selected?.path, selected?.attributeName);
-  const index = item?.index as number;
-  return typeof index === 'number' ? index : -1;
+  const parentPath = selected?.parent?.path;
+  const parent = parentPath ? editor.getItemByPath(parentPath)?.properties : editor.getProperties();
+  const keys = Object.keys(parent);
+  const index = keys.findIndex((key) => key == selected?.path);
+  return index;
 };
 
 // 根据节点的配置返回节点的初始值
