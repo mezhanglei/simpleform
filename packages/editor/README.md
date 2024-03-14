@@ -2,7 +2,7 @@
 
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-2.1.0-green)](https://www.npmjs.com/package/@simpleform/editor)
+[![](https://img.shields.io/badge/version-2.1.1-green)](https://www.npmjs.com/package/@simpleform/editor)
 
 > Based on `react` implementation of the form designer , support for custom components , template import and export , visual design and other form design features , the secondary development is very simple .
 

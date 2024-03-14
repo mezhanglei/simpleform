@@ -5,7 +5,7 @@ import SvgIcon from '../components/common/SvgIcon';
 import { CustomFormNodeProps } from '../components/formrender';
 import { getConfigItem, getSelectedIndex, insertFormItem } from '../utils/utils';
 import DndSortable from 'react-dragger-sort';
-import { useEditorContext } from '../context';
+import { FormEditorContextProps, useEditorContext } from '../context';
 
 export interface TagProps {
   className?: string
@@ -64,14 +64,16 @@ export interface EditorPanelProps {
   className?: string
   style?: CSSProperties
   panelData?: { [title: string]: Array<string> }; // 组件面板配置
+  children?: (context: FormEditorContextProps) => React.ReactNode;
 }
 
 const prefixCls = `simple-form-panel`;
-function EditorPanel(props: EditorPanelProps, ref: any) {
+function EditorPanel(props: EditorPanelProps) {
   const {
     style,
     className,
-    panelData
+    panelData,
+    children
   } = props;
 
   const context = useEditorContext();
@@ -89,36 +91,39 @@ function EditorPanel(props: EditorPanelProps, ref: any) {
   };
 
   return (
-    <div ref={ref} className={cls} style={style}>
-      {
-        Object.entries(panelData || defaultPanelData).map(([title, list]) => {
-          return (
-            <div key={title} className='panel-list'>
-              <div className={`panel-list-title`}>{title}</div>
-              <DndSortable
-                className='elements-list'
-                collection={{ type: 'panel' }}
-                options={{
-                  disabledDrop: true,
-                  hiddenFrom: false,
-                  disabledSort: true
-                }}
-              >
-                {
-                  list.map((key) => {
-                    const data = editorConfig?.[key] || {};
-                    const panel = data?.panel || {};
-                    return <Tag key={key} data-id={key} icon={panel?.icon} onChange={() => onChange?.(key, data)}>{panel.label}</Tag>;
-                  })
-                }
-              </DndSortable>
-            </div>
-          );
-        })
-      }
-    </div>
+    typeof children == 'function' ?
+      children(context)
+      :
+      <div className={cls} style={style}>
+        {
+          Object.entries(panelData || defaultPanelData).map(([title, list]) => {
+            return (
+              <div key={title} className='panel-list'>
+                <div className={`panel-list-title`}>{title}</div>
+                <DndSortable
+                  className='elements-list'
+                  collection={{ type: 'panel' }}
+                  options={{
+                    disabledDrop: true,
+                    hiddenFrom: false,
+                    disabledSort: true
+                  }}
+                >
+                  {
+                    list.map((key) => {
+                      const data = editorConfig?.[key] || {};
+                      const panel = data?.panel || {};
+                      return <Tag key={key} data-id={key} icon={panel?.icon} onChange={() => onChange?.(key, data)}>{panel.label}</Tag>;
+                    })
+                  }
+                </DndSortable>
+              </div>
+            );
+          })
+        }
+      </div>
   );
 };
 
 EditorPanel.displayName = 'editor-panel';
-export default React.forwardRef(EditorPanel);
+export default EditorPanel;

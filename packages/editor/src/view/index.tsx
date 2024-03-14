@@ -5,15 +5,16 @@ import RootDnd from './RootDnd';
 import ComponentSelection from './selection';
 import DefaultFormRender, { CustomFormRenderProps } from '../components/formrender';
 import { setFormInitialValue } from '../utils/utils';
-import { useEditorContext } from '../context';
+import { FormEditorContextProps, useEditorContext } from '../context';
 import PlatContainer from '../tools/platContainer';
 
 export interface EditorViewProps {
   className?: string;
   style?: CSSProperties;
+  children?: (context: FormEditorContextProps) => React.ReactNode;
 }
 
-function EditorView(props: EditorViewProps, ref: any) {
+function EditorView(props: EditorViewProps) {
 
   const context = useEditorContext();
   const { platType = 'pc', beforeSelected, editor, editorForm, settingForm, properties } = context.state;
@@ -22,6 +23,7 @@ function EditorView(props: EditorViewProps, ref: any) {
   const {
     style,
     className,
+    children,
     ...restProps
   } = props;
 
@@ -38,25 +40,28 @@ function EditorView(props: EditorViewProps, ref: any) {
   const cls = classnames("editor-view", className);
 
   return (
-    <main ref={ref}
-      className={cls}
-      style={style}
-      {...restProps}
-      onClick={() => {
-      }}>
-      <PlatContainer plat={platType}>
-        <FormRender
-          options={{ isEditor: true, context: context }}
-          formrender={editor}
-          form={editorForm}
-          properties={properties}
-          onPropertiesChange={onPropertiesChange}
-          onFieldsChange={onFieldsChange}
-          inside={RootDnd}
-          renderItem={renderItem}
-        />
-      </PlatContainer>
-    </main>
+    typeof children === 'function' ?
+      children(context)
+      :
+      <main
+        className={cls}
+        style={style}
+        {...restProps}
+        onClick={() => {
+        }}>
+        <PlatContainer plat={platType}>
+          <FormRender
+            options={{ isEditor: true, context: context }}
+            formrender={editor}
+            form={editorForm}
+            properties={properties}
+            onPropertiesChange={onPropertiesChange}
+            onFieldsChange={onFieldsChange}
+            inside={RootDnd}
+            renderItem={renderItem}
+          />
+        </PlatContainer>
+      </main>
   );
 };
 
@@ -72,4 +77,4 @@ const renderItem: CustomFormRenderProps['renderItem'] = (props) => {
 };
 
 EditorView.displayName = 'editor-view';
-export default React.forwardRef(EditorView);
+export default EditorView;

@@ -3,16 +3,19 @@ import classnames from 'classnames';
 import { Tabs } from 'antd';
 import ComponentSetting from './component';
 import './index.less';
+import { FormEditorContextProps, useEditorContext } from '../context';
 
 export interface EditorSettingProps {
   className?: string
   style?: CSSProperties
+  children?: (context: FormEditorContextProps) => React.ReactNode;
 }
 const prefixCls = `simple-form-setting`;
-function EditorSetting(props: EditorSettingProps, ref: any) {
+function EditorSetting(props: EditorSettingProps) {
   const {
     style,
-    className
+    className,
+    children
   } = props;
 
   const TabsData = [{
@@ -21,25 +24,30 @@ function EditorSetting(props: EditorSettingProps, ref: any) {
     component: ComponentSetting
   }];
 
+  const context = useEditorContext();
+
   const cls = classnames(prefixCls, className);
 
   return (
-    <div ref={ref} className={cls} style={style}>
-      <Tabs className='setting-tabs'>
-        {
-          TabsData?.map((item) => {
-            const { component: TabChildren, ...rest } = item;
-            return (
-              <Tabs.TabPane {...rest}>
-                <TabChildren />
-              </Tabs.TabPane>
-            );
-          })
-        }
-      </Tabs>
-    </div>
+    typeof children === 'function' ?
+      children(context)
+      :
+      <div className={cls} style={style}>
+        <Tabs className='setting-tabs'>
+          {
+            TabsData?.map((item) => {
+              const { component: TabChildren, ...rest } = item;
+              return (
+                <Tabs.TabPane {...rest}>
+                  <TabChildren />
+                </Tabs.TabPane>
+              );
+            })
+          }
+        </Tabs>
+      </div>
   );
 };
 
 EditorSetting.displayName = 'editor-setting';
-export default React.forwardRef(EditorSetting);
+export default EditorSetting;
