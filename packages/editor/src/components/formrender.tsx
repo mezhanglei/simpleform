@@ -5,9 +5,10 @@ import '@simpleform/render/lib/css/main.css';
 import widgets from '.';
 import { ConfigSettingItem, FormEditorContextProps } from '../context';
 import createRequest from './common/request';
+import bindRequest from './bind-request';
 
 export * from '@simpleform/render';
-export { createRequest };
+export { createRequest, bindRequest };
 
 // 自定义传参
 export interface CustomOptions {
