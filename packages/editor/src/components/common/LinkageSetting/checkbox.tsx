@@ -4,9 +4,10 @@ import SvgIcon from "../SvgIcon";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import LinkageSettingModal, { SettingModalProps } from "./modal";
 import './checkbox.less';
+import { CommonWidgetProps } from "../../formrender";
 
 // checkbox点击联动弹窗
-const OperateCheckbox = (props: SettingModalProps & CheckboxProps & { value?: boolean | string, onChange?: (val?: boolean | string) => void }) => {
+const OperateCheckbox = (props: SettingModalProps & CheckboxProps & CommonWidgetProps<boolean | string>) => {
 
   const {
     value,

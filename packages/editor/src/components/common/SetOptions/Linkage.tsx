@@ -1,9 +1,11 @@
 import React from "react";
+import { SettingModalProps } from "../LinkageSetting/modal";
 import ShowSettingModal from "../LinkageSetting/ShowSettingModal";
 
-const OptionsDynamicSetting: React.FC = (props) => {
+// 联动设置
+const LinkageSetting: React.FC<SettingModalProps> = (props) => {
 
   return <ShowSettingModal {...props} setting={{ type: 'CodeTextArea', }} />;
 };
 
-export default OptionsDynamicSetting;
+export default LinkageSetting;

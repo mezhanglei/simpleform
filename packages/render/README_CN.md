@@ -26,7 +26,7 @@ yarn add @simpleform/render
 ### 1.首先注册基本组件(以antd@5.x组件库为例)
 ```javascript
 // register
-import FormRenderCore, { FormChildren as FormChildrenCore, FormRenderProps, FormChildrenProps } from '@simpleform/render';
+import DefaultFormRender, { FormChildren as DefaultFormChildren, FormRenderProps, FormChildrenProps } from '@simpleform/render';
 import '@simpleform/render/lib/css/main.css';
 import React from 'react';
 import dayjs from 'dayjs';
@@ -76,7 +76,7 @@ export type CustomFormChildrenProps = FormChildrenProps<any>;
 export function FormChildren(props: CustomFormChildrenProps) {
   const { components, plugins, ...rest } = props;
   return (
-    <FormChildrenCore
+    <DefaultFormChildren
       options={{ props: { autoComplete: 'off' } }}
       components={{ ...widgets, ...components }}
       plugins={{ ...plugins, dayjs }}
@@ -88,7 +88,7 @@ export type CustomFormRenderProps = FormRenderProps<any>;
 export default function FormRender(props: CustomFormRenderProps) {
   const { components, plugins, ...rest } = props;
   return (
-    <FormRenderCore
+    <DefaultFormRender
       options={{ props: { autoComplete: 'off' } }}
       components={{ ...widgets, ...components }}
       plugins={{ ...plugins, dayjs }}

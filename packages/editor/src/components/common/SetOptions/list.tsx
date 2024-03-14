@@ -1,14 +1,13 @@
 import { isEmpty } from "../../../utils/type";
 import { Button, Col, Input, message, Row } from "antd";
 import React, { ChangeEvent, useEffect } from "react";
-import './OptionsList.less';
+import './list.less';
 import SvgIcon from "../SvgIcon";
 import { useTableData } from "../../../utils/hooks";
+import { CommonWidgetProps } from "../../formrender";
 
-export interface OptionItem { label?: string, value?: string }
-export interface OptionsListProps {
-  value?: OptionItem[];
-  onChange?: (data?: OptionItem[]) => void;
+interface OptionItem { label?: string, value?: string }
+export interface OptionListProps extends CommonWidgetProps<Array<OptionItem>> {
 }
 
 const prefixCls = 'options-list';
@@ -17,9 +16,9 @@ const classes = {
 };
 
 /**
- * 单选或多选编辑组件
+ * 列表
  */
-const OptionsList = React.forwardRef<HTMLElement, OptionsListProps>((props, ref) => {
+const OptionList = React.forwardRef<HTMLElement, OptionListProps>((props, ref) => {
 
   const {
     value,
@@ -89,4 +88,4 @@ const OptionsList = React.forwardRef<HTMLElement, OptionsListProps>((props, ref)
   );
 });
 
-export default OptionsList;
+export default OptionList;

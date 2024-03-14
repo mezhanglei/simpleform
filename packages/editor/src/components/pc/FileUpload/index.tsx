@@ -5,15 +5,13 @@ import { UploadFile } from 'antd/lib/upload/interface';
 import './index.less';
 import { objectToFormData } from '../../../utils/object';
 import { DOC_MIME_KEYS, DOC_MIME_VALUES, isDocFile } from '../../../utils/mime';
-import { EditorSelection } from '../../../components/formrender';
+import { CommonWidgetProps } from '../../../components/formrender';
 
 // 扩展后的文件类型
 export type FileItem = UploadFile & RcFile & Record<string, any>;
-export interface FileUploadProps extends Omit<UploadProps, 'onChange'>, EditorSelection {
+export interface FileUploadProps extends Omit<UploadProps, 'onChange'>, CommonWidgetProps<Array<FileItem>> {
   formdataKey: string; // FormData的key
   maxSize?: number; // 每个文件的限制上传大小
-  value?: Array<FileItem>; // 赋值给defaultFileList
-  onChange?: (data: Array<FileItem>) => void; // 手动上传时的回调
   uploadCallback?: (data: any) => any; // 上传请求函数回调
 }
 const FileUpload = React.forwardRef<any, FileUploadProps>((props, ref) => {

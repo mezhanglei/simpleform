@@ -14,3 +14,4 @@ export * from './tools';
 export * from './provider';
 export * from './utils/utils';
 export * from './components/formrender';
+export * from './config';

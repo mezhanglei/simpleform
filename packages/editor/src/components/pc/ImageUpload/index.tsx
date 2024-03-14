@@ -5,15 +5,13 @@ import { UploadFile } from 'antd/lib/upload/interface';
 import { objectToFormData } from '../../../utils/object';
 import { getBase64 } from './util';
 import { IMAGE_MIME_KEYS, isImageFile } from '../../../utils/mime';
-import { EditorSelection } from '../../../components/formrender';
+import { CommonWidgetProps } from '../../../components/formrender';
 
 // 扩展后的文件类型
 export type FileItem = UploadFile & RcFile & Record<string, any>;
-export interface ImageUploadProps extends Omit<UploadProps, 'onChange'>, EditorSelection {
+export interface ImageUploadProps extends Omit<UploadProps, 'onChange'>, CommonWidgetProps<Array<FileItem>> {
   formdataKey: string; // FormData的key
   maxSize?: number; // 每张图片的限制上传大小
-  value?: Array<FileItem>;
-  onChange?: (data: Array<FileItem>) => void; // 手动上传时的回调
   uploadCallback?: (data: any) => any; // 上传请求函数回调
 }
 const ImageUpload = React.forwardRef<any, ImageUploadProps>((props, ref) => {
@@ -103,7 +101,7 @@ const ImageUpload = React.forwardRef<any, ImageUploadProps>((props, ref) => {
         }
       }).then((res) => {
         const data = res.data;
-        const params = uploadCallback ? uploadCallback(data) : {};
+        const params = typeof uploadCallback === 'function' ? uploadCallback(data) : {};
         cloneData[insertIndex] = { ...file, status: 'success', ...params };
         if (!cloneData[insertIndex].url) {
           getBase64(file).then((url) => {

@@ -43,6 +43,7 @@ export function useFormError(form?: SimpleForm, path?: string) {
 
   // 订阅组件更新错误的函数
   useEffect(() => {
+    subscribeError();
     return () => {
       form && form.unsubscribeError(path);
     };
@@ -73,6 +74,7 @@ export function useFormValues<T = unknown>(form: SimpleForm, path?: string | str
   }, [JSON.stringify(path)]);
 
   useEffect(() => {
+    subscribeForm();
     return () => {
       form && form.unsubscribeFormValues();
     };

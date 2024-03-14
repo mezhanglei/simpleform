@@ -1,12 +1,7 @@
 import { Input, InputProps, InputRef } from 'antd';
-import React, { CSSProperties, useEffect, useState } from 'react';
-import { convertToString, evalString } from '../../../utils/string';
+import React, { useEffect, useState } from 'react';
 
-// 
 export interface NameInputProps extends InputProps {
-  value?: any;
-  onChange?: (val: any) => void;
-  style?: CSSProperties;
 }
 const NameInput = React.forwardRef<InputRef, NameInputProps>((props, ref) => {
 
@@ -17,7 +12,7 @@ const NameInput = React.forwardRef<InputRef, NameInputProps>((props, ref) => {
     ...rest
   } = props;
 
-  const [curValue, setCurValue] = useState<string>();
+  const [curValue, setCurValue] = useState<InputProps['value']>();
 
   useEffect(() => {
     setCurValue(value);

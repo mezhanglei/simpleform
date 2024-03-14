@@ -4,8 +4,6 @@ import { convertToString, evalString } from '../../../utils/string';
 
 // 值的输入框
 export interface CodeInputProps extends InputProps {
-  value?: any;
-  onChange?: (val: any) => void;
   style?: CSSProperties;
 }
 const CodeInput = React.forwardRef<InputRef, CodeInputProps>((props, ref) => {

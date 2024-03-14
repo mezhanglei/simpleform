@@ -9,7 +9,6 @@ import FormTable from './FormTable';
 import Collapse from './Collapse';
 import Table, { TableBody, TableCell, TableHead, TableRow } from './LayoutTable';
 import { GridCol, GridRow } from './grid';
-import SliderNumber from './SliderNumber';
 import OperateCheckbox from './LinkageSetting/checkbox';
 
 // 编辑器公共组件
@@ -31,6 +30,5 @@ export default {
   TableHead,
   TableBody,
   GridRow,
-  GridCol,
-  SliderNumber,
+  GridCol
 };

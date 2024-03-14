@@ -13,7 +13,6 @@ const panelData = {
     "DatePicker.RangePicker",
     "Slider",
     "Rate",
-    "ColorPicker",
     "Cascader",
     "FileUpload",
     "ImageUpload",

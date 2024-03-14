@@ -5,20 +5,15 @@ import './index.less';
 import CustomModal from '../AntdModal';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
+import { CommonWidgetProps } from '../../formrender';
 
 
-export interface RichEditorProps {
-  value?: string;
-  onChange?: (val?: string) => void;
-  action?: string;
-  handleResponse?: (res: any) => string;
+export interface RichEditorProps extends CommonWidgetProps<string> {
 }
 
 const RichEditor = React.forwardRef<any, RichEditorProps>((props, ref) => {
 
   const {
-    action,
-    handleResponse,
     value,
     onChange,
   } = props;

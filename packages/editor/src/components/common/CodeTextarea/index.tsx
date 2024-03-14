@@ -1,14 +1,11 @@
 import { Input } from 'antd';
 import { TextAreaProps } from 'antd/lib/input';
 import { TextAreaRef } from 'antd/lib/input/TextArea';
-import React, { CSSProperties, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { convertToString, evalString } from '../../../utils/string';
 
 // 函数代码编辑器
 export interface CodeTextAreaProps extends TextAreaProps {
-  value?: any;
-  onChange?: (val: any) => void;
-  style?: CSSProperties;
 }
 const CodeTextArea = React.forwardRef<TextAreaRef, CodeTextAreaProps>((props, ref) => {
 

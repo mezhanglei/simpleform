@@ -1,6 +1,7 @@
 import React from 'react';
+import { CommonWidgetProps } from '../../formrender';
 // 按钮弹窗富文本
-export const RichText = React.forwardRef<any, { value: string, onChange: (val?: string) => void }>((props, ref) => {
+export const RichText = React.forwardRef<any, CommonWidgetProps<string>>((props, ref) => {
 
   const {
     value,
@@ -9,7 +10,7 @@ export const RichText = React.forwardRef<any, { value: string, onChange: (val?: 
   } = props;
 
   return (
-    <div ref={ref} dangerouslySetInnerHTML={{ __html: value }} {...rest}>
+    <div ref={ref} dangerouslySetInnerHTML={{ __html: value || '' }} {...rest}>
     </div>
   );
 });

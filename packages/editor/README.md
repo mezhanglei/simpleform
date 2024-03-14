@@ -44,12 +44,12 @@ import { FormRender as DefaultFormRender, FormChildren as DefaultFormChildren, c
 export * from '@simpleform/editor';
 // import Example from './Example';
 
-// TODO axios config
+// TODO: axios config
 const axiosConfig = {
 
 };
 
-// TODO default antd@5.x and to add new components
+// TODO: default antd@5.x and to add new components
 const widgets = {
 //  example: Example
 }
@@ -80,7 +80,7 @@ export default function FormRender(props: CustomFormRenderProps) {
 ```
 
 ### 2. Customizable FormEditor
-* Component configuration of the editor
+* Configuring information of component
 ```javascript
 const EditorConfig = {
   'example': {
@@ -99,7 +99,7 @@ const EditorConfig = {
   }
 }
 ```
-* Configuring the `EditorPanel` rendering list
+* Add this component in the `EditorPanel`
 ```javascript
 // config data for EditPanel
 const panelData = {
@@ -117,7 +117,6 @@ const panelData = {
     "DatePicker.RangePicker",
     "Slider",
     "Rate",
-    "ColorPicker",
     "Cascader",
     "FileUpload",
     "ImageUpload",
@@ -127,7 +126,7 @@ const panelData = {
   '业务组件': ['example']
 };
 ```
-* Building the editor component
+* import the above configurations into the `FormEditor`.
 ```javascript
 import { Col, Row } from 'antd';
 import classnames from 'classnames';

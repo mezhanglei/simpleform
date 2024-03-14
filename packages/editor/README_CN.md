@@ -41,12 +41,12 @@ import { FormRender as DefaultFormRender, FormChildren as DefaultFormChildren, c
 export * from '@simpleform/editor';
 // import Example from './Example';
 
-// TODO axios config
+// TODO: axios config
 const axiosConfig = {
 
 };
 
-// TODO default antd@5.x and to add new components
+// TODO: default antd@5.x and to add new components
 const widgets = {
 //  example: Example
 }
@@ -77,7 +77,7 @@ export default function FormRender(props: CustomFormRenderProps) {
 ```
 
 ### 2. 自定义编辑器FormEditor
-* 编辑器的组件配置
+* 配置组件的信息
 ```javascript
 const EditorConfig = {
   'example': {
@@ -96,7 +96,7 @@ const EditorConfig = {
   }
 }
 ```
-* 配置`EditorPanel`的渲染列表
+* 在`EditorPanel`中加入该组件
 ```javascript
 // config data for EditPanel
 const panelData = {
@@ -114,7 +114,6 @@ const panelData = {
     "DatePicker.RangePicker",
     "Slider",
     "Rate",
-    "ColorPicker",
     "Cascader",
     "FileUpload",
     "ImageUpload",
@@ -124,7 +123,7 @@ const panelData = {
   '业务组件': ['example']
 };
 ```
-* 构建编辑器界面
+* 引入上述配置组合成`FormEditor`
 ```javascript
 import { Col, Row } from 'antd';
 import classnames from 'classnames';

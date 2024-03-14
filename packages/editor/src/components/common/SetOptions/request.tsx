@@ -2,7 +2,7 @@ import classNames from "classnames";
 import React, { CSSProperties, useEffect } from "react";
 import CodeTextArea from "../CodeTextarea";
 import { EditorCodeMirrorModal } from "../CodeMirror";
-import DefaultFormRender, { useSimpleForm, FormRenderProps, EditorSelection } from "../../formrender";
+import DefaultFormRender, { useSimpleForm, FormRenderProps, CommonWidgetProps } from "../../formrender";
 
 export interface RequestResponseConfig {
   url?: string; // 请求的路径
@@ -13,9 +13,7 @@ export interface RequestResponseConfig {
   returnFn?: string | ((val: any) => any); // 解析函数字符串
 }
 
-export interface OptionsRequestProps extends EditorSelection {
-  value?: RequestResponseConfig;
-  onChange?: (val?: RequestResponseConfig) => void;
+export interface RequestSettingProps extends CommonWidgetProps<RequestResponseConfig> {
   className?: string;
   style?: CSSProperties;
 }
@@ -33,7 +31,8 @@ const paramsTypeOptions = [
   { value: 'json', label: 'JSON' }
 ];
 
-const OptionsRequest = React.forwardRef<HTMLElement, OptionsRequestProps>((props, ref) => {
+// 请求配置
+const RequestSetting = React.forwardRef<HTMLElement, RequestSettingProps>((props, ref) => {
 
   const {
     value,
@@ -124,4 +123,4 @@ const OptionsRequest = React.forwardRef<HTMLElement, OptionsRequestProps>((props
   );
 });
 
-export default OptionsRequest;
+export default RequestSetting;

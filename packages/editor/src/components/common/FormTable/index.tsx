@@ -1,10 +1,10 @@
 import { ColumnType, TableProps } from 'antd/lib/table';
 import React, { CSSProperties } from 'react';
-import { EditorSelection, CustomFormNodeProps, GenerateFormNodeProps } from '../../formrender';
+import { CustomFormNodeProps, GenerateFormNodeProps, CommonWidgetProps } from '../../formrender';
 import EditorTable from './editor';
 import FormTable from './render';
 
-export interface FormTableProps extends Omit<TableProps<any>, 'title'>, EditorSelection {
+export interface FormTableProps extends Omit<TableProps<any>, 'title' | 'onChange'>, CommonWidgetProps {
   minRows?: number; // 表格默认最少行数
   maxRows?: number; // 表格默认最大行数
   disabled?: boolean; // 禁用
@@ -12,8 +12,6 @@ export interface FormTableProps extends Omit<TableProps<any>, 'title'>, EditorSe
   columns: CustomColumnType[];
   className?: string;
   style?: CSSProperties;
-  value?: any;
-  onChange?: (val?: any) => void;
 }
 
 export interface CustomColumnType<T = any> extends ColumnType<T>, CustomFormNodeProps<GenerateFormNodeProps> {

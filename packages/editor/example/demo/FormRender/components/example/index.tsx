@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
+import { CommonWidgetProps } from '../../../../../src';
 import FormRender, { useSimpleForm, FormRenderProps } from '../../../FormRender';
-import FormConfigs from './data';
+import data from './data';
 
-const ExampleGroup = (props: any) => {
+const ExampleGroup = (props: CommonWidgetProps) => {
   const form = useSimpleForm();
   const { value, onChange, disabled } = props;
 
@@ -18,7 +19,7 @@ const ExampleGroup = (props: any) => {
 
   return <FormRender
     form={form}
-    properties={FormConfigs}
+    properties={data}
     onFieldsChange={handleChange}
     options={{ props: { disabled } }}
   />;

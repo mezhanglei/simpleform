@@ -8,6 +8,7 @@ import { convertToString, evalString } from '../../../utils/string';
 import { javascript } from '@codemirror/lang-javascript';
 import CodeMirror, { ViewUpdate } from '@uiw/react-codemirror';
 import { json } from "@codemirror/lang-json";
+import { CommonWidgetProps } from "../../formrender";
 
 const prefixCls = 'custom-editor';
 const classes = {
@@ -15,9 +16,7 @@ const classes = {
   disabled: `${prefixCls}-disabled`,
   modal: `${prefixCls}-modal`,
 };
-export interface EditorCodeMirrorProps {
-  value?: any;
-  onChange?: (val: any) => void;
+export interface EditorCodeMirrorProps extends CommonWidgetProps {
   readOnly?: boolean; // 只读
   disabled?: boolean; // 禁止编辑
   className?: string;

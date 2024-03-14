@@ -30,7 +30,6 @@ const defaultPanelData = {
     "DatePicker.RangePicker",
     "Slider",
     "Rate",
-    "ColorPicker",
     "Cascader",
     "FileUpload",
     "ImageUpload",

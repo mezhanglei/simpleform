@@ -3,29 +3,19 @@ import SvgIcon from "../../SvgIcon";
 import './index.less';
 import CustomModal from "../../AntdModal";
 import classNames from "classnames";
-import DefaultFormRender, { Form, CustomFormNodeProps, useSimpleForm, matchExpression, EditorSelection } from "../../../formrender";
+import DefaultFormRender, { Form, CustomFormNodeProps, useSimpleForm, matchExpression, CommonWidgetProps } from "../../../formrender";
 import { Radio } from "antd";
 import ShowSettingModal from "../../LinkageSetting/ShowSettingModal";
-
-export interface InputFormRule {
-  max?: number | string;
-  min?: number | string;
-  pattern?: boolean | string;
-  required?: boolean | string;
-  message?: string;
-}
-export type InputFormRuleKey = keyof Omit<InputFormRule, 'message'>
+import { InputFormRule, InputFormRuleKey } from "..";
 
 export interface RuleCoreRefs {
   showRuleModal: () => void
 }
 
-export interface RuleCoreProps extends EditorSelection {
+export interface RuleCoreProps extends CommonWidgetProps<any> {
   name?: InputFormRuleKey;
-  value?: InputFormRule;
   label?: string;
   setting?: CustomFormNodeProps;
-  onChange?: (val?: InputFormRule) => void;
   className?: string;
 }
 

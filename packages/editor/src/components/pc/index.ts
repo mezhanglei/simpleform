@@ -15,7 +15,6 @@ import {
   Divider,
 } from 'antd';
 import bindRequest from '../bind-request';
-import ColorPicker from './ColorPicker';
 import FileUpload from './FileUpload';
 import ImageUpload from './ImageUpload';
 
@@ -47,7 +46,6 @@ const widgets: any = {
   "Alert": Alert, // 提示组件
   "Divider": Divider, // 分割线组件
   // 自定义组件
-  "ColorPicker": ColorPicker, // 颜色选择器
   "FileUpload": FileUpload, // 文件上传
   "ImageUpload": ImageUpload, // 图片上传
 };

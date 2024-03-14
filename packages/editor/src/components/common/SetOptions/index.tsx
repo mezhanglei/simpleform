@@ -1,20 +1,18 @@
 import { Select } from "antd";
 import React, { useMemo } from "react";
-import OptionsList from './OptionsList';
-import OptionsRequest from './OptionsRequest';
 import './index.less';
-import OptionsDynamicSetting from "./OptionsDynamic";
+import LinkageSetting from "./Linkage";
+import RequestSetting from './request';
+import OptionList from './list';
 import { EditorCodeMirror } from "../CodeMirror";
 import { getFormItem } from "../../../utils/utils";
-import { joinFormPath, EditorSelection } from "../../formrender";
+import { joinFormPath, CommonWidgetProps } from "../../formrender";
 
 /**
  * 数据源的配置组件。
  */
 
-export interface SetOptionsProps extends EditorSelection {
-  value?: any;
-  onChange?: (val: any) => void;
+export interface SetOptionsProps extends CommonWidgetProps {
   includes?: string[]; // 当前可用模块
 }
 
@@ -25,13 +23,12 @@ const classes = {
 };
 
 const OptionsWidget = {
-  list: { label: '选项数据', component: OptionsList },
+  list: { label: '选项数据', component: OptionList },
   json: { label: '静态数据', component: EditorCodeMirror },
-  request: { label: '接口请求', component: OptionsRequest },
-  dynamic: { label: '联动设置', component: OptionsDynamicSetting },
+  request: { label: '接口请求', component: RequestSetting },
+  dynamic: { label: '联动设置', component: LinkageSetting },
 };
-type OptionsData = typeof OptionsWidget;
-type OptionsKey = keyof OptionsData;
+type OptionsKey = keyof typeof OptionsWidget;
 type OptionsKeyList = Array<OptionsKey>;
 const OptionsKeys = Object.keys(OptionsWidget) as OptionsKeyList;
 

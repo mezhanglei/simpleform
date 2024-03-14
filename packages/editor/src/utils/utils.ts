@@ -7,7 +7,7 @@ export const defaultGetId = (key?: string) => {
   return typeof key == 'string' ? `${key.replace(/\./g, '')}_${nanoid(6)}` : '';
 };
 
-// 失去选中
+// 未被选中
 export const isNoSelected = (path?: string) => {
   if (!path || path === '#') return true;
 };

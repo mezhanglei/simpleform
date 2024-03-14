@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import './modal.less';
 import { useTableData } from "../../../utils/hooks";
 import SvgIcon from "../SvgIcon";
-import DefaultFormRender, { CustomFormNodeProps, EditorSelection, FieldChangedParams } from "../../formrender";
+import DefaultFormRender, { CommonWidgetProps, CustomFormNodeProps, FieldChangedParams } from "../../formrender";
 import { codeToRule, ruleToCodeStr } from "./utils";
 import CustomModal, { CustomModalProps } from "../AntdModal";
 
@@ -15,9 +15,7 @@ export type RuleSettingItem = {
   code?: string;
   value?: unknown;
 }
-export interface SettingModalProps extends CustomModalProps, EditorSelection {
-  value?: string;
-  onChange?: (codeStr?: string) => void;
+export interface SettingModalProps extends CustomModalProps, CommonWidgetProps<string> {
   setting?: CustomFormNodeProps;
 }
 

@@ -25,7 +25,7 @@ yarn add @simpleform/render
 ### 1. First register the basic components (Take antd@5.x as an example)
 ```javascript
 // register
-import FormRenderCore, { FormChildren as FormChildrenCore, FormRenderProps, FormChildrenProps } from '@simpleform/render';
+import DefaultFormRender, { FormChildren as FormChildrenCore, FormRenderProps, FormChildrenProps } from '@simpleform/render';
 import '@simpleform/render/lib/css/main.css';
 import React from 'react';
 import dayjs from 'dayjs';
@@ -75,7 +75,7 @@ export type CustomFormChildrenProps = FormChildrenProps<any>;
 export function FormChildren(props: CustomFormChildrenProps) {
   const { components, plugins, ...rest } = props;
   return (
-    <FormChildrenCore
+    <DefaultFormChildren
       options={{ props: { autoComplete: 'off' } }}
       components={{ ...widgets, ...components }}
       plugins={{ ...plugins, dayjs }}
@@ -87,7 +87,7 @@ export type CustomFormRenderProps = FormRenderProps<any>;
 export default function FormRender(props: CustomFormRenderProps) {
   const { components, plugins, ...rest } = props;
   return (
-    <FormRenderCore
+    <DefaultFormRender
       options={{ props: { autoComplete: 'off' } }}
       components={{ ...widgets, ...components }}
       plugins={{ ...plugins, dayjs }}

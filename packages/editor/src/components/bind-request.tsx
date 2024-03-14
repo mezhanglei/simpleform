@@ -8,8 +8,7 @@ import { objectToFormData } from '../utils/object';
  * @returns 
  */
 
-export default function bindRequest(component: any, codeStr: string = "options") {
-  const Component = component;
+export default function bindRequest(Component: any, codeStr: string = "options") {
   return React.forwardRef<any, any>(({ optionType, ...props }, ref) => {
     // 目标参数
     const target = props?.[codeStr];

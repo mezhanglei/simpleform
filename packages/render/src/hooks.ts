@@ -24,9 +24,9 @@ export function useProperties(formrender: SimpleFormRender) {
   useEffect(() => {
     subscribeData();
     return () => {
-      formrender.unsubscribeProperties();
+      formrender && formrender.unsubscribeProperties();
     };
-  }, [formrender]);
+  }, []);
 
   return [properties, setProperties];
 }

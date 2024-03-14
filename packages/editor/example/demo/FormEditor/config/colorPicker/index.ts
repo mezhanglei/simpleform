@@ -1,5 +1,5 @@
+import { FieldSetting } from '../../../FormRender';
 import Setting from './setting';
-import FieldSetting from '../../fieldSetting';
 
 export default {
   panel: {

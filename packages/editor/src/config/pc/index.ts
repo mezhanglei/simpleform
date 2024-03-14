@@ -9,7 +9,6 @@ import DatePicker from './datePicker';
 import DatePickerRangePicker from './datePickerRangePicker';
 import Slider from './slider';
 import Rate from './rate';
-import ColorPicker from './colorPicker';
 import FileUpload from './fileUpload';
 import ImageUpload from './imageUpload';
 import Cascader from './cascader';
@@ -44,7 +43,6 @@ export default {
   "DatePicker.RangePicker": DatePickerRangePicker,
   "Slider": Slider,
   "Rate": Rate,
-  "ColorPicker": ColorPicker,
   "Cascader": Cascader,
   "FileUpload": FileUpload,
   "ImageUpload": ImageUpload,

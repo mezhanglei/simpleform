@@ -28,6 +28,12 @@ export type CustomFormNodeProps<T = FormNodeProps> = T & CustomOptions;
 export type FormDesignData = { [key: string]: CustomFormNodeProps } | CustomFormNodeProps[];
 // 选中项类型
 export type EditorSelection = { attributeName?: string, appendSetting?: ConfigSettingItem } & GenerateParams<CustomOptions>;
+// 控件的公共输入项props
+export type CommonWidgetProps<T = any> = {
+  value?: T;
+  onChange?: (val?: T) => void;
+  disabled?: boolean;
+} & EditorSelection;
 
 export type CustomFormChildrenProps = FormChildrenProps<CustomOptions>;
 export function FormChildren(props: CustomFormChildrenProps) {
