@@ -8,7 +8,7 @@ import { FormEditorContextProps, useEditorContext } from '../context';
 export interface EditorSettingProps {
   className?: string
   style?: CSSProperties
-  children?: (context: FormEditorContextProps) => React.ReactNode;
+  children?: (context: FormEditorContextProps) => React.ReactElement;
 }
 const prefixCls = `simple-form-setting`;
 function EditorSetting(props: EditorSettingProps) {

@@ -1,6 +1,6 @@
-import { pathToArr, deepGet, deepSet } from "./object";
+import { pathToArr, deepGet, deepSet, formatFormKey } from "./object";
 import { isEmpty } from "./type";
-export { pathToArr, deepGet, deepSet };
+export { pathToArr, deepGet, deepSet, formatFormKey };
 
 // 是否存在前缀
 export function isExitPrefix(prefix: string, path: string | string[]) {
@@ -26,8 +26,8 @@ export function getValueFromEvent(...args: any[]) {
 }
 
 // 是否携带中括号
-export const isWithBracket = (part?: any) => {
-  return typeof part === 'string' && (/\[(\d+)\]/gi.test(part));
+export const isWithBracket = (code?: any) => {
+  return typeof code === 'string' && /^\[\d+\]$/.test(code);
 };
 
 // 由前到后拼接当前项的表单的path

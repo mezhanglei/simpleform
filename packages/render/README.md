@@ -2,13 +2,15 @@
 
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-2.0.7-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-2.0.8-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > A lightweight dynamic forms engine that makes it easy to dynamically render forms.
 
+* Break Change: Version >= 3.x is recommended, providing a better semanticized `JSON` structure.
+
 ## Introduction
 - Component Registration: Form controls used in `@simpleform/render` must be controlled components with `value` and `onChange` props.
-- Component Description: `properties` supports rendering of object or array types, and adding nested object fields via the `properties` property.
+- Component Description: `properties` supports rendering of object or array types.
 - Component Rendering: `Form` component handles form values, `FormChildren` component handles form rendering, a `Form` component can support multiple `FormChildren` components rendering inside.
 - Component linkage: All form properties can support string expressions to describe linkage conditions (except `properties`).
 

@@ -1,10 +1,10 @@
 import { Modal, ModalProps } from 'antd';
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { useState } from 'react';
 import './style.less';
 
 export interface CustomModalProps extends ModalProps {
-  displayElement?: ((showModal: () => any) => ReactNode) | ReactNode;
+  displayElement?: ((showModal: () => any) => React.ReactElement) | React.ReactElement;
   onOk?: (closeModal: any) => void | Promise<void>;
   onCancel?: (closeModal: any) => void | Promise<void>;
 }

@@ -11,8 +11,8 @@ import { showExportJsonModal } from './exportJson';
 export interface EditorToolsProps {
   className?: string;
   style?: CSSProperties;
-  children?: (context: FormEditorContextProps) => React.ReactNode;
-  renderTools?: (context: FormEditorContextProps) => React.ReactNode;
+  children?: (context: FormEditorContextProps) => React.ReactElement;
+  renderTools?: (context: FormEditorContextProps) => React.ReactElement;
 }
 
 function EditorTools(props: EditorToolsProps) {

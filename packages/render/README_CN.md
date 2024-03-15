@@ -2,13 +2,15 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-2.0.7-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-2.0.8-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 轻量级动态表单引擎，实现动态渲染表单很简单.
 
+* Break Change: 建议使用3.x以上版本，提供了更好的语义化`JSON`结构。
+
 ## 介绍
 - 组件注册: 在`@simpleform/render`中使用的表单控件必须是具有`value`和`onChange`两个props的受控组件.
-- 组件描述：`properties`支持对象或者数组类型的渲染，支持通过`properties`属性添加嵌套对象字段。
+- 组件描述：`properties`支持对象或者数组类型的渲染。
 - 组件渲染：`Form`组件处理表单的值, `FormChildren`组件处理表单的渲染, 一个`Form`组件可以支持多个`FormChildren`组件在内部渲染.
 - 组件联动：表单属性均可以支持字符串表达式描述联动条件(`properties`除外).
 

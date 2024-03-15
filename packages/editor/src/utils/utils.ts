@@ -1,6 +1,6 @@
 import { deepMergeObject } from './object';
 import { nanoid } from 'nanoid';
-import { SimpleForm, EditorSelection, SimpleFormRender, getInitialValues, getPathEnd, joinFormPath } from '../components/formrender';
+import { SimpleForm, EditorSelection, SimpleFormRender, getInitialValues, getPathEnd, joinFormPath, getParent } from '../components/formrender';
 import { FormEditorState } from '../context';
 
 export const defaultGetId = (key?: string) => {
@@ -36,10 +36,10 @@ export const getSelectedIndex = (editor?: SimpleFormRender | null, selected?: Ed
   if (!editor) return -1;
   const len = Object.keys(editor.getProperties() || {}).length || 0;
   if (isNoSelected(selected?.path)) return len;
-  const parentPath = selected?.parent?.path;
-  const parent = parentPath ? editor.getItemByPath(parentPath)?.properties : editor.getProperties();
+  const parent = selected?.attributeName ? editor.getItemByPath(selected.path, getParent(selected?.attributeName)) : editor.getItemByPath(selected?.parent?.path);
+  const endCode = (selected?.attributeName ? getPathEnd(selected?.attributeName) : getPathEnd(selected?.path))?.replace(/\]/, '').replace(/\[/, '');
   const keys = Object.keys(parent);
-  const index = keys.findIndex((key) => key == selected?.path);
+  const index = keys.findIndex((key) => key == endCode);
   return index;
 };
 

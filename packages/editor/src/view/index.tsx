@@ -11,7 +11,7 @@ import PlatContainer from '../tools/platContainer';
 export interface EditorViewProps {
   className?: string;
   style?: CSSProperties;
-  children?: (context: FormEditorContextProps) => React.ReactNode;
+  children?: (context: FormEditorContextProps) => React.ReactElement;
 }
 
 function EditorView(props: EditorViewProps) {

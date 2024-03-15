@@ -1,18 +1,16 @@
 import React, { CSSProperties } from 'react';
 import classnames from 'classnames';
 import './index.less';
-import SvgIcon from '../components/common/SvgIcon';
-import { CustomFormNodeProps } from '../components/formrender';
 import { getConfigItem, getSelectedIndex, insertFormItem } from '../utils/utils';
 import DndSortable from 'react-dragger-sort';
 import { FormEditorContextProps, useEditorContext } from '../context';
+import { getParent } from '../components/formrender';
 
-export interface TagProps {
+export interface PanelTagProps {
   className?: string
   style?: CSSProperties
   children: any
   onChange: () => void
-  icon?: string;
 }
 
 const defaultPanelData = {
@@ -38,13 +36,12 @@ const defaultPanelData = {
   ]
 };
 
-const Tag = React.forwardRef((props: TagProps, ref: any) => {
+const PanelTag = React.forwardRef((props: PanelTagProps, ref: any) => {
   const {
     style,
     className,
     children,
     onChange,
-    icon,
     ...restProps
   } = props;
   const prefixCls = 'component-tag';
@@ -52,9 +49,6 @@ const Tag = React.forwardRef((props: TagProps, ref: any) => {
 
   return (
     <span onClick={onChange} ref={ref} className={cls} style={style} {...restProps}>
-      <div className={`${prefixCls}-icon`}>
-        {icon && <SvgIcon name={icon} />}
-      </div>
       {children}
     </span>
   );
@@ -64,7 +58,7 @@ export interface EditorPanelProps {
   className?: string
   style?: CSSProperties
   panelData?: { [title: string]: Array<string> }; // 组件面板配置
-  children?: (context: FormEditorContextProps) => React.ReactNode;
+  children?: (context: FormEditorContextProps) => React.ReactElement;
 }
 
 const prefixCls = `simple-form-panel`;
@@ -78,15 +72,16 @@ function EditorPanel(props: EditorPanelProps) {
 
   const context = useEditorContext();
   const { selected, editor, editorConfig, historyRecord } = context.state;
-  const selectedParent = selected?.parent;
-  const attributeName = selected?.attributeName;
   const cls = classnames(prefixCls, className);
 
-  const onChange = (key: string, item: CustomFormNodeProps) => {
-    if (attributeName) return;
+  const onChange = (key: string) => {
     const newIndex = getSelectedIndex(editor, selected) + 1; // 插入位置序号
     const configItem = getConfigItem(key, editorConfig); // 提取默认值
-    insertFormItem(editor, configItem, newIndex, { path: selectedParent?.path });
+    if (selected?.attributeName) {
+      insertFormItem(editor, configItem, newIndex, { path: selected?.path, attributeName: getParent(selected?.attributeName) });
+    } else {
+      insertFormItem(editor, configItem, newIndex, { path: selected?.parent?.path });
+    }
     historyRecord?.save();
   };
 
@@ -113,7 +108,7 @@ function EditorPanel(props: EditorPanelProps) {
                     list.map((key) => {
                       const data = editorConfig?.[key] || {};
                       const panel = data?.panel || {};
-                      return <Tag key={key} data-id={key} icon={panel?.icon} onChange={() => onChange?.(key, data)}>{panel.label}</Tag>;
+                      return <PanelTag key={key} data-id={key} onChange={() => onChange?.(key)}>{panel.label}</PanelTag>;
                     })
                   }
                 </DndSortable>
