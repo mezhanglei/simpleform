@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import './modal.less';
 import { useTableData } from "../../../utils/hooks";
 import SvgIcon from "../SvgIcon";
-import DefaultFormRender, { CommonWidgetProps, CustomFormNodeProps, FieldChangedParams } from "../../formrender";
+import DefaultFormRender, { CommonWidgetProps, CustomWidgetItem, FieldChangedParams } from "../../formrender";
 import { codeToRule, ruleToCodeStr } from "./utils";
 import CustomModal, { CustomModalProps } from "../AntdModal";
 
@@ -16,7 +16,7 @@ export type RuleSettingItem = {
   value?: unknown;
 }
 export interface SettingModalProps extends CustomModalProps, CommonWidgetProps<string> {
-  setting?: CustomFormNodeProps;
+  setting?: CustomWidgetItem;
 }
 
 const prefixCls = 'dynamic-rules';
@@ -46,7 +46,7 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
     setting,
     title,
     displayElement,
-    field,
+    widgetItem,
     ...rest
   } = props;
 
@@ -60,7 +60,7 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
     deleteItem
   } = useTableData<RuleSettingItem>(initialValue);
 
-  const context = field?.context;
+  const context = widgetItem?.context;
   const FormRender = context?.state?.FormRender || DefaultFormRender;
 
   useEffect(() => {

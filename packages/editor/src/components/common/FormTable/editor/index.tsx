@@ -13,7 +13,6 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
   disabled,
   className,
   style,
-  name,
   ...rest
 }, ref) => {
 
@@ -29,11 +28,11 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
     placeholder: `${prefix}-placeholder`,
   };
 
-  const context = rest?.field?.context;
+  const context = rest?.widgetItem?.context;
   const { editor, settingForm } = context?.state || {};
 
   const onFieldsChange = (colIndex: number, newVal: any) => {
-    setFormInitialValue(editor, settingForm, { path: rest?.path, attributeName: `props.columns[${colIndex}]` }, newVal);
+    setFormInitialValue(editor, settingForm, rest?.path, newVal);
   };
 
   return (

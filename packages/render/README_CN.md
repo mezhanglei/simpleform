@@ -2,17 +2,20 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-2.0.8-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-3.0.0-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 轻量级动态表单引擎，实现动态渲染表单很简单.
 
 * Break Change: 建议使用3.x以上版本，提供了更好的语义化`JSON`结构。
+ - 废弃 ~`properties`~ : 由`widgetList`代替.
+ - 废弃 ~`onPropertiesChange`~ : 由`onRenderChange`代替.
+ - `useSimpleFormRender()`的方法全部变更使用方式.
 
 ## 介绍
-- 组件注册: 在`@simpleform/render`中使用的表单控件必须是具有`value`和`onChange`两个props的受控组件.
-- 组件描述：`properties`支持对象或者数组类型的渲染。
+- 组件注册: 在`@simpleform/render`中使用的表单控件必须是具有`value`和`onChange`两个`props`的受控组件.
+- 组件描述：`widgetList`数组列表描述当前的表单结构.
 - 组件渲染：`Form`组件处理表单的值, `FormChildren`组件处理表单的渲染, 一个`Form`组件可以支持多个`FormChildren`组件在内部渲染.
-- 组件联动：表单属性均可以支持字符串表达式描述联动条件(`properties`除外).
+- 组件联动：表单属性均可以支持字符串表达式描述联动条件(`widgetList`属性除外).
 
 ## 安装
 - [Node.js](https://nodejs.org/en/) Version >= 14.0.0
@@ -118,105 +121,104 @@ export default function Demo5(props) {
     }
   }
 
-  const properties = {
-      name1: {
-        label: "readonly",
-        readOnly: true,
-        readOnlyRender: "readonly component",
-        initialValue: 1111,
-        hidden: '{{formvalues && formvalues.name6 == true}}',
-        type: 'Input',
-        props: {}
-      },
-      name2: {
-        label: "input",
-        rules: [{ required: true, message: 'input empty' }],
-        initialValue: 1,
-        hidden: '{{formvalues && formvalues.name6 == true}}',
-        type: 'Input',
-        props: {}
-      },
-      name3: {
-        // type: '',
-        // props: {},
-        properties: [{
-          label: 'list[0]',
-          rules: [{ required: true, message: 'list[0] empty' }],
-          initialValue: { label: 'option1', value: '1', key: '1' },
-          type: 'Select',
-          props: {
-            labelInValue: true,
-            style: { width: '100%' },
-            children: [
-              { type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } },
-              { type: 'Select.Option', props: { key: 2, value: '2', children: 'option2' } }
-            ]
-          }
-        }, {
-          label: 'list[1]',
-          rules: [{ required: true, message: 'list[1] empty' }],
-          type: 'Select',
-          props: {
-            labelInValue: true,
-            style: { width: '100%' },
-            children: [
-              { type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } },
-              { type: 'Select.Option', props: { key: 2, value: '2', children: 'option2' } }
-            ]
-          }
-        }]
-      },
-      name4: {
-        // type: '',
-        // props: {},
-        properties: {
-          first: {
-            label: 'first',
-            rules: [{ required: true, message: 'first empty' }],
-            type: 'Select',
-            props: {
-              style: { width: '100%' },
-              children: [{ type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } }]
-            }
-          },
-          second: {
-            label: 'second',
-            rules: [{ required: true, message: 'second empty' }],
-            type: 'Select',
-            props: {
-              style: { width: '100%' },
-              children: [{ type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } }]
-            }
-          }
-        }
-      },
-      name5: {
-        label: 'name5',
-        initialValue: { span: 12 },
-        valueSetter: "{{(value)=> (value && value['span'])}}",
-        valueGetter: "{{(value) => ({span: value})}}",
-        type: 'Select',
-        props: {
-          style: { width: '100%' },
-          children: [
-            { type: 'Select.Option', props: { key: 1, value: 12, children: 'option1' } },
-            { type: 'Select.Option', props: { key: 2, value: 6, children: 'option2' } },
-            { type: 'Select.Option', props: { key: 3, value: 4, children: 'option3' } }
-          ]
-        }
-      },
-      name6: {
-        label: 'checkbox',
-        valueProp: 'checked',
-        initialValue: true,
-        rules: [{ required: true, message: 'checkbox empty' }],
-        type: 'Checkbox',
-        props: {
-          style: { width: '100%' },
-          children: 'option'
-        }
-      },
-    }
+  const widgetList = [
+    {
+      label: "readonly",
+      name: 'name1',
+      readOnly: true,
+      readOnlyRender: "readonly component",
+      initialValue: 1111,
+      hidden: '{{formvalues && formvalues.name6 == true}}',
+      type: 'Input',
+      props: {}
+    },
+    {
+      label: "input",
+      name: 'name2',
+      rules: [{ required: true, message: 'input empty' }],
+      initialValue: 1,
+      hidden: '{{formvalues && formvalues.name6 == true}}',
+      type: 'Input',
+      props: {}
+    },
+    {
+      label: 'list[0]',
+      name: 'list[0]',
+      rules: [{ required: true, message: 'list[0] empty' }],
+      initialValue: { label: 'option1', value: '1', key: '1' },
+      type: 'Select',
+      props: {
+        labelInValue: true,
+        style: { width: '100%' },
+        children: [
+          { type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } },
+          { type: 'Select.Option', props: { key: 2, value: '2', children: 'option2' } }
+        ]
+      }
+    },
+    {
+      label: 'list[1]',
+      name: 'list[1]',
+      rules: [{ required: true, message: 'list[1] empty' }],
+      type: 'Select',
+      props: {
+        labelInValue: true,
+        style: { width: '100%' },
+        children: [
+          { type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } },
+          { type: 'Select.Option', props: { key: 2, value: '2', children: 'option2' } }
+        ]
+      }
+    },
+    {
+      label: 'first',
+      name: 'name4.first',
+      rules: [{ required: true, message: 'first empty' }],
+      type: 'Select',
+      props: {
+        style: { width: '100%' },
+        children: [{ type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } }]
+      }
+    },
+    {
+      label: 'second',
+      name: 'name4.second',
+      rules: [{ required: true, message: 'second empty' }],
+      type: 'Select',
+      props: {
+        style: { width: '100%' },
+        children: [{ type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } }]
+      }
+    },
+    {
+      label: 'name5',
+      name: 'name5',
+      initialValue: { span: 12 },
+      valueSetter: "{{(value)=> (value && value['span'])}}",
+      valueGetter: "{{(value) => ({span: value})}}",
+      type: 'Select',
+      props: {
+        style: { width: '100%' },
+        children: [
+          { type: 'Select.Option', props: { key: 1, value: 12, children: 'option1' } },
+          { type: 'Select.Option', props: { key: 2, value: 6, children: 'option2' } },
+          { type: 'Select.Option', props: { key: 3, value: 4, children: 'option3' } }
+        ]
+      }
+    },
+    {
+      label: 'checkbox',
+      name: 'name6',
+      valueProp: 'checked',
+      initialValue: true,
+      rules: [{ required: true, message: 'checkbox empty' }],
+      type: 'Checkbox',
+      props: {
+        style: { width: '100%' },
+        children: 'option'
+      }
+    },
+  ]
 
   const form = useSimpleForm();
   // const formrender = useSimpleFormRender();
@@ -232,7 +234,7 @@ export default function Demo5(props) {
       <FormRender
         form={form}
         // formrender={formrender}
-        properties={properties}
+        widgetList={widgetList}
         watch={watch} />
       <div style={{ marginLeft: '120px' }}>
         <Button onClick={onSubmit}>submit</Button>
@@ -252,25 +254,23 @@ import { FormChildren, Form, useSimpleForm } from './form-render';
 import { Button } from 'antd';
 export default function Demo(props) {
   
-  const properties1 = {
-    part1: {
-      label: "part1input",
-      rules: [{ required: true, message: 'name1 empty' }],
-      initialValue: 1,
-      type: 'Input',
-      props: {}
-    },
-  }
+  const widgetList1 = [{
+    label: "part1input",
+    name: 'part1',
+    rules: [{ required: true, message: 'part1 empty' }],
+    initialValue: 1,
+    type: 'Input',
+    props: {}
+  }]
 
-  const properties2 = {
-    part2: {
-      label: "part2input",
-      rules: [{ required: true, message: 'name1 empty' }],
-      initialValue: 1,
-      type: 'Input',
-      props: {}
-    },
-  }
+  const widgetList2 = [{
+    label: "part2input",
+    name: 'part2',
+    rules: [{ required: true, message: 'part2 empty' }],
+    initialValue: 1,
+    type: 'Input',
+    props: {}
+  }]
 
   const form = useSimpleForm();
   // const formrender1 = useSimpleFormRender()
@@ -289,14 +289,14 @@ export default function Demo(props) {
           <p>part1</p>
           <FormChildren
             // formrender={formrender1}
-            properties={properties1}
+            widgetList={widgetList1}
           />
         </div>
         <div>
           <p>part2</p>
           <FormChildren
             // formrender={formrender2}
-            properties={properties2}
+            widgetList={widgetList2}
           />
         </div>
       </Form>
@@ -315,32 +315,36 @@ import FormRender, { useSimpleForm } from './form-render';
 import { Button } from 'antd';
 export default function Demo(props) {
   const form = useSimpleForm();
-  const properties =
+  const widgetList =
     [
       {
         label: "list-0",
-        rules: [{ required: true, message: 'name1 empty' }],
+        name: 'list[0]',
+        rules: [{ required: true, message: 'list[0] empty' }],
         initialValue: 1,
         type: 'Input',
         props: {}
       },
       {
         label: "list-1",
-        rules: [{ required: true, message: 'name1 empty' }],
+        name: 'list[1]',
+        rules: [{ required: true, message: 'list[1] empty' }],
         initialValue: 2,
         type: 'Input',
         props: {}
       },
       {
         label: "list-2",
-        rules: [{ required: true, message: 'name1 empty' }],
+        name: 'list[2]',
+        rules: [{ required: true, message: 'list[2] empty' }],
         initialValue: 3,
         type: 'Input',
         props: {}
       },
       {
         label: "list-3",
-        rules: [{ required: true, message: 'name1 empty' }],
+        name: 'list[3]',
+        rules: [{ required: true, message: 'list[3] empty' }],
         initialValue: 4,
         type: 'Input',
         props: {}
@@ -357,7 +361,7 @@ export default function Demo(props) {
     <div style={{ padding: '0 8px' }}>
       <FormRender
         form={form}
-        properties={properties}
+        widgetList={widgetList}
       />
       <div style={{ marginLeft: '120px' }}>
         <Button onClick={onSubmit}>submit</Button>
@@ -373,26 +377,25 @@ export default function Demo(props) {
 来源于[@simpleform/form](../form);
 
 ### FormChildren's props
-- `properties`: `{ [name: string]: FormNodeProps } | FormNodeProps[]` 渲染表单的DSL形式的json数据
+- `widgetList`: `WidgetItem[]` 渲染表单的DSL形式的json数据
 - `components`：注册表单中的所有组件;
 - `plugins`：表单中需要引入的外来库;
 - `options`： `GenerateFormNodeProps | ((field: GenerateFormNodeProps) => any)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
 - `renderList`：提供自定义渲染列表的函数.
 - `renderItem`：提供自定义渲染节点的函数.
-- `onPropertiesChange`: `(newValue: PropertiesData) => void;` `properties`更改时回调函数
+- `onRenderChange`: `(newValue: WidgetList) => void;` `widgetList`更改时回调函数
 - `formrender`: 负责渲染的表单类。通过`useSimpleFormRender()`创建，选填.
 - `form`: 负责表单的值的类。通过`useSimpleForm()`创建，选填.
 - `uneval`: 不执行表单中的字符串表达式.
 
 ### SimpleFormRender's Methods
-- `updateItemByPath`: `(data?: any, path?: string, attributeName?: string) => void` 更新路径`path`对应的节点，如果更新节点中的具体属性则需要`attributeName`参数
-- `setItemByPath`: `(data?: any, path?: string, attributeName?: string) => void` 设置路径`path`对应的节点，如果设置节点中的具体属性则需要`attributeName`参数
-- `updateNameByPath`: `(newName?: string, path: string) => void` 更新指定路径的name键
-- `delItemByPath`: `(path?: string, attributeName?: string) => void` 删除路径`path`对应的节点，如果删除节点中的具体属性则需要`attributeName`参数
-- `insertItemByIndex`: `(data: InsertItemType, index?: number, parent?: { path?: string, attributeName?: string }) => void` 根据序号和父节点路径添加选项
-- `getItemByPath`: `(path?: string, attributeName?: string) => void` 获取路径`path`对应的节点，如果是节点中的具体属性则需要`attributeName`参数
+- `updateItemByPath`: `(data?: any, path?: string) => void` 根据`path`获取对应的节点
+- `setItemByPath`: `(data?: any, path?: string) => void` 根据`path`设置对应的节点
+- `delItemByPath`: `(path?: string) => void` 删除路径`path`对应的节点
+- `insertItemByIndex`: `(data: WidgetItem | WidgetItem[], index?: number, parent?: string) => void` 根据序号和父节点路径添加节点
+- `getItemByPath`: `(path?: string) => void` 获取路径`path`对应的节点
 - `moveItemByPath`: `(from: { parent?: string, index: number }, to: { parent?: string, index?: number })` 把树中的选项从一个位置调换到另外一个位置
-- `setProperties`: `(data?: Partial<FormNodeProps>) => void` 设置`properties`;
+- `setWidgetList`: `(data?: WidgetList) => void` 设置表单的`widgetList`属性;
 
 ### Hooks
 - `useSimpleFormRender()`: 创建 `new SimpleFormRender()`.
@@ -400,66 +403,40 @@ export default function Demo(props) {
 
 ## 其他
 
-### properties结构说明
-`properties`属性中每一项均为一个表单节点，节点分为嵌套节点和控件节点。
-- 嵌套节点:
-有`properties`属性的节点，通过`type`和`props`字段描述该节点为哪个组件，不携带表单域组件(`Form.Item`)。
-- 控件节点:
-无`properties`属性的节点，默认携带表单域组件(`Form.Item`)。
+### widgetList结构说明
+`widgetList`列表中每一项均为一个渲染节点, 分为表单控件节点和非控件节点
+- 表单控件节点:
+具有`name`属性的节点为表单控件节点，默认携带表单域组件(`Form.Item`)，举例：
 ```javascript
-const properties = {
-  name3: {
-    // 嵌套节点
-    // type: '',
-    // props: {},
-    properties: {
-      // 控件节点
-      first: {
-        label: 'first',
-        rules: [{ required: true, message: 'first empty' }],
-        type: 'Select',
-        props: {
-          style: { width: '100%' },
-          children: [{ type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } }]
-        }
-      },
-    }
-  },
-}
+const widgetList = [{
+  label: "part2input",
+  name: 'part2',
+  rules: [{ required: true, message: 'part2 empty' }],
+  initialValue: 1,
+  type: 'Input',
+  props: {}
+}]
 ```
-- 节点的类型
+- 普通组件节点:
+无`name`属性的节点。举例：
 ```javascript
-export interface FormComponent {
-  type?: string;
-  props?: any & { children?: any | Array<FormComponent> };
-}
-
-export type UnionComponent<P> =
-  | React.ComponentType<P>
-  | React.ForwardRefExoticComponent<P>
-  | React.FC<P>
-  | keyof React.ReactHTML;
-
-// 表单上的组件联合类型
-export type CustomUnionType = FormComponent | Array<FormComponent> | UnionComponent<any> | Function | ReactNode
-// 表单对象
-export type PropertiesData = { [name: string]: FormNodeProps } | FormNodeProps[]
-// 表单域(字符串表达式编译后)
-export type GenerateFormNodeProps<T = {}> = FormComponent & FormItemProps & T & {
-  ignore?: boolean; // 标记当前节点为非表单节点
-  inside?: CustomUnionType; // 节点内层嵌套组件
-  outside?: CustomUnionType; // 节点外层嵌套组件
+const widgetList = [{
+  type: 'CustomCard',
+  props: {}
+}]
+```
+- 节点的属性
+```javascript
+export type GenerateWidgetItem<T extends Record<string, any> = {}> = FormItemProps & T & {
+  inside?: CustomUnionType; // 节点的内层
+  outside?: CustomUnionType; // 节点的外层
   readOnly?: boolean; // 只读模式
-  readOnlyRender?: CustomUnionType; // 只读模式展示的组件
-  typeRender?: CustomUnionType; // 自定义注册组件
-  properties?: PropertiesData;
-  hidden?: boolean;
-}
-// 表单域(字符串表达式编译前)
-export type FormNodeProps = {
-  [key in keyof GenerateFormNodeProps]: key extends 'rules' ?
-  (string | Array<{ [key in keyof FormRule]: FormRule[key] | string }> | GenerateFormNodeProps[key])
-  : (key extends 'properties' ? GenerateFormNodeProps[key] : (string | GenerateFormNodeProps[key]))
+  readOnlyRender?: CustomUnionType; // 只读模式下的组件
+  typeRender?: CustomUnionType; // 自定义渲染实例
+  hidden?: boolean; // 隐藏节点
+  type?: string; //  注册组件
+  props?: Record<string, any> & { children?: any | Array<CustomWidget> }; // 注册组件的props
+  widgetList?: WidgetList; // 嵌套的子节点(会覆盖props.children)
 }
 ```
 
@@ -482,10 +459,8 @@ export type FormNodeProps = {
 表单中的注册组件会接收到上下文参数
 ```javascript
 export interface GenerateParams<T = {}> {
-  name?: string;
   path?: string;
-  field?: GenerateFormNodeProps<T>;
-  parent?: { name?: string; path?: string, field?: GenerateFormNodeProps<T>; };
+  widgetItem?: GenerateWidgetItem<T>;
   formrender?: SimpleFormRender;
   form?: SimpleForm;
 };
@@ -499,14 +474,15 @@ export interface GenerateParams<T = {}> {
 - `a[0].b`表示数组a下面的第一个选项的b属性
 
 ### 字符串表达式用法
- 表单节点中属性字段除`properties`外均可以支持字符串表达式来进行联动
+ 表单节点中属性字段除`widgetList`外均可以支持字符串表达式来进行联动
  1. 快速使用：用`{{`和`}}`包裹目标属性值的计算表达式
 ```javascript
   ...
 
-  const properties = {
-    name1: {
+  const widgetList = [
+    {
       label: 'name1',
+      name: 'name1',
       valueProp: 'checked',
       initialValue: true,
       type: 'Checkbox',
@@ -514,20 +490,22 @@ export interface GenerateParams<T = {}> {
         children: 'option'
       }
     },
-    name2: {
+    {
       label: "name2",
+      name: 'name2',
       rules: '{{[{ required: formvalues && formvalues.name1 === true, message: "name2 empty" }]}}',
       initialValue: 1,
       type: 'Input',
       props: {}
-    },
-  }
+    }
+  ]
 
   // OR
 
-  const properties = {
-    name1: {
+  const widgetList = [
+    {
       label: 'name1',
+      name: 'name1',
       valueProp: 'checked',
       initialValue: true,
       type: 'Checkbox',
@@ -535,14 +513,15 @@ export interface GenerateParams<T = {}> {
         children: 'option'
       }
     },
-    name2: {
+    {
       label: "name2",
+      name: 'name2',
       hidden: '{{formvalues && formvalues.name1 === true}}',
       initialValue: 1,
       type: 'Input',
       props: {}
     },
-  }
+  ]
 ```
 2. 字符串表达式的使用规则
 - 一个字符串有且只能有一对`{{`和`}}`.
@@ -551,14 +530,12 @@ export interface GenerateParams<T = {}> {
 import dayjs from 'dayjs';
 import FormRender from "./form-render";
 
-const properties = {
-   name3: {
-     label: "name3",
-     initialValue: "{{dayjs().format('YYYY-MM-DD')}}",
-     type: 'Input',
-     props: {}
-   },
- }
+const widgetList = [{
+  label: "name3",
+  initialValue: "{{dayjs().format('YYYY-MM-DD')}}",
+  type: 'Input',
+  props: {}
+}]
  
-<FormRender properties={properties} plugins={{ dayjs }} />
+<FormRender widgetList={widgetList} plugins={{ dayjs }} />
 ```

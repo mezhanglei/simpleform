@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from 'react';
-import { CustomFormNodeProps, EditorSelection, FormDesignData, SimpleFormRender, SimpleForm } from './components/formrender';
+import { CustomWidgetItem, EditorSelection, FormDesignData, SimpleFormRender, SimpleForm } from './components/formrender';
 import { PlatType } from './tools/platContainer';
 import SimpleUndo from './utils/simple-undo';
 
@@ -24,7 +24,7 @@ export interface FormEditorState {
   selected?: EditorSelection;
   beforeSelected?: EditorSelection;
   properties?: FormDesignData;
-  editorConfig?: Record<string, CustomFormNodeProps & { setting?: ConfigSettingItem }>;
+  editorConfig?: Record<string, CustomWidgetItem>;
   platType?: PlatType;
   historyRecord?: SimpleUndo;
 }

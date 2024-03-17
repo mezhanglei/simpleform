@@ -10,8 +10,8 @@ export interface ControlDndProps extends EditorSelection {
 
 // 控件的拖放区域组件
 function FormDnd(props: ControlDndProps, ref: any) {
-  const { children, formrender, path, field, ...rest } = props;
-  const context = field?.context;
+  const { children, formrender, path, widgetItem, ...rest } = props;
+  const context = widgetItem?.context;
   const { editorConfig, historyRecord } = context?.state || {};
 
   const currentPath = path;

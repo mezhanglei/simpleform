@@ -38,11 +38,11 @@ const SetOptions: React.FC<SetOptionsProps> = (props) => {
     includes = OptionsKeys,
     value,
     onChange,
-    field,
+    widgetItem,
     ...rest
   } = props;
 
-  const context = field?.context;
+  const context = widgetItem?.context;
   const { selected, editor } = context?.state || {};
   const buttons = useMemo(() => (OptionsKeys?.filter((key) => includes?.includes(key))), [includes]);
   const optionSelect: OptionsKey = getFormItem(editor, selected?.path, joinFormPath(selected?.attributeName, 'props.optionSelect')) || buttons[0];

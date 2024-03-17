@@ -1,4 +1,4 @@
-import FormRenderCore, { FormChildren as FormChildrenCore, FormNodeProps, FormRenderProps, FormChildrenProps, GenerateParams } from '@simpleform/render';
+import DefaultFormRender, { FormChildren as DefaultFormChildren, FormRenderProps, FormChildrenProps, GenerateParams, WidgetItem } from '@simpleform/render';
 import React from 'react';
 import dayjs from 'dayjs';
 import '@simpleform/render/lib/css/main.css';
@@ -24,11 +24,11 @@ export interface CustomOptions {
   setting?: ConfigSettingItem;
 }
 // 自定义表单节点信息
-export type CustomFormNodeProps<T = FormNodeProps> = T & CustomOptions;
+export type CustomWidgetItem<T = WidgetItem> = T & CustomOptions;
 // 表单渲染数据的类型
-export type FormDesignData = { [key: string]: CustomFormNodeProps } | CustomFormNodeProps[];
+export type FormDesignData = Array<CustomWidgetItem>;
 // 选中项类型
-export type EditorSelection = { attributeName?: string, appendSetting?: ConfigSettingItem } & GenerateParams<CustomOptions>;
+export type EditorSelection = { appendSetting?: ConfigSettingItem } & GenerateParams<CustomOptions>;
 // 控件的公共输入项props
 export type CommonWidgetProps<T = any> = {
   value?: T;
@@ -40,7 +40,7 @@ export type CustomFormChildrenProps = FormChildrenProps<CustomOptions>;
 export function FormChildren(props: CustomFormChildrenProps) {
   const { components, plugins, ...rest } = props;
   return (
-    <FormChildrenCore
+    <DefaultFormChildren
       options={{ props: { autoComplete: 'off' } }}
       components={{ ...widgets, ...components }}
       plugins={{ ...plugins, dayjs }}
@@ -52,7 +52,7 @@ export type CustomFormRenderProps = FormRenderProps<CustomOptions>;
 export default function FormRender(props: CustomFormRenderProps) {
   const { components, plugins, ...rest } = props;
   return (
-    <FormRenderCore
+    <DefaultFormRender
       options={{ props: { autoComplete: 'off' } }}
       components={{ ...widgets, ...components }}
       plugins={{ ...plugins, dayjs }}

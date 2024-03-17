@@ -29,10 +29,8 @@ const FileUpload = React.forwardRef<any, FileUploadProps>((props, ref) => {
     multiple = true,
     children,
     formdataKey = 'file',
-    name,
     path,
-    parent,
-    field,
+    widgetItem,
     formrender,
     uploadCallback,
     ...rest

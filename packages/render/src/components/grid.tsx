@@ -29,10 +29,8 @@ export interface CustomRowProps extends RowProps, GenerateParams {
 // row组件
 export const CustomRow = React.forwardRef<any, CustomRowProps>((props, ref) => {
   const {
-    name,
     path,
-    field,
-    parent,
+    widgetItem,
     formrender,
     form,
     children,
@@ -53,17 +51,15 @@ export interface CustomColProps extends ColProps, GenerateParams {
 // col组件
 export const CustomCol = React.forwardRef<any, CustomColProps>((props, ref) => {
   const {
-    name,
     path,
-    field,
-    parent,
+    widgetItem,
     formrender,
     form,
     className,
     children,
     ...rest
   } = props;
-  const calcProps = getColProps(rest, field?.inline);
+  const calcProps = getColProps(rest, widgetItem?.inline);
   const cls = classnames('custom-col', className);
   return (
     <Col ref={ref} className={cls} {...calcProps}>

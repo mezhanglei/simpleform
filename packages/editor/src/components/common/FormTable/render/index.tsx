@@ -35,10 +35,8 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
     pagination = false,
     form,
     formrender,
-    name,
     path,
-    field,
-    parent,
+    widgetItem,
     ...rest
   } = props;
 
@@ -58,7 +56,7 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
   const deleteBtn = (rowIndex: number) => {
     if (disabled) return;
     deleteItem(rowIndex);
-    const old = form && form.getFieldValue(name) || [];
+    const old = form && form.getFieldValue(widgetItem?.name) || [];
     old.splice(rowIndex, 1);
   };
 
@@ -78,20 +76,13 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
         dataIndex: dataIndex,
         title: title,
         onCell: (record: unknown, rowIndex?: number) => {
-          const parentName = joinFormPath(name, rowIndex);
-          const parentPath = joinFormPath(path, rowIndex);
-          const curName = joinFormPath(parentName, dataIndex);
-          const curPath = joinFormPath(parentPath, dataIndex);
+          const curName = joinFormPath(widgetItem?.name, rowIndex, dataIndex);
+          const curPath = joinFormPath(path, rowIndex, dataIndex);
           const params = {
             form,
             formrender,
             name: curName,
             path: curPath,
-            parent: {
-              name: parentName,
-              path: parentPath,
-              field: col
-            }
           };
           const formControl = formrender && formrender.createFormElement({ type, props: Object.assign({ disabled }, params, props) });
           return {

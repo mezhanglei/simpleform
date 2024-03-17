@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import React, { useState } from 'react';
 import './index.less';
 import pickAttrs from '../../../utils/pickAttrs';
-import { joinFormPath, EditorSelection } from '../../../components/formrender';
+import { EditorSelection } from '../../../components/formrender';
 
 export interface BaseSelectionProps extends EditorSelection, Omit<React.HtmlHTMLAttributes<HTMLDivElement>, 'onSelect'> {
   tools?: any[]; // 工具栏
@@ -20,11 +20,8 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
   const {
     children,
     className,
-    name,
     path,
-    parent,
-    attributeName,
-    field,
+    widgetItem,
     formrender: editor,
     form: editorForm,
     configLabel,
@@ -36,18 +33,13 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
   } = props;
 
   const [isOver, setIsOver] = useState<boolean>(false);
-  const context = field?.context;
+  const context = widgetItem?.context;
   const { selected } = context?.state || {};
-  const currentPath = joinFormPath(path, attributeName) as string;
-  const selectedPath = joinFormPath(selected?.path, selected?.attributeName);
-  const isSelected = currentPath ? currentPath === selectedPath : false;
+  const isSelected = path ? path === selected?.path : false;
 
   const nextSelected = {
-    name: name,
     path: path,
-    parent: parent,
-    attributeName: attributeName,
-    field: field,
+    widgetItem: widgetItem
   };
 
   const chooseItem = (e: any) => {

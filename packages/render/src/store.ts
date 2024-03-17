@@ -1,6 +1,6 @@
 import { deepClone } from "./utils/object";
-import { CustomUnionType, FormNodeProps, GenerateParams, PropertiesData } from "./types";
-import { getItemByPath, setItemByPath, updateItemByPath, moveSameLevel, moveDiffLevel, updateName, getKeyValueByIndex, insertItemByIndex } from "./utils/utils";
+import { CustomUnionType, GenerateParams, WidgetItem, WidgetList } from "./types";
+import { getItemByPath, setItemByPath, moveSameLevel, moveDiffLevel, updateName, getKeyValueByIndex, insertItemByIndex } from "./utils/utils";
 import { createFormElement, getFormComponent } from "./utils/transform";
 import { joinFormPath } from "@simpleform/form";
 
@@ -10,14 +10,14 @@ export type FormRenderListener = (newValue?: any, oldValue?: any) => void;
 export class SimpleFormRender {
   public plugins: any;
   public components: any;
-  private properties: PropertiesData;
-  private lastProperties: PropertiesData | undefined;
-  private propertiesListeners: FormRenderListener[] = [];
+  private widgetList: WidgetList;
+  private lastWidgetList: WidgetList | undefined;
+  private widgetListListeners: FormRenderListener[] = [];
   constructor() {
-    this.properties = {};
-    this.lastProperties = undefined;
-    this.getProperties = this.getProperties.bind(this);
-    this.setProperties = this.setProperties.bind(this);
+    this.widgetList = [];
+    this.lastWidgetList = undefined;
+    this.getWidgetList = this.getWidgetList.bind(this);
+    this.setWidgetList = this.setWidgetList.bind(this);
     this.addPlugin = this.addPlugin.bind(this);
     this.getFormComponent = this.getFormComponent.bind(this);
     this.createFormElement = this.createFormElement.bind(this);
@@ -46,124 +46,114 @@ export class SimpleFormRender {
     return createFormElement(target, typeMap, commonProps);
   }
 
-  // 获取当前组件的properties
-  public getProperties() {
-    return deepClone(this.properties || {});
+  // 获取当前组件的widgetList
+  public getWidgetList() {
+    return deepClone(this.widgetList || []);
   }
 
-  // 设置properties
-  setProperties(data?: PropertiesData) {
-    this.lastProperties = this.properties;
-    this.properties = data || {};
-    this.notifyProperties();
+  // 设置widgetList
+  setWidgetList(data?: WidgetList) {
+    this.lastWidgetList = this.widgetList;
+    this.widgetList = data || [];
+    this.notifyWidgetList();
   }
 
-  // 更新指定路径的值
-  updateItemByPath = (data?: any, path?: string, attributeName?: string) => {
-    const cloneProperties = this.getProperties();
-    if (cloneProperties) {
-      let newProperties = updateItemByPath(cloneProperties, data, path, attributeName);
-      this.setProperties(newProperties);
+  // 设置指定路径的值
+  setItemByPath = (data?: any, path?: string) => {
+    const cloneData = this.getWidgetList();
+    if (cloneData) {
+      let newData = setItemByPath(cloneData, data, path);
+      this.setWidgetList(newData);
     }
   };
 
   // 设置指定路径的值
-  setItemByPath = (data?: any, path?: string, attributeName?: string) => {
-    const cloneProperties = this.getProperties();
-    if (cloneProperties) {
-      let newProperties = setItemByPath(cloneProperties, data, path, attributeName);
-      this.setProperties(newProperties);
-    }
-  };
-
-  // 设置指定路径的值
-  setItemByIndex = (data?: any, index?: number, parent?: { path?: string, attributeName?: string }) => {
-    const cloneProperties = this.getProperties();
-    if (cloneProperties) {
-      const keyValue = getKeyValueByIndex(cloneProperties, index, parent);
-      const { path, attributeName } = parent || {};
-      const formPath = attributeName ? path : joinFormPath(path, keyValue && keyValue[0]);
-      let newProperties = setItemByPath(cloneProperties, data, formPath, attributeName);
-      this.setProperties(newProperties);
+  setItemByIndex = (data?: any, index?: number, parent?: string) => {
+    const cloneData = this.getWidgetList();
+    if (cloneData) {
+      const keyValue = getKeyValueByIndex(cloneData, index, parent);
+      const path = joinFormPath(parent, keyValue && keyValue[0]);
+      const newData = setItemByPath(cloneData, data, path);
+      this.setWidgetList(newData);
     }
   };
 
   // 更新节点的键
   updateNameByPath = (endName?: string, path?: string) => {
-    const cloneProperties = this.getProperties();
-    if (cloneProperties) {
-      let newProperties = updateName(cloneProperties, endName, path);
-      this.setProperties(newProperties);
+    const cloneData = this.getWidgetList();
+    if (cloneData) {
+      const newData = updateName(cloneData, endName, path);
+      this.setWidgetList(newData);
     }
   };
 
   // 插入值，默认末尾
-  insertItemByIndex = (data: Partial<PropertiesData> | Array<FormNodeProps>, index?: number, parent?: { path?: string, attributeName?: string }) => {
-    const cloneProperties = this.getProperties();
-    if (cloneProperties) {
-      let newProperties = insertItemByIndex(cloneProperties, data, index, parent);
-      this.setProperties(newProperties);
+  insertItemByIndex = (data: WidgetItem | Array<WidgetItem>, index?: number, parent?: string) => {
+    const cloneData = this.getWidgetList();
+    if (cloneData) {
+      const newData = insertItemByIndex(cloneData, data, index, parent);
+      this.setWidgetList(newData);
     }
   };
 
   // 根据path删除一条
-  delItemByPath = (path?: string, attributeName?: string) => {
-    const cloneProperties = this.getProperties();
-    if (cloneProperties) {
-      let newProperties = setItemByPath(cloneProperties, undefined, path, attributeName);
-      this.setProperties(newProperties);
+  delItemByPath = (path?: string) => {
+    const cloneData = this.getWidgetList();
+    if (cloneData) {
+      const newData = setItemByPath(cloneData, undefined, path);
+      this.setWidgetList(newData);
     }
   };
 
   // 获取指定路径的项
-  getItemByPath = (path?: string, attributeName?: string) => {
-    const cloneProperties = this.getProperties();
-    if (cloneProperties) {
-      return getItemByPath(cloneProperties, path, attributeName);
+  getItemByPath = (path?: string) => {
+    const cloneData = this.getWidgetList();
+    if (cloneData) {
+      return getItemByPath(cloneData, path);
     }
   };
 
   // 获取指定index的项
-  getItemByIndex = (index: number, parent: { path?: string, attributeName?: string }) => {
-    const cloneProperties = this.getProperties();
-    if (cloneProperties) {
-      const keyValue = getKeyValueByIndex(cloneProperties, index, parent);
+  getItemByIndex = (index: number, parent?: string) => {
+    const cloneData = this.getWidgetList();
+    if (cloneData) {
+      const keyValue = getKeyValueByIndex(cloneData, index, parent);
       return keyValue && keyValue[1];
     }
   };
 
   // 从from到to更换位置
   moveItemByPath = (from: { parent?: string, index: number }, to: { parent?: string, index?: number }) => {
-    const cloneProperties = this.getProperties();
-    if (cloneProperties) {
-      let newProperties;
+    const cloneData = this.getWidgetList();
+    if (cloneData) {
+      let newData: any;
       if (from?.parent === to?.parent) {
-        newProperties = moveSameLevel(cloneProperties, from, to);
+        newData = moveSameLevel(cloneData, from, to);
       } else {
-        newProperties = moveDiffLevel(cloneProperties, from, to);
+        newData = moveDiffLevel(cloneData, from, to);
       }
-      this.setProperties(newProperties);
+      this.setWidgetList(newData);
     }
   };
 
   // 订阅表单渲染数据的变动
-  public subscribeProperties(listener: FormRenderListener) {
-    this.propertiesListeners.push(listener);
+  public subscribeWidgetList(listener: FormRenderListener) {
+    this.widgetListListeners.push(listener);
     return () => {
-      this.propertiesListeners = [];
+      this.widgetListListeners = [];
     };
   }
 
   // 卸载
-  public unsubscribeProperties() {
-    this.propertiesListeners = [];
+  public unsubscribeWidgetList() {
+    this.widgetListListeners = [];
   }
 
   // 同步表单渲染数据的变化
-  private notifyProperties() {
-    this.propertiesListeners.forEach((onChange) => {
-      const cloneProperties = this.getProperties();
-      onChange && onChange(cloneProperties, this.lastProperties);
+  private notifyWidgetList() {
+    this.widgetListListeners.forEach((onChange) => {
+      const cloneData = this.getWidgetList();
+      onChange && onChange(cloneData, this.lastWidgetList);
     });
   }
 }

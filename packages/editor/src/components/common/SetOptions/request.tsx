@@ -38,11 +38,11 @@ const RequestSetting = React.forwardRef<HTMLElement, RequestSettingProps>((props
     value,
     onChange,
     className,
-    field,
+    widgetItem,
     ...rest
   } = props;
 
-  const context = field?.context;
+  const context = widgetItem?.context;
   const FormRender = context?.state?.FormRender || DefaultFormRender;
   const requestForm = useSimpleForm();
 

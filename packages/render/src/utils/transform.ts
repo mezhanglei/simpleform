@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormComponent, GenerateParams } from "../types";
+import { CustomWidget, GenerateParams } from "../types";
 import { isReactComponent } from "./ReactIs";
 import { isEmpty, isObject } from './type';
 
@@ -8,7 +8,7 @@ export interface ComponentsMap {
 }
 // 是否为注册组件
 const isFormRegistered = (target?: any, typeMap?: ComponentsMap): React.ComponentType | null => {
-  const Com = isObject(target) && typeMap ? typeMap[(target as FormComponent).type || ''] : null;
+  const Com = isObject(target) && typeMap ? typeMap[(target as CustomWidget).type || ''] : null;
   return Com;
 };
 

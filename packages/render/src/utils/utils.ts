@@ -1,8 +1,7 @@
 import { arrayMove } from "./array";
-import { FormNodeProps, PropertiesData } from "../types";
-import { pathToArr, deepSet, joinFormPath, deepGet, formatFormKey } from "@simpleform/form";
-import { deepMergeObject } from "./object";
-import { isEmpty } from "./type";
+import { pathToArr, deepSet, joinFormPath, formatFormKey } from "@simpleform/form";
+import { isEmpty, isObject } from "./type";
+import { WidgetItem, WidgetList } from "../types";
 
 // 匹配字符串表达式
 export const matchExpression = (value?: any) => {
@@ -34,117 +33,60 @@ export const getPathLen = (path?: string) => {
   return pathArr.length;
 };
 
-// 根据路径更新数据
-export const updateItemByPath = (properties: PropertiesData, data?: any, path?: string, attributeName?: string) => {
-  const pathArr = pathToArr(path);
-  const end = formatFormKey(pathArr.pop());
-  const pathLen = pathArr?.length;
-  let temp: any = properties;
-  pathArr.forEach((item, index) => {
-    const name = formatFormKey(item);
-    if (index === 0) {
-      temp = temp[name];
-    } else {
-      temp = temp?.properties?.[name];
-    }
-  });
-  // 计算
-  temp = pathLen === 0 ? temp : temp?.properties;
-  if (!isEmpty(end)) {
-    const endData = temp[end];
-    if (attributeName) {
-      temp[end] = deepSet(endData, attributeName, data);
-    } else {
-      if (data === undefined) {
-        if (temp instanceof Array) {
-          const index = +end;
-          temp?.splice(index, 1);
-        } else {
-          delete temp[end];
-        }
-      } else {
-        temp[end] = deepMergeObject(endData, data);
-      }
-    }
-  }
-  return properties;
-};
-
 // 设置指定路径的值
-export const setItemByPath = (properties: PropertiesData, data?: any, path?: string, attributeName?: string) => {
+export const setItemByPath = (widgetList: WidgetList, data?: any, path?: string) => {
   const pathArr = pathToArr(path);
   const end = formatFormKey(pathArr.pop());
-  const pathLen = pathArr?.length;
-  let temp: any = properties;
-  pathArr.forEach((item, index) => {
-    const name = formatFormKey(item);
-    if (index === 0) {
-      temp = temp[name];
-    } else {
-      temp = temp?.properties?.[name];
-    }
+  let temp: any = widgetList;
+  pathArr.forEach((item) => {
+    const key = formatFormKey(item);
+    temp = temp[key];
   });
-  // 计算
-  temp = pathLen === 0 ? temp : temp?.properties;
   if (!isEmpty(end)) {
-    if (attributeName) {
-      const lastData = temp[end];
-      const newData = deepSet(lastData, attributeName, data);
-      temp[end] = newData;
-    } else {
-      if (data === undefined) {
-        if (temp instanceof Array) {
-          const index = +end;
-          temp?.splice(index, 1);
-        } else {
-          delete temp[end];
-        }
+    if (data === undefined) {
+      if (temp instanceof Array) {
+        const index = +end;
+        temp?.splice(index, 1);
       } else {
-        // @ts-ignore
-        if (temp instanceof Array && temp[endCode] === undefined) {
-          const index = +end;
-          temp.splice(index, 0, data);
-        } else {
-          temp[end] = data;
-        }
+        delete temp[end];
+      }
+    } else {
+      // @ts-ignore
+      if (temp instanceof Array && temp[endCode] === undefined) {
+        const index = +end;
+        temp.splice(index, 0, data);
+      } else {
+        temp[end] = data;
       }
     }
   }
-  return properties;
+  return widgetList;
 };
 
 // 根据path获取指定路径的项
-export const getItemByPath = (properties?: PropertiesData, path?: string, attributeName?: string) => {
-  if (!properties) return;
+export const getItemByPath = (widgetList?: WidgetList, path?: string) => {
+  if (!(widgetList instanceof Array)) return;
   const pathArr = pathToArr(path);
-  let temp: any = properties;
+  let temp: any = widgetList;
   if (pathArr.length === 0) {
     return temp;
   }
-  pathArr.forEach((item, index) => {
-    const name = formatFormKey(item);
-    if (index === 0) {
-      temp = temp[name];
-    } else {
-      temp = temp?.properties?.[name];
-    }
+  pathArr.forEach((item) => {
+    const key = formatFormKey(item);
+    temp = temp[key];
   });
-  if (attributeName) {
-    return deepGet(temp, attributeName);
-  }
   return temp;
 };
 
 // 根据index获取目标项
-export const getKeyValueByIndex = (properties: PropertiesData, index?: number, parent?: { path?: string; attributeName?: string }) => {
-  if (!properties || typeof index !== 'number') return;
-  const { path, attributeName } = parent || {};
-  const parentItem = getItemByPath(properties, path, attributeName);
-  const childs = attributeName ? parentItem : (path ? parentItem?.properties : parentItem);
-  const childKeys = Object.keys(childs || {});
-  const isList = childs instanceof Array;
+export const getKeyValueByIndex = (widgetList: WidgetList, index?: number, parent?: string) => {
+  if (!(widgetList instanceof Array) || typeof index !== 'number') return;
+  const parentItem = getItemByPath(widgetList, parent);
+  if (!isObject(parentItem) && !(parentItem instanceof Array)) return;
+  const childKeys = Object.keys(parentItem || {});
+  const isList = parentItem instanceof Array;
   const key = isList ? index : childKeys[index];
-  return [key, childs[key]] as [string | number, any];
+  return [key, parentItem[key]] as [string | number, any];
 };
 
 // 转化为有序列表
@@ -176,37 +118,17 @@ const parseEntries = (entriesData?: { entries: Array<[string | number, any]>, is
   }
 };
 
-// 更新指定路径的name
-export const updateName = (properties: PropertiesData, newName?: string, path?: string) => {
-  const end = getPathEnd(path) || '';
-  if (typeof newName !== 'string' || end === newName) return properties;
-  const parentPath = getParent(path);
-  const parent = getItemByPath(properties, parentPath);
-  const childProperties = parentPath ? parent?.properties : parent;
-  const entriesData = toEntries(childProperties);
-  // 只有对象才会去更新键名
-  if (!entriesData?.isList) {
-    entriesData?.entries?.map((item) => {
-      if (item?.[0] === end) {
-        item[0] = newName;
-      }
-    });
-  }
-  const result = parseEntries(entriesData);
-  if (parentPath) {
-    parent.properties = result;
-    return properties;
-  } else {
-    return result;
-  }
+// 更新目标的name值
+export const updateName = (widgetList: WidgetList, newName?: string, path?: string) => {
+  if (typeof newName !== 'string') return widgetList;
+  const namePath = joinFormPath(path, 'name');
+  return setItemByPath(widgetList, newName, namePath);
 };
 
 // 插入数据
-export const insertItemByIndex = (properties: PropertiesData, data?: Partial<PropertiesData> | Array<FormNodeProps>, index?: number, parent?: { path?: string; attributeName?: string }) => {
-  const { path, attributeName } = parent || {};
-  const parentItem = getItemByPath(properties, path, attributeName);
-  const childs = attributeName ? parentItem : (path ? parentItem?.properties : parentItem);
-  const entriesData = toEntries(childs);
+export const insertItemByIndex = (widgetList: WidgetList, data?: WidgetItem | Array<WidgetItem>, index?: number, parent?: string) => {
+  const parentItem = getItemByPath(widgetList, parent);
+  const entriesData = toEntries(parentItem);
   const isList = entriesData?.isList;
   const addItems = isList ? Object.entries(data instanceof Array ? data : [data]) : Object.entries(data || {});
   if (typeof index === 'number') {
@@ -215,21 +137,11 @@ export const insertItemByIndex = (properties: PropertiesData, data?: Partial<Pro
     entriesData?.entries?.push(...addItems);
   }
   const changedChilds = parseEntries(entriesData);
-  if (path) {
-    if (attributeName) {
-      const result = setItemByPath(properties, changedChilds, path, attributeName);
-      return result;
-    } else {
-      parentItem.properties = changedChilds;
-      return properties;
-    }
-  } else {
-    return changedChilds;
-  }
+  return setItemByPath(widgetList, changedChilds, parent);
 };
 
 // 同级调换位置
-export const moveSameLevel = (properties: PropertiesData, from: { parent?: string, index: number }, to: { parent?: string, index?: number }) => {
+export const moveSameLevel = (widgetList: WidgetList, from: { parent?: string, index: number }, to: { parent?: string, index?: number }) => {
   // 拖拽源
   const fromParentPath = from?.parent;
   const fromIndex = from?.index;
@@ -238,31 +150,25 @@ export const moveSameLevel = (properties: PropertiesData, from: { parent?: strin
   let toIndex = to?.index;
   // 同域排序
   if (fromParentPath === toParentPath) {
-    let fromParent = getItemByPath(properties, fromParentPath);
-    const childProperties = fromParentPath ? fromParent?.properties : fromParent;
+    const fromParent = getItemByPath(widgetList, fromParentPath);
     // 转成列表以便排序
-    const entriesData = toEntries(childProperties);
+    const entriesData = toEntries(fromParent);
     const entries = entriesData?.entries;
     toIndex = typeof toIndex === 'number' ? toIndex : entries?.length;
     entriesData.entries = arrayMove(entries, fromIndex, toIndex);
     const result = parseEntries(entriesData);
-    if (fromParentPath) {
-      fromParent.properties = result;
-      return properties;
-    } else {
-      return result;
-    }
+    return result;
   }
 };
 
 // 跨级调换位置
-export const moveDiffLevel = (properties: PropertiesData, from: { parent?: string, index: number }, to: { parent?: string, index?: number }) => {
+export const moveDiffLevel = (widgetList: WidgetList, from: { parent?: string, index: number }, to: { parent?: string, index?: number }) => {
   // 拖拽源
   const fromParentPath = from?.parent;
   const fromIndex = from?.index;
   const fromLen = getPathLen(fromParentPath);
-  const keyValue = getKeyValueByIndex(properties, fromIndex, { path: fromParentPath });
-  if (!keyValue) return properties;
+  const keyValue = getKeyValueByIndex(widgetList, fromIndex, fromParentPath);
+  if (!keyValue) return widgetList;
   const insertItem = parseEntries({ isList: typeof keyValue[0] === 'number', entries: [keyValue] });
   const fromPath = joinFormPath(fromParentPath, keyValue[0]);
   // 拖放源
@@ -271,56 +177,43 @@ export const moveDiffLevel = (properties: PropertiesData, from: { parent?: strin
   const toLen = getPathLen(toParentPath);
   // 先计算内部变动，再计算外部变动
   if (fromLen > toLen || !toLen) {
-    setItemByPath(properties, undefined, fromPath);
-    const result = insertItemByIndex(properties, insertItem, toIndex, { path: toParentPath });
+    setItemByPath(widgetList, undefined, fromPath);
+    const result = insertItemByIndex(widgetList, insertItem, toIndex, toParentPath);
     return result;
   } else {
-    const result = insertItemByIndex(properties, insertItem, toIndex, { path: toParentPath });
+    const result = insertItemByIndex(widgetList, insertItem, toIndex, toParentPath);
     result && setItemByPath(result, undefined, fromPath);
     return result;
   }
 };
 
-// 提取properties中的默认值
-export const getInitialValues = (properties?: PropertiesData) => {
-  if (!properties) return;
+// 提取widgetList中的默认值
+export const getInitialValues = (widgetList?: WidgetList) => {
+  if (!(widgetList instanceof Array)) return;
   let initialValues = {};
-  // 遍历处理对象树中的非properties字段
-  const deepHandle = (formNode: FormNodeProps, path?: string) => {
-    for (const propsKey of Object.keys(formNode)) {
-      if (propsKey !== 'properties') {
+  const deepHandleItem = (item: WidgetItem, path: string) => {
+    for (const key of Object.keys(item)) {
+      if (key === 'widgetList') {
         // @ts-ignore
-        const propsValue = formNode[propsKey];
-        if (propsKey === 'initialValue' && propsValue !== undefined) {
-          initialValues = deepSet(initialValues, path, propsValue);
-        }
+        const widgetList = item[key] as WidgetList;
+        const curPath = joinFormPath(path, key);
+        widgetList.forEach((child, index) => {
+          const childPath = joinFormPath(curPath, `[${index}]`);
+          deepHandleItem(child, childPath);
+        });
       } else {
-        const childProperties = formNode[propsKey];
-        const isList = childProperties instanceof Array;
-        if (childProperties) {
-          for (const childKey of Object.keys(childProperties)) {
-            // @ts-ignore
-            const childField = childProperties[childKey];
-            const childName = isList ? `[${childKey}]` : childKey;
-            if (typeof childName === 'string') {
-              const childPath = childField?.ignore === true ? path : joinFormPath(path, childName) as string;
-              deepHandle(childField, childPath);
-            }
-          }
+        // @ts-ignore
+        const val = item[key];
+        if (key === 'initialValue' && val !== undefined) {
+          initialValues = deepSet(initialValues, item.name, val);
         }
       }
     }
   };
 
-  const isList = properties instanceof Array;
-  for (const key of Object.keys(properties)) {
-    // @ts-ignore
-    const childField = properties[key];
-    const childName = isList ? `[${key}]` : key;
-    if (typeof childName === 'string') {
-      const childPath = joinFormPath(childField?.ignore ? undefined : childName);
-      deepHandle(childField, childPath);
-    }
-  }
+  widgetList.forEach((item, index) => {
+    const path = `[${index}]`;
+    deepHandleItem(item, path);
+  });
   return initialValues;
 };

@@ -4,11 +4,11 @@ import { defaultGetId, setFormItem } from '../../../../utils/utils';
 import FormTableColSetting from './column-setting';
 import { pickObject } from '../../../../utils/object';
 import BaseSelection, { BaseSelectionProps } from '../../BaseSelection';
-import { deepSet, CustomFormNodeProps, EditorSelection } from '../../../formrender';
+import { CustomWidgetItem, deepSet, EditorSelection } from '../../../formrender';
 
 export interface ColumnSelectionProps extends BaseSelectionProps {
   colIndex: number;
-  column: CustomFormNodeProps;
+  column: CustomWidgetItem;
 }
 /**
  * 给表单中的控件外围添加选中框
@@ -22,8 +22,7 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
     style,
     className,
     path,
-    field,
-    parent,
+    widgetItem,
     formrender: editor,
     form: editorForm,
     colIndex,
@@ -31,15 +30,15 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
     // ...restProps
   } = props;
 
-  const columns = field?.props?.columns || [];
+  const columns = widgetItem?.props?.columns || [];
   const columnsPath = `props.columns`;
   const attributeName = `${columnsPath}[${colIndex}]`;
   const currentPath = path;
-  const context = field?.context;
+  const context = widgetItem?.context;
   const { editorConfig } = context?.state || {};
 
   const onSelect = (selected: EditorSelection) => {
-    const selectedItem = editor?.getItemByPath(selected?.path, selected?.attributeName);
+    const selectedItem = editor?.getItemByPath(selected?.path);
     const configSetting = editorConfig?.[selectedItem?.type || ''].setting;
     const controlSetting = pickObject(configSetting, (key) => key !== '公共属性');
     const mergeSetting = Object.assign({}, FormTableColSetting, controlSetting);
@@ -58,8 +57,8 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
       dataIndex: defaultGetId(column?.type),
     };
     oldColumns.splice(nextColIndex, 0, newColumn);
-    const newField = deepSet(field, columnsPath, oldColumns);
-    setFormItem(editor, newField, currentPath);
+    const newItem = deepSet(widgetItem, columnsPath, oldColumns);
+    setFormItem(editor, newItem, currentPath);
   };
 
   const deleteColumn = (e: any) => {
@@ -73,7 +72,6 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
       ref={ref}
       {...props}
       configLabel="表格列"
-      attributeName={attributeName}
       onSelect={onSelect}
       tools={[<Icon key="fuzhi" name="fuzhi" onClick={copyItem} />, <Icon key="shanchu" name="shanchu" onClick={deleteColumn} />]}>
       {children}

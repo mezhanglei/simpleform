@@ -16,8 +16,8 @@ const GridRow = React.forwardRef<any, CustomRowProps>((props, ref) => {
     ...rest
   } = props;
 
-  const { field } = rest || {};
-  const isEditor = field?.isEditor;
+  const { widgetItem } = rest || {};
+  const isEditor = widgetItem?.isEditor;
   const cls = classnames(className, {
     'edit-row': isEditor
   });

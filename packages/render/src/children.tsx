@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FormNodeProps, GenerateParams, CustomUnionType, PropertiesData, CustomRenderType, FormChildrenProps } from './types';
+import { GenerateParams, CustomUnionType, CustomRenderType, FormChildrenProps, WidgetList, WidgetItem, GenerateWidgetItem } from './types';
 import { Form, joinFormPath, SimpleFormContext } from '@simpleform/form';
 import { isEqual } from './utils/object';
 import '@simpleform/form/lib/css/main.css';
@@ -22,51 +22,53 @@ export default function FormChildren(props: FormChildrenProps) {
     uneval,
     components,
     plugins = {},
-    onPropertiesChange,
+    onRenderChange,
     renderItem,
     renderList,
     inside,
-    properties: propsProperties,
+    widgetList: propsWidgetList,
     form = curForm,
     formrender = curFormrender,
-    options,
-    evalPropNames = ['props', 'rules'],
+    options
   } = props;
 
-  const [fieldPropsMap, setFieldPropsMap] = useState<Partial<FormNodeProps>>({});
-  const [properties, setProperties] = useState<PropertiesData>({});
+  const [widgetList, setWidgetList] = useState<WidgetList>([]);
+  const [compileData, setCompileData] = useState<Record<string, any>>({});
   formrender.registry(Object.assign({}, defaultComponents, components));
   formrender.addPlugin(plugins);
 
-  // 从SimpleFormRender中订阅更新properties
+  // 从SimpleFormRender中订阅更新widgetList
   useEffect(() => {
     if (!formrender) return;
-    formrender.subscribeProperties((newValue, oldValue) => {
-      setProperties(newValue);
+    formrender.subscribeWidgetList((newValue, oldValue) => {
+      setWidgetList(newValue);
       if (!isEqual(newValue, oldValue)) {
-        onPropertiesChange && onPropertiesChange(newValue, oldValue);
+        onRenderChange && onRenderChange(newValue, oldValue);
       }
     });
     return () => {
-      formrender?.unsubscribeProperties();
+      formrender?.unsubscribeWidgetList();
     };
-  }, [formrender, onPropertiesChange]);
+  }, [formrender, onRenderChange]);
 
-  // 从props中更新properties
+  // 从props中更新widgetList
   useEffect(() => {
     if (!formrender) return;
-    formrender.setProperties(propsProperties);
-  }, [propsProperties]);
+    formrender.setWidgetList(propsWidgetList);
+  }, [propsWidgetList]);
 
   // 变化时更新
   useEffect(() => {
-    if (!properties) return;
-    handleFieldProps();
-  }, [properties]);
+    if (!widgetList) return;
+    handleExpression();
+  }, [widgetList]);
 
   // 递归检测对象
-  const evalAttr = (val: Object | Array<any>): any => {
-    if (val instanceof Array) {
+  const evalAttr = (val: any): any => {
+    const isElement = React.isValidElement(val);
+    if (isElement) {
+      return val;
+    } else if (val instanceof Array) {
       return val.map((item) => {
         return evalAttr(item);
       });
@@ -84,75 +86,59 @@ export default function FormChildren(props: FormChildrenProps) {
     }
   };
 
-  // 递归遍历处理表单域的字符串表达式并存储解析后的信息
-  const handleFieldProps = () => {
-    if (!properties) return;
-    const fieldPropsMap = {};
-    // 遍历处理对象树中的非properties字段
-    const deepHandle = (formNode: FormNodeProps, path: string) => {
-      for (const propsKey of Object.keys(formNode || {})) {
-        if (typeof propsKey === 'string') {
-          if (propsKey !== 'properties') {
-            // @ts-ignore
-            const propsValue = formNode[propsKey];
-            let result = propsValue;
-            const matchStr = matchExpression(propsValue);
-            if (matchStr) {
-              result = compileExpression(propsValue, uneval);
-            } else if (evalPropNames.includes(propsKey)) {
-              result = evalAttr(propsValue);
-            }
-            const propsPath = joinFormPath(path, propsKey);
-            // @ts-ignore
-            fieldPropsMap[propsPath] = result;
+  // 递归遍历编译表达式信息
+  const handleExpression = () => {
+    if (!(widgetList instanceof Array)) return;
+    const compileData: Record<string, any> = {};
+    const deepHandleItem = (item: WidgetItem, path: string) => {
+      for (const key of Object.keys(item)) {
+        if (key === 'widgetList') {
+          // @ts-ignore
+          const widgetList = item[key] as WidgetList;
+          const curPath = joinFormPath(path, key);
+          widgetList.forEach((child, index) => {
+            const childPath = joinFormPath(curPath, `[${index}]`);
+            deepHandleItem(child, childPath);
+          });
+        } else {
+          // @ts-ignore
+          const val = item[key];
+          const curPath = joinFormPath(path, key);
+          if (isObject(val) || val instanceof Array) {
+            compileData[curPath] = evalAttr(val);
           } else {
-            const childProperties = formNode[propsKey];
-            const isList = childProperties instanceof Array;
-            if (childProperties) {
-              for (const key of Object.keys(childProperties)) {
-                // @ts-ignore
-                const childField = childProperties[key];
-                const childName = isList ? `[${key}]` : key;
-                if (typeof childName === 'string') {
-                  const childPath = joinFormPath(path, childName) as string;
-                  deepHandle(childField, childPath);
-                }
-              }
+            const matchStr = matchExpression(val);
+            if (matchStr) {
+              const result = compileExpression(val, uneval);
+              compileData[curPath] = result;
             }
           }
         }
       }
     };
 
-    for (const key of Object.keys(properties)) {
-      // @ts-ignore
-      const childField = properties[key];
-      const childName = key;
-      if (typeof key === 'string') {
-        deepHandle(childField, childName);
-      }
-    }
-    setFieldPropsMap(fieldPropsMap);
+    widgetList.forEach((item, index) => {
+      const path = `[${index}]`;
+      deepHandleItem(item, path);
+    });
+
+    setCompileData(compileData);
   };
 
-  // 获取计算表达式之后的结果
-  const getEvalFieldProps = (field: FormNodeProps, path?: string) => {
-    if (isEmpty(field)) return;
+  const getComileWidgetItem = (item?: WidgetItem, path?: string) => {
+    if (isEmpty(item)) return;
     return Object.fromEntries(
-      Object.entries(field || {})?.map(
+      Object.entries(item || {})?.map(
         ([propsKey, propsValue]) => {
-          const propsPath = joinFormPath(path, propsKey);
-          // @ts-ignore
-          const generateValue = propsPath && fieldPropsMap[propsPath];
-          const matchStr = matchExpression(propsValue);
-          // 匹配上表达式或表达式值的映射则返回映射值
-          if (matchStr || generateValue !== undefined) {
+          const curPath = joinFormPath(path, propsKey);
+          if (curPath in compileData) {
             if (propsKey === 'valueSetter' || propsKey === 'valueGetter') {
-              return [propsKey, generateValue ? generateValue : () => undefined];
+              return [propsKey, compileData[curPath] ? compileData[curPath] : () => undefined];
             }
-            return generateValue == undefined ? [propsKey] : [propsKey, generateValue];
+            return [propsKey, compileData[curPath]];
+          } else {
+            return [propsKey, propsValue];
           }
-          return [propsKey, propsValue];
         }
       )
     );
@@ -196,111 +182,91 @@ export default function FormChildren(props: FormChildrenProps) {
     return cloneChilds;
   };
 
-  // 生成表单项
-  const renderChild = (params: GenerateParams) => {
-    const { name, path, field, parent } = params;
-    if (!field) return;
-    const optionsProps = typeof options === 'function' ? options(field) : options;
-    const mergeField = Object.assign({}, optionsProps, field, { props: Object.assign({}, optionsProps?.props, field?.props) });
-    const {
-      readOnlyRender,
-      hidden,
-      type,
-      props,
-      typeRender,
-      properties,
-      footer,
-      suffix,
-      component,
-      inside,
-      outside,
-      ...restField
-    } = mergeField;
-    if (hidden === true) return;
-    // 是否有子节点
-    const haveProperties = isObject(properties) || properties instanceof Array;
-    // 当前节点是否为只读
-    const isReadOnly = restField?.readOnly === true;
+  const renderChild = (item?: GenerateWidgetItem, path?: string) => {
+    if (!item) return;
+    const optionsProps = typeof options === 'function' ? options(item) : options;
+    const mergeItem = Object.assign({}, optionsProps, item, { props: Object.assign({}, optionsProps?.props, item?.props) });
+    if (mergeItem?.hidden === true) return;
     const commonParams = {
-      name,
       path,
-      field: mergeField,
-      parent,
-      form: form,
-      formrender: formrender
-    }; // 公共参数
-    const footerInstance = formrender.createFormElement(footer, commonParams);
-    const suffixInstance = formrender.createFormElement(suffix, commonParams);
-    const fieldProps = Object.assign({
-      name: name,
-      footer: footerInstance,
-      suffix: suffixInstance,
-      component: formrender.getFormComponent(component),
-    }, restField);
-    let result;
-    if (isReadOnly) {
-      // 只读节点
-      const readOnlyWidget = formrender.createFormElement(readOnlyRender, commonParams);
-      result = haveProperties ?
-        readOnlyWidget
-        :
-        <Form.Item {...fieldProps}>
-          {readOnlyWidget}
-        </Form.Item>;
-    } else {
-      // 其他表单节点
-      const FormNodeWidget = formrender.createFormElement(typeRender || { type, props }, commonParams);
-      if (haveProperties) {
-        const FormNodeChildren = Object.entries(properties as PropertiesData || {}).map(([key, field], index: number) => {
-          const isList = properties instanceof Array;
-          const childKey = isList ? `[${key}]` : key;
-          const joinPath = joinFormPath(path, childKey);
-          const generateField = getEvalFieldProps(field, joinPath);
-          const joinName = generateField?.ignore === true ? name : joinFormPath(name, childKey);
-          if (generateField) {
-            generateField['index'] = index;
-          }
-          return renderChild({
-            name: joinName,
-            path: joinPath,
-            field: generateField,
-            parent: { name, path, field: mergeField }
-          });
-        }) as any;
-        const withSideChildren = withSide(FormNodeChildren, inside, renderList, commonParams);
-        result = React.isValidElement(FormNodeWidget) ?
-          React.cloneElement(FormNodeWidget, { children: withSideChildren } as Partial<unknown>)
-          : withSideChildren;
+      widgetItem: mergeItem,
+      formrender,
+      form
+    };
+    // 存在name字段就是表单控件字段
+    if (mergeItem?.name) {
+      const {
+        hidden,
+        readOnlyRender,
+        type,
+        props,
+        typeRender,
+        footer,
+        suffix,
+        component,
+        inside,
+        outside,
+        ...restField
+      } = mergeItem;
+      const footerInstance = formrender.createFormElement(footer, commonParams);
+      const suffixInstance = formrender.createFormElement(suffix, commonParams);
+      const fieldProps = Object.assign({
+        footer: footerInstance,
+        suffix: suffixInstance,
+        component: formrender.getFormComponent(component),
+      }, restField);
+      let child;
+      if (mergeItem?.readOnly === true) {
+        // 只读节点
+        const readOnlyWidget = formrender.createFormElement(readOnlyRender, commonParams);
+        child = (
+          <Form.Item {...fieldProps}>
+            {readOnlyWidget}
+          </Form.Item>
+        );
       } else {
-        // 最底层的项携带表单域的节点
         const { onValuesChange, ...restFieldProps } = fieldProps;
-        result = (
+        const FormWidget = formrender.createFormElement(typeRender || { type, props }, commonParams);
+        child = (
           <Form.Item
             {...restFieldProps}
             onValuesChange={(...args) => {
               onValuesChange && onValuesChange(...args);
-              handleFieldProps();
+              handleExpression();
             }}>
-            {({ bindProps }: any) => React.isValidElement(FormNodeWidget) ? React.cloneElement(FormNodeWidget, bindProps) : FormNodeWidget}
+            {({ bindProps }: any) => React.isValidElement(FormWidget) ? React.cloneElement(FormWidget, bindProps) : FormWidget}
           </Form.Item>
         );
-      };
+      }
+      return withSide(child, outside, renderItem, commonParams);
+    } else {
+      const { typeRender, type, props, inside, outside, widgetList } = mergeItem;
+      const isHaveWidgetList = widgetList instanceof Array ? true : false;
+      const widgetNode = formrender.createFormElement(typeRender || { type, props }, commonParams);
+      if (isHaveWidgetList) {
+        const widgetNodeChildren = widgetList?.map((item, index) => {
+          const childPath = joinFormPath(path, 'widgetList', `${[index]}`);
+          const compileItem = getComileWidgetItem(item, childPath);
+          return renderChild(compileItem, childPath);
+        });
+        const withSideChildren = withSide(widgetNodeChildren, inside, renderList, commonParams);
+        const result = React.isValidElement(widgetNode) ?
+          React.cloneElement(widgetNode, { children: withSideChildren } as Partial<unknown>)
+          : withSideChildren;
+        return withSide(result, outside, renderItem, commonParams);
+      } else {
+        return withSide(widgetNode, outside, renderItem, commonParams);
+      }
     }
-    return withSide(result, outside, renderItem, commonParams);
   };
 
-  const isList = properties instanceof Array;
-  const childs = Object.entries(properties || {}).map(([key, field], index: number) => {
-    const childKey = isList ? `[${key}]` : key;
-    const generateField = getEvalFieldProps(field, childKey);
-    if (generateField) {
-      generateField['index'] = index;
-    }
-    const joinName = generateField?.ignore === true ? '' : childKey;
-    return renderChild({ name: joinName, path: childKey, field: generateField });
+  const childs = (widgetList || []).map((item, index) => {
+    const curPath = `[${index}]`;
+    const compileItem = getComileWidgetItem(item, curPath);
+    return renderChild(compileItem, curPath);
   });
 
-  return withSide(childs, inside, renderList, { formrender: formrender, form: form });
+  return withSide(childs, inside, renderList, { formrender, form });
 }
 
 FormChildren.displayName = 'Form.Children';

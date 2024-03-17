@@ -10,33 +10,31 @@ export default function FormRender(props: FormRenderProps) {
     formrender,
     form = curForm,
     uneval,
-    properties,
+    widgetList,
     components,
     plugins,
     renderItem,
     renderList,
     inside,
-    onPropertiesChange,
+    onRenderChange,
     options,
-    evalPropNames,
     ...formOptions
   } = props;
 
   return (
     <Form form={form} {...formOptions}>
       <FormChildren
-        evalPropNames={evalPropNames}
         options={options}
         uneval={uneval}
         form={form}
         formrender={formrender}
-        properties={properties}
+        widgetList={widgetList}
         components={components}
         plugins={plugins}
         renderItem={renderItem}
         renderList={renderList}
         inside={inside}
-        onPropertiesChange={onPropertiesChange}
+        onRenderChange={onRenderChange}
       />
     </Form>
   );

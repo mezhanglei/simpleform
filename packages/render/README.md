@@ -2,17 +2,19 @@
 
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-2.0.8-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-3.0.0-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > A lightweight dynamic forms engine that makes it easy to dynamically render forms.
 
 * Break Change: Version >= 3.x is recommended, providing a better semanticized `JSON` structure.
-
+ - Deprecated ~`properties`~ : Replaced by `widgetList`.
+ - Deprecated ~`onPropertiesChange`~ : replaced by `onRenderChange`.
+ - All methods of `useSimpleFormRender()` are changed.
 ## Introduction
-- Component Registration: Form controls used in `@simpleform/render` must be controlled components with `value` and `onChange` props.
-- Component Description: `properties` supports rendering of object or array types.
-- Component Rendering: `Form` component handles form values, `FormChildren` component handles form rendering, a `Form` component can support multiple `FormChildren` components rendering inside.
-- Component linkage: All form properties can support string expressions to describe linkage conditions (except `properties`).
+- Component Registration: The form control used in `@simpleform/render` must be a controlled component with `value` and `onChange` `props`.
+- Component Description: `widgetList` array list describing the current form structure.
+- Component Rendering: `Form` component handles the values of the form, `FormChildren` component handles the rendering of the form, a `Form` component can support multiple `FormChildren` components for internal rendering.
+- Component linkage: All form properties can support string expressions to describe linkage conditions (except `widgetList` property).
 
 ## install
 - [Node.js](https://nodejs.org/en/) Version >= 14.0.0
@@ -27,7 +29,7 @@ yarn add @simpleform/render
 ### 1. First register the basic components (Take antd@5.x as an example)
 ```javascript
 // register
-import DefaultFormRender, { FormChildren as FormChildrenCore, FormRenderProps, FormChildrenProps } from '@simpleform/render';
+import DefaultFormRender, { FormChildren as DefaultFormChildren, FormRenderProps, FormChildrenProps } from '@simpleform/render';
 import '@simpleform/render/lib/css/main.css';
 import React from 'react';
 import dayjs from 'dayjs';
@@ -117,105 +119,104 @@ export default function Demo5(props) {
     }
   }
 
-  const properties = {
-      name1: {
-        label: "readonly",
-        readOnly: true,
-        readOnlyRender: "readonly component",
-        initialValue: 1111,
-        hidden: '{{formvalues && formvalues.name6 == true}}',
-        type: 'Input',
-        props: {}
-      },
-      name2: {
-        label: "input",
-        rules: [{ required: true, message: 'input empty' }],
-        initialValue: 1,
-        hidden: '{{formvalues && formvalues.name6 == true}}',
-        type: 'Input',
-        props: {}
-      },
-      name3: {
-        // type: '',
-        // props: {},
-        properties: [{
-          label: 'list[0]',
-          rules: [{ required: true, message: 'list[0] empty' }],
-          initialValue: { label: 'option1', value: '1', key: '1' },
-          type: 'Select',
-          props: {
-            labelInValue: true,
-            style: { width: '100%' },
-            children: [
-              { type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } },
-              { type: 'Select.Option', props: { key: 2, value: '2', children: 'option2' } }
-            ]
-          }
-        }, {
-          label: 'list[1]',
-          rules: [{ required: true, message: 'list[1] empty' }],
-          type: 'Select',
-          props: {
-            labelInValue: true,
-            style: { width: '100%' },
-            children: [
-              { type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } },
-              { type: 'Select.Option', props: { key: 2, value: '2', children: 'option2' } }
-            ]
-          }
-        }]
-      },
-      name4: {
-        // type: '',
-        // props: {},
-        properties: {
-          first: {
-            label: 'first',
-            rules: [{ required: true, message: 'first empty' }],
-            type: 'Select',
-            props: {
-              style: { width: '100%' },
-              children: [{ type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } }]
-            }
-          },
-          second: {
-            label: 'second',
-            rules: [{ required: true, message: 'second empty' }],
-            type: 'Select',
-            props: {
-              style: { width: '100%' },
-              children: [{ type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } }]
-            }
-          }
-        }
-      },
-      name5: {
-        label: 'name5',
-        initialValue: { span: 12 },
-        valueSetter: "{{(value)=> (value && value['span'])}}",
-        valueGetter: "{{(value) => ({span: value})}}",
-        type: 'Select',
-        props: {
-          style: { width: '100%' },
-          children: [
-            { type: 'Select.Option', props: { key: 1, value: 12, children: 'option1' } },
-            { type: 'Select.Option', props: { key: 2, value: 6, children: 'option2' } },
-            { type: 'Select.Option', props: { key: 3, value: 4, children: 'option3' } }
-          ]
-        }
-      },
-      name6: {
-        label: 'checkbox',
-        valueProp: 'checked',
-        initialValue: true,
-        rules: [{ required: true, message: 'checkbox empty' }],
-        type: 'Checkbox',
-        props: {
-          style: { width: '100%' },
-          children: 'option'
-        }
-      },
-    }
+  const widgetList = [
+    {
+      label: "readonly",
+      name: 'name1',
+      readOnly: true,
+      readOnlyRender: "readonly component",
+      initialValue: 1111,
+      hidden: '{{formvalues && formvalues.name6 == true}}',
+      type: 'Input',
+      props: {}
+    },
+    {
+      label: "input",
+      name: 'name2',
+      rules: [{ required: true, message: 'input empty' }],
+      initialValue: 1,
+      hidden: '{{formvalues && formvalues.name6 == true}}',
+      type: 'Input',
+      props: {}
+    },
+    {
+      label: 'list[0]',
+      name: 'list[0]',
+      rules: [{ required: true, message: 'list[0] empty' }],
+      initialValue: { label: 'option1', value: '1', key: '1' },
+      type: 'Select',
+      props: {
+        labelInValue: true,
+        style: { width: '100%' },
+        children: [
+          { type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } },
+          { type: 'Select.Option', props: { key: 2, value: '2', children: 'option2' } }
+        ]
+      }
+    },
+    {
+      label: 'list[1]',
+      name: 'list[1]',
+      rules: [{ required: true, message: 'list[1] empty' }],
+      type: 'Select',
+      props: {
+        labelInValue: true,
+        style: { width: '100%' },
+        children: [
+          { type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } },
+          { type: 'Select.Option', props: { key: 2, value: '2', children: 'option2' } }
+        ]
+      }
+    },
+    {
+      label: 'first',
+      name: 'name4.first',
+      rules: [{ required: true, message: 'first empty' }],
+      type: 'Select',
+      props: {
+        style: { width: '100%' },
+        children: [{ type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } }]
+      }
+    },
+    {
+      label: 'second',
+      name: 'name4.second',
+      rules: [{ required: true, message: 'second empty' }],
+      type: 'Select',
+      props: {
+        style: { width: '100%' },
+        children: [{ type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } }]
+      }
+    },
+    {
+      label: 'name5',
+      name: 'name5',
+      initialValue: { span: 12 },
+      valueSetter: "{{(value)=> (value && value['span'])}}",
+      valueGetter: "{{(value) => ({span: value})}}",
+      type: 'Select',
+      props: {
+        style: { width: '100%' },
+        children: [
+          { type: 'Select.Option', props: { key: 1, value: 12, children: 'option1' } },
+          { type: 'Select.Option', props: { key: 2, value: 6, children: 'option2' } },
+          { type: 'Select.Option', props: { key: 3, value: 4, children: 'option3' } }
+        ]
+      }
+    },
+    {
+      label: 'checkbox',
+      name: 'name6',
+      valueProp: 'checked',
+      initialValue: true,
+      rules: [{ required: true, message: 'checkbox empty' }],
+      type: 'Checkbox',
+      props: {
+        style: { width: '100%' },
+        children: 'option'
+      }
+    },
+  ]
 
   const form = useSimpleForm();
   // const formrender = useSimpleFormRender();
@@ -231,7 +232,7 @@ export default function Demo5(props) {
       <FormRender
         form={form}
         // formrender={formrender}
-        properties={properties}
+        widgetList={widgetList}
         watch={watch} />
       <div style={{ marginLeft: '120px' }}>
         <Button onClick={onSubmit}>submit</Button>
@@ -250,25 +251,23 @@ import { FormChildren, Form, useSimpleForm } from './form-render';
 import { Button } from 'antd';
 export default function Demo(props) {
   
-  const properties1 = {
-    part1: {
-      label: "part1input",
-      rules: [{ required: true, message: 'name1 empty' }],
-      initialValue: 1,
-      type: 'Input',
-      props: {}
-    },
-  }
+  const widgetList1 = [{
+    label: "part1input",
+    name: 'part1',
+    rules: [{ required: true, message: 'part1 empty' }],
+    initialValue: 1,
+    type: 'Input',
+    props: {}
+  }]
 
-  const properties2 = {
-    part2: {
-      label: "part2input",
-      rules: [{ required: true, message: 'name1 empty' }],
-      initialValue: 1,
-      type: 'Input',
-      props: {}
-    },
-  }
+  const widgetList2 = [{
+    label: "part2input",
+    name: 'part2',
+    rules: [{ required: true, message: 'part2 empty' }],
+    initialValue: 1,
+    type: 'Input',
+    props: {}
+  }]
 
   const form = useSimpleForm();
   // const formrender1 = useSimpleFormRender()
@@ -287,14 +286,14 @@ export default function Demo(props) {
           <p>part1</p>
           <FormChildren
             // formrender={formrender1}
-            properties={properties1}
+            widgetList={widgetList1}
           />
         </div>
         <div>
           <p>part2</p>
           <FormChildren
             // formrender={formrender2}
-            properties={properties2}
+            widgetList={widgetList2}
           />
         </div>
       </Form>
@@ -313,32 +312,36 @@ import FormRender, { useSimpleForm } from './form-render';
 import { Button } from 'antd';
 export default function Demo(props) {
   const form = useSimpleForm();
-  const properties =
+  const widgetList =
     [
       {
         label: "list-0",
-        rules: [{ required: true, message: 'name1 empty' }],
+        name: 'list[0]',
+        rules: [{ required: true, message: 'list[0] empty' }],
         initialValue: 1,
         type: 'Input',
         props: {}
       },
       {
         label: "list-1",
-        rules: [{ required: true, message: 'name1 empty' }],
+        name: 'list[1]',
+        rules: [{ required: true, message: 'list[1] empty' }],
         initialValue: 2,
         type: 'Input',
         props: {}
       },
       {
         label: "list-2",
-        rules: [{ required: true, message: 'name1 empty' }],
+        name: 'list[2]',
+        rules: [{ required: true, message: 'list[2] empty' }],
         initialValue: 3,
         type: 'Input',
         props: {}
       },
       {
         label: "list-3",
-        rules: [{ required: true, message: 'name1 empty' }],
+        name: 'list[3]',
+        rules: [{ required: true, message: 'list[3] empty' }],
         initialValue: 4,
         type: 'Input',
         props: {}
@@ -355,7 +358,7 @@ export default function Demo(props) {
     <div style={{ padding: '0 8px' }}>
       <FormRender
         form={form}
-        properties={properties}
+        widgetList={widgetList}
       />
       <div style={{ marginLeft: '120px' }}>
         <Button onClick={onSubmit}>submit</Button>
@@ -370,26 +373,25 @@ export default function Demo(props) {
 Sourced from [@simpleform/form](../form);
 
 ### FormChildren's props
-- `properties`: `{ [name: string]: FormNodeProps } | FormNodeProps[]` Renders the form's DSL form json data
+- `widgetList`: `WidgetItem[]` Renders the form's DSL form json data
 - `components`: registers all components in the form.
 - `plugins`: foreign libraries to be introduced in the form.
 - `options`: `GenerateFormNodeProps | ((field: GenerateFormNodeProps) => any)` Parameter information passed to the form node components. The priority is lower than the form node's own parameters
 - `renderList`: Provides a function to customize the rendered list.
 - `renderItem`: provides a function to customize the rendering of the node.
-- `onPropertiesChange`: `(newValue: PropertiesData) => void;` `Properties` change callback function.
+- `onRenderChange`: `(newValue: WidgetList) => void;` `onRenderChange` change callback function.
 - `formrender`: The form class responsible for rendering. Created by `useSimpleFormRender()`, optional.
 - `form`: Class responsible for the value of the form. Created via `useSimpleForm()`, optional.
 - `uneval`: does not execute string expressions in the form.
 
 ### SimpleFormRender's Methods
-- `updateItemByPath`: `(data?: any, path?: string, attributeName?: string) => void` Updates the node corresponding to the path `path`, if updating a specific attribute in the node then the `attributeName` parameter is required.
-- `setItemByPath`: `(data?: any, path?: string, attributeName?: string) => void` Sets the node corresponding to the path `path`, the `attributeName` parameter is required if you are updating a specific attribute in the node.
-- `updateNameByPath`: `(newName?: string, path: string) => void` Updates the name key of the specified path.
-- `delItemByPath`: `(path?: string, attributeName?: string) => void` Deletes the node corresponding to the path `path`, if deleting a specific attribute in the node then the `attributeName` parameter is required.
-- `insertItemByIndex`: `(data: InsertItemType, index?: number, parent?: { path?: string, attributeName?: string }) => void` Adds an option based on the serial number and the path of the parent node.
-- `getItemByPath`: `(path?: string, attributeName?: string) => void` Get the node that corresponds to the path `path`, or the `attributeName` parameter if it is a specific attribute in the node.
-- `moveItemByPath`: `(from: { parent?: string, index: number }, to: { parent?: string, index?: number })` Swap options in the tree from one location to another.
-- `setProperties`: `(data?: Partial<FormNodeProps>) => void` sets `properties`.
+- `updateItemByPath`: `(data?: any, path?: string) => void` Get the corresponding node based on `path`.
+- `setItemByPath`: `(data?: any, path?: string) => void` Sets the corresponding node according to `path`.
+- `delItemByPath`: `(path?: string) => void` Removes the node corresponding to the path `path`.
+- `insertItemByIndex`: `(data: WidgetItem | WidgetItem[], index?: number, parent?: string) => void` Adds a node based on the serial number and the path of the parent node.
+- `getItemByPath`: `(path?: string) => void` Get the node corresponding to the path `path`.
+- `moveItemByPath`: `(from: { parent?: string, index: number }, to: { parent?: string, index?: number })` Swap options in the tree from one position to another
+- `setWidgetList`: `(data?: WidgetList) => void` Sets the `widgetList` attribute of the form.
 
 ### Hooks
 - `useSimpleFormRender()`: create `new SimpleFormRender()`.
@@ -397,66 +399,40 @@ Sourced from [@simpleform/form](../form);
 
 ## Other
 
-### Properties structure description
-Each item in the `properties` property is a form node, and the nodes are categorized into nested nodes and control nodes.
-- Nested nodes.
-Nodes that have a `properties` property that describes which component the node is, via the `type` and `props` fields, and do not carry a form field component (`Form.Item`).
-- Form control Node.
-A node with no `properties` attribute that carries the form field component (`Form.Item`) by default.
+### widgetList structure description
+Each item in the `widgetList` list is a rendering node, divided into a form control node and nonform node.
+- Form control nodes.
+Nodes with the `name` attribute are form control nodes and carry the form field component (`Form.Item`) by default, for example:
 ```javascript
-const properties = {
-  name3: {
-    // Nested nodes
-    // type: '',
-    // props: {},
-    properties: {
-      // Control node
-      first: {
-        label: 'first',
-        rules: [{ required: true, message: 'first empty' }],
-        type: 'Select',
-        props: {
-          style: { width: '100%' },
-          children: [{ type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } }]
-        }
-      }
-    }
-  },
-}
+const widgetList = [{
+  label: "part2input",
+  name: 'part2',
+  rules: [{ required: true, message: 'part2 empty' }],
+  initialValue: 1,
+  type: 'Input',
+  props: {}
+}]
+```
+- nonform node.
+Nodes without the `name` attribute. Example:
+```javascript
+const widgetList = [{
+  type: 'CustomCard',
+  props: {}
+}]
 ```
 - Form Node's types
 ```javascript
-export interface FormComponent {
-  type?: string;
-  props?: any & { children?: any | Array<FormComponent> };
-}
-
-export type UnionComponent<P> =
-  | React.ComponentType<P>
-  | React.ForwardRefExoticComponent<P>
-  | React.FC<P>
-  | keyof React.ReactHTML;
-
-// Component
-export type CustomUnionType = FormComponent | Array<FormComponent> | UnionComponent<any> | Function | ReactNode
-// FormRender's properties
-export type PropertiesData = { [name: string]: FormNodeProps } | FormNodeProps[]
-// field's props(String expressions after compilation)
-export type GenerateFormNodeProps<T = {}> = FormComponent & FormItemProps & T & {
-  ignore?: boolean; // Mark the current node as a non-form node
-  inside?: CustomUnionType; // Nested components within nodes
-  outside?: CustomUnionType; // Nested components in the outer layer of the node
+export type GenerateWidgetItem<T extends Record<string, any> = {}> = FormItemProps & T & {
+  inside?: CustomUnionType; // The inner layer of the node
+  outside?: CustomUnionType; // The outside layer of the node
   readOnly?: boolean; // read-only mode
   readOnlyRender?: CustomUnionType; // Read-only mode rendering
   typeRender?: CustomUnionType; // Registering components for custom rendering
-  properties?: PropertiesData;
   hidden?: boolean;
-}
-// field's props(String expressions before compilation)
-export type FormNodeProps = {
-  [key in keyof GenerateFormNodeProps]: key extends 'rules' ?
-  (string | Array<{ [key in keyof FormRule]: FormRule[key] | string }> | GenerateFormNodeProps[key])
-  : (key extends 'properties' ? GenerateFormNodeProps[key] : (string | GenerateFormNodeProps[key]))
+  type?: string; //  Register the component
+  props?: Record<string, any> & { children?: any | Array<CustomWidget> }; // Register the component's props
+  widgetList?: WidgetList; // children of the component(will override props.children)
 }
 ```
 ### parameter injection
@@ -478,10 +454,8 @@ Set the global properties of the form node via 'options'
 The registration component in the form receives a context parameter
 ```javascript
 export interface GenerateParams<T = {}> {
-  name?: string;
   path?: string;
-  field?: GenerateFormNodeProps<T>;
-  parent?: { name?: string; path?: string, field?: GenerateFormNodeProps<T>; };
+  widgetItem?: GenerateWidgetItem<T>;
   formrender?: SimpleFormRender;
   form?: SimpleForm;
 };
@@ -494,15 +468,16 @@ Example:
 - `a[0].b` represents the `b` attribute of the first option below the array `a`
 
 ### String Expression Usage
-Property fields in a form node can support string expressions for linkage, except for `properties`.
+Property fields in a form node can support string expressions for linkage, except for `widgetList`.
 1. Quick use: computational expressions wrapping target attribute values in `{{` and `}}`
 ```javascript
 
   ...
 
-  const properties = {
-    name1: {
+  const widgetList = [
+    {
       label: 'name1',
+      name: 'name1',
       valueProp: 'checked',
       initialValue: true,
       type: 'Checkbox',
@@ -510,20 +485,22 @@ Property fields in a form node can support string expressions for linkage, excep
         children: 'option'
       }
     },
-    name2: {
+    {
       label: "name2",
+      name: 'name2',
       rules: '{{[{ required: formvalues && formvalues.name1 === true, message: "name2 empty" }]}}',
       initialValue: 1,
       type: 'Input',
       props: {}
-    },
-  }
+    }
+  ]
 
   // OR
 
-  const properties = {
-    name1: {
+  const widgetList = [
+    {
       label: 'name1',
+      name: 'name1',
       valueProp: 'checked',
       initialValue: true,
       type: 'Checkbox',
@@ -531,14 +508,15 @@ Property fields in a form node can support string expressions for linkage, excep
         children: 'option'
       }
     },
-    name2: {
+    {
       label: "name2",
+      name: 'name2',
       hidden: '{{formvalues && formvalues.name1 === true}}',
       initialValue: 1,
       type: 'Input',
       props: {}
     },
-  }
+  ]
 ```
 2. Rules for the use of string expressions
 - A string has and can have only one pair of `{{` and `}}`.
@@ -547,14 +525,12 @@ Property fields in a form node can support string expressions for linkage, excep
  import dayjs from 'dayjs';
  import FormRender from "./form-render";
 
- const properties = {
-    name3: {
-      label: "name3",
-      initialValue: "{{dayjs().format('YYYY-MM-DD')}}",
-      type: 'Input',
-      props: {}
-    },
-  }
+const widgetList = [{
+  label: "name3",
+  initialValue: "{{dayjs().format('YYYY-MM-DD')}}",
+  type: 'Input',
+  props: {}
+}]
   
-  <FormRender properties={properties} plugins={{ dayjs }} />
+  <FormRender widgetList={widgetList} plugins={{ dayjs }} />
 ```

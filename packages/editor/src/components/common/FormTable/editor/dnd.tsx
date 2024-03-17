@@ -10,11 +10,11 @@ export interface TableDndProps extends EditorSelection {
 
 // 表格拖放
 function TableDnd(props: TableDndProps, ref: any) {
-  const { children, formrender, path, field, ...rest } = props;
+  const { children, formrender, path, widgetItem, ...rest } = props;
 
   const attributeName = `props.columns`;
   const currentPath = path;
-  const context = field?.context;
+  const context = widgetItem?.context;
   const { settingForm, editorConfig, historyRecord } = context?.state || {};
 
   const updateContext = () => {
@@ -29,7 +29,7 @@ function TableDnd(props: TableDndProps, ref: any) {
     const fromIndex = from?.index;
     const dropIndex = to?.index;
     if (typeof fromIndex != 'number' || typeof dropIndex !== 'number') return;
-    const columns = field?.props?.columns || [];
+    const columns = widgetItem?.props?.columns || [];
     const oldColumns = [...columns];
     const newColumns = arrayMove(oldColumns, fromIndex, dropIndex);
     setFormItem(formrender, newColumns, currentPath, attributeName);
@@ -50,32 +50,32 @@ function TableDnd(props: TableDndProps, ref: any) {
     const fromIndex = from?.index;
     if (typeof fromIndex != 'number') return;
     const dropIndex = to?.index || 0;
-    let controlField;
+    let widgetItem;
     // 从侧边栏插入进来
     if (fromCollection?.type === 'panel') {
       const type = from?.id as string;
-      controlField = getConfigItem(type, editorConfig);
+      widgetItem = getConfigItem(type, editorConfig);
       // 从表单节点中插入
     } else {
-      controlField = formrender && formrender.getItemByIndex(fromIndex, { path: fromCollection?.path });
-      formrender && formrender.setItemByIndex(undefined, fromIndex, { path: fromCollection?.path });
+      widgetItem = formrender && formrender.getItemByIndex(fromIndex, fromCollection?.path);
+      formrender && formrender.setItemByIndex(undefined, fromIndex, fromCollection?.path);
     }
     // 拼接column
     const newColumn = {
-      ...controlField,
-      title: controlField?.label,
-      dataIndex: defaultGetId(controlField.type)
+      ...widgetItem,
+      title: widgetItem?.label,
+      dataIndex: defaultGetId(widgetItem.type)
     };
     insertFormItem(formrender, newColumn, dropIndex, { path: currentPath, attributeName: attributeName });
     updateContext();
   };
 
   const disabledDrop: DndCondition = (param) => {
-    // 如果目标来自于attributeName，则不允许放进来
-    const fromCollection = param?.from?.group?.collection;
-    if (fromCollection?.attributeName) {
-      return true;
-    }
+    // // 如果目标来自于attributeName，则不允许放进来
+    // const fromCollection = param?.from?.group?.collection;
+    // if (fromCollection?.attributeName) {
+    //   return true;
+    // }
   };
 
   return (
@@ -85,7 +85,7 @@ function TableDnd(props: TableDndProps, ref: any) {
       onAdd={onAdd}
       className='table-dnd'
       options={{ hiddenFrom: true, disabledDrop: disabledDrop }}
-      collection={{ path: currentPath, attributeName }}
+      collection={{ path: currentPath }}
     >
       {children}
     </DndSortable>

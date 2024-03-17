@@ -1,6 +1,6 @@
 import { ColumnType, TableProps } from 'antd/lib/table';
 import React, { CSSProperties } from 'react';
-import { CustomFormNodeProps, GenerateFormNodeProps, CommonWidgetProps } from '../../formrender';
+import { CommonWidgetProps, CustomWidgetItem, GenerateWidgetItem } from '../../formrender';
 import EditorTable from './editor';
 import FormTable from './render';
 
@@ -14,7 +14,7 @@ export interface FormTableProps extends Omit<TableProps<any>, 'title' | 'onChang
   style?: CSSProperties;
 }
 
-export interface CustomColumnType<T = any> extends ColumnType<T>, CustomFormNodeProps<GenerateFormNodeProps> {
+export interface CustomColumnType<T = any> extends ColumnType<T>, CustomWidgetItem<GenerateWidgetItem> {
   key?: string;
   title: string;
   dataIndex: string;
@@ -26,11 +26,11 @@ export interface CustomColumnType<T = any> extends ColumnType<T>, CustomFormNode
 
 const Table = React.forwardRef<any, FormTableProps>((props, ref) => {
   const {
-    field,
+    widgetItem,
   } = props;
 
-  const isEditor = field?.isEditor;
-  const columns = field?.props?.columns;
+  const isEditor = widgetItem?.isEditor;
+  const columns = widgetItem?.props?.columns;
 
   return (
     isEditor ? <EditorTable {...props} columns={columns} ref={ref} /> : <FormTable {...props} ref={ref} columns={columns} />
