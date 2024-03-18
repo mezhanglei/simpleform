@@ -1,7 +1,7 @@
 import React, { CSSProperties, useEffect, useMemo } from 'react';
 import classnames from 'classnames';
 import { CustomFormRenderProps, Form, FormChildren, joinFormPath, useSimpleForm } from '../components/formrender';
-import { getNameSetting, asyncSettingForm, setFormValue } from '../utils/utils';
+import { asyncSettingForm } from '../utils/utils';
 import './component.less';
 import CustomCollapse from '../components/common/Collapse';
 import { useEditorContext } from '../context';
@@ -22,18 +22,16 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   const context = useEditorContext();
   const { selected, editor, editorForm, editorConfig } = context.state;
   const selectedPath = selected?.path;
-  const selectedName = selected?.name;
-  const attributeName = selected?.attributeName;
   const form = useSimpleForm();
   const cls = classnames(prefixCls, className);
   const configSetting = useMemo(() => {
     if (!selected) return;
-    const selectedItem = editor?.getItemByPath(selected?.path, selected?.attributeName);
+    const selectedItem = editor?.getItemByPath(selected?.path);
     const configSetting = editorConfig?.[selectedItem?.type || '']?.setting;
     const appendSetting = selected.appendSetting;
     return appendSetting || configSetting;
-  }, [editor, selectedPath, attributeName, editorConfig]);
-  const nameSetting = useMemo(() => getNameSetting(selected), [selectedPath, attributeName]); // 表单节点字段设置
+  }, [editor, selectedPath, editorConfig]);
+
   useEffect(() => {
     context.dispatch((old) => ({ ...old, settingForm: form }));
   }, []);
@@ -46,27 +44,11 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
     setTimeout(() => {
       asyncSettingForm(editor, form, selected);
     }, 50);
-  }, [selectedPath, attributeName]);
+  }, [selectedPath]);
 
   const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = ({ name, value }) => {
-    if (typeof name !== 'string') return;
-    if (name == 'name') {
-      editor?.updateNameByPath(value, selectedPath);
-      // 更新selected
-      if (!attributeName) {
-        const joinName = joinFormPath(selected?.parent?.name, value);
-        const joinPath = joinFormPath(selected?.parent?.path, value);
-        context.dispatch((old) => ({ ...old, selected: { ...selected, name: joinName, path: joinPath } }));
-      }
-    } else {
-      editor?.updateItemByPath(value, selectedPath, joinFormPath(attributeName, name));
-      if (!attributeName) {
-        // 更新editorForm
-        if (name === 'initialValue') {
-          setFormValue(editorForm, selectedName, value);
-        }
-      }
-    }
+    const curPath = joinFormPath(selectedPath, name);
+    editor?.setItemByPath(value, curPath);
   };
 
   const renderCommonList = () => {
@@ -75,7 +57,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
       Object.entries(configSetting)?.map(([name, data]) => {
         return (
           <CustomCollapse header={name} key={name} isOpened>
-            <FormChildren properties={data} options={{ context: context }} />
+            <FormChildren widgetList={data} options={{ context: context }} />
           </CustomCollapse>
         );
       })
@@ -85,7 +67,6 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   return (
     <div ref={ref} className={cls} style={style}>
       <Form layout="vertical" form={form} onFieldsChange={onFieldsChange}>
-        <FormChildren properties={nameSetting} uneval />
         {renderCommonList()}
       </Form>
     </div>

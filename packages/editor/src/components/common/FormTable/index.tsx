@@ -17,9 +17,9 @@ export interface FormTableProps extends Omit<TableProps<any>, 'title' | 'onChang
 export interface CustomColumnType<T = any> extends ColumnType<T>, CustomWidgetItem<GenerateWidgetItem> {
   key?: string;
   title: string;
-  dataIndex: string;
   type?: string;
   props?: any;
+  dataIndex: string;
   initialValue?: any;
   render?: (val: unknown, record?: unknown, rowIndex?: number, colIndex?: number) => any;
 }

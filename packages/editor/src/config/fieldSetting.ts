@@ -1,11 +1,13 @@
 // 默认的表单域显示组件的属性
-const baseSetting = {
-  label: {
+const baseSetting = [
+  {
     label: '标签名称',
+    name: 'label',
     type: 'Input'
   },
-  layout: {
+  {
     label: "标签布局",
+    name: 'layout',
     type: "Radio.Group",
     initialValue: "horizontal",
     props: {
@@ -16,8 +18,9 @@ const baseSetting = {
       ]
     }
   },
-  labelAlign: {
+  {
     label: '标签水平排列',
+    name: 'labelAlign',
     type: "Select",
     initialValue: 'right',
     props: {
@@ -30,16 +33,18 @@ const baseSetting = {
       ]
     }
   },
-  gutter: {
+  {
     label: '标签间距',
+    name: 'gutter',
     type: 'InputNumber',
     props: {
       min: 0,
       max: 300
     }
   },
-  labelWidth: {
+  {
     label: '标签宽度',
+    name: 'labelWidth',
     type: 'InputNumber',
     initialValue: 120,
     props: {
@@ -47,21 +52,24 @@ const baseSetting = {
       max: 300
     }
   },
-  suffix: {
+  {
     label: '后缀',
+    name: 'suffix',
     type: 'Input'
   },
-  footer: {
+  {
     label: '描述',
+    name: 'footer',
     type: 'Input'
   },
-  colon: {
+  {
     label: '携带冒号',
+    name: 'colon',
     type: 'Switch',
     valueProp: 'checked',
     initialValue: false,
   }
-};
+];
 
 const setting = {
   '公共属性': baseSetting

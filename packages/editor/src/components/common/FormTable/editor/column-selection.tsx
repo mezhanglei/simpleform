@@ -1,10 +1,10 @@
 import React from 'react';
 import Icon from '../../SvgIcon';
-import { defaultGetId, setFormItem } from '../../../../utils/utils';
+import { defaultGetId, setWidgetItem } from '../../../../utils/utils';
 import FormTableColSetting from './column-setting';
 import { pickObject } from '../../../../utils/object';
 import BaseSelection, { BaseSelectionProps } from '../../BaseSelection';
-import { CustomWidgetItem, deepSet, EditorSelection } from '../../../formrender';
+import { joinFormPath, CustomWidgetItem, EditorSelection } from '../../../formrender';
 
 export interface ColumnSelectionProps extends BaseSelectionProps {
   colIndex: number;
@@ -27,13 +27,12 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
     form: editorForm,
     colIndex,
     column,
-    // ...restProps
+    ...restProps
   } = props;
 
   const columns = widgetItem?.props?.columns || [];
-  const columnsPath = `props.columns`;
-  const attributeName = `${columnsPath}[${colIndex}]`;
-  const currentPath = path;
+  const colmunsPath = joinFormPath(path, 'props.columns');
+  const colmunPath = joinFormPath(colmunsPath, colIndex);
   const context = widgetItem?.context;
   const { editorConfig } = context?.state || {};
 
@@ -50,27 +49,29 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
 
   const copyItem = () => {
     const nextColIndex = colIndex + 1;
-    const oldColumns = [...columns];
+    const cloneColumns = [...columns];
     const newColumn = {
       ...column,
       title: column?.label,
       dataIndex: defaultGetId(column?.type),
     };
-    oldColumns.splice(nextColIndex, 0, newColumn);
-    const newItem = deepSet(widgetItem, columnsPath, oldColumns);
-    setFormItem(editor, newItem, currentPath);
+    cloneColumns.splice(nextColIndex, 0, newColumn);
+    setWidgetItem(editor, cloneColumns, colmunsPath);
   };
 
   const deleteColumn = (e: any) => {
     e.stopPropagation();
     context?.dispatch && context?.dispatch((old) => ({ ...old, selected: {} }));
-    setFormItem(editor, undefined, currentPath, attributeName);
+    const cloneColumns = [...columns];
+    cloneColumns.splice(colIndex, 1);
+    setWidgetItem(editor, cloneColumns, colmunsPath);
   };
 
   return (
     <BaseSelection
       ref={ref}
       {...props}
+      path={colmunPath}
       configLabel="表格列"
       onSelect={onSelect}
       tools={[<Icon key="fuzhi" name="fuzhi" onClick={copyItem} />, <Icon key="shanchu" name="shanchu" onClick={deleteColumn} />]}>

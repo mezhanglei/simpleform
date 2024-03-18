@@ -39,7 +39,7 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
     widgetItem,
     ...rest
   } = props;
-
+  const curName = widgetItem?.name;
   const items = Array.from({ length: Math.max(minRows || 0) });
   const defaultValue = useMemo(() => items.map(() => ({ key: defaultGetId('row') })), [items]);
   const {
@@ -56,7 +56,7 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
   const deleteBtn = (rowIndex: number) => {
     if (disabled) return;
     deleteItem(rowIndex);
-    const old = form && form.getFieldValue(widgetItem?.name) || [];
+    const old = form && form.getFieldValue(curName) || [];
     old.splice(rowIndex, 1);
   };
 
@@ -69,25 +69,25 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
   };
 
   const newColumns = useMemo(() => {
-    const result = columns?.map((col) => {
+    const result = columns?.map((col, colIndex) => {
       const { dataIndex, title, type, props, ...restCol } = col;
       return {
         ...restCol,
         dataIndex: dataIndex,
         title: title,
         onCell: (record: unknown, rowIndex?: number) => {
-          const curName = joinFormPath(widgetItem?.name, rowIndex, dataIndex);
-          const curPath = joinFormPath(path, rowIndex, dataIndex);
-          const params = {
+          const colName = joinFormPath(curName, rowIndex, dataIndex); // 表单字段
+          const colPath = joinFormPath(path, 'props.columns', colIndex); // column所在的位置
+          const columnParams = {
             form,
             formrender,
-            name: curName,
-            path: curPath,
+            path: colPath,
+            widgetItem: col,
           };
-          const formControl = formrender && formrender.createFormElement({ type, props: Object.assign({ disabled }, params, props) });
+          const formControl = formrender && formrender.createFormElement({ type, props: Object.assign({ disabled }, columnParams, props) });
           return {
             record,
-            name: curName, // 拼接路径
+            name: colName, // 拼接路径
             formControl: formControl,
             ...restCol,
           };

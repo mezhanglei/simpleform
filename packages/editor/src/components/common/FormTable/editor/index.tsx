@@ -4,9 +4,8 @@ import './index.less';
 import ColumnSelection from "./column-selection";
 import TableDnd from './dnd';
 import { FormTableProps } from "..";
-import { setFormInitialValue } from "../../../../utils/utils";
 import pickAttrs from '../../../../utils/pickAttrs';
-import { Form } from "../../../formrender";
+import { CustomFormRenderProps, Form, joinFormPath } from "../../../formrender";
 
 const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
   columns = [],
@@ -28,11 +27,12 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
     placeholder: `${prefix}-placeholder`,
   };
 
-  const context = rest?.widgetItem?.context;
-  const { editor, settingForm } = context?.state || {};
+  const widgetItem = rest?.widgetItem;
+  const context = widgetItem?.context;
+  const { settingForm } = context?.state || {};
 
-  const onFieldsChange = (colIndex: number, newVal: any) => {
-    setFormInitialValue(editor, settingForm, rest?.path, newVal);
+  const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = ({ value }) => {
+    settingForm && settingForm.setFieldValue('initialValue', value);
   };
 
   return (
@@ -44,16 +44,17 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
       <TableDnd {...rest}>
         {
           columns?.map((column, colIndex) => {
-            const { dataIndex, title, type, props, ...restColumn } = column;
+            const { title, type, props, ...restColumn } = column;
+            const columnPath = joinFormPath(rest?.path, `props.columns[${colIndex}]`, 'initialValue');
             const columnInstance = rest?.formrender && rest.formrender.createFormElement({ type: type, props: Object.assign({ disabled, form: rest?.form, formrender: rest?.formrender }, props) });
             return (
-              <ColumnSelection key={dataIndex} className={Classes.TableSelection} {...rest} column={column} colIndex={colIndex}>
+              <ColumnSelection key={columnPath} className={Classes.TableSelection} {...rest} column={column} colIndex={colIndex}>
                 <div className={Classes.TableCol}>
                   <div className={Classes.TableColHead}>
                     {title}
                   </div>
                   <div className={Classes.TableColBody}>
-                    <Form.Item {...restColumn} label="" name={dataIndex} onFieldsChange={({ value }) => onFieldsChange(colIndex, value)}>
+                    <Form.Item {...restColumn} label="" name={columnPath} onFieldsChange={onFieldsChange}>
                       {React.isValidElement(columnInstance) ? ({ bindProps }: any) => React.cloneElement(columnInstance, bindProps) : columnInstance}
                     </Form.Item>
                   </div>

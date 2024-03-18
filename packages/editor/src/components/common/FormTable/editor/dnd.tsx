@@ -1,8 +1,8 @@
-import DndSortable, { arrayMove, DndCondition, DndSortableProps } from 'react-dragger-sort';
+import DndSortable, { arrayMove, DndSortableProps } from 'react-dragger-sort';
 import React from 'react';
 import './dnd.less';
-import { defaultGetId, getConfigItem, insertFormItem, setFormItem } from '../../../../utils/utils';
-import { EditorSelection } from '../../../formrender';
+import { defaultGetId, getConfigItem, insertWidgetItem, setWidgetItem } from '../../../../utils/utils';
+import { joinFormPath, EditorSelection } from '../../../formrender';
 
 export interface TableDndProps extends EditorSelection {
   children?: any;
@@ -11,10 +11,9 @@ export interface TableDndProps extends EditorSelection {
 // 表格拖放
 function TableDnd(props: TableDndProps, ref: any) {
   const { children, formrender, path, widgetItem, ...rest } = props;
-
-  const attributeName = `props.columns`;
-  const currentPath = path;
   const context = widgetItem?.context;
+  const columns = widgetItem?.props?.columns || [];
+  const columnsPath = joinFormPath(path, 'props.columns');
   const { settingForm, editorConfig, historyRecord } = context?.state || {};
 
   const updateContext = () => {
@@ -29,10 +28,9 @@ function TableDnd(props: TableDndProps, ref: any) {
     const fromIndex = from?.index;
     const dropIndex = to?.index;
     if (typeof fromIndex != 'number' || typeof dropIndex !== 'number') return;
-    const columns = widgetItem?.props?.columns || [];
-    const oldColumns = [...columns];
-    const newColumns = arrayMove(oldColumns, fromIndex, dropIndex);
-    setFormItem(formrender, newColumns, currentPath, attributeName);
+    const cloneColumns = [...columns];
+    const newColumns = arrayMove(cloneColumns, fromIndex, dropIndex);
+    setWidgetItem(formrender, newColumns, columnsPath);
     updateContext();
   };
 
@@ -45,7 +43,6 @@ function TableDnd(props: TableDndProps, ref: any) {
     const fromCollection = fromGroup?.collection as {
       type?: string;
       path?: string;
-      attributeName?: string
     };
     const fromIndex = from?.index;
     if (typeof fromIndex != 'number') return;
@@ -61,21 +58,16 @@ function TableDnd(props: TableDndProps, ref: any) {
       formrender && formrender.setItemByIndex(undefined, fromIndex, fromCollection?.path);
     }
     // 拼接column
+    const id = defaultGetId(widgetItem.type);
     const newColumn = {
       ...widgetItem,
       title: widgetItem?.label,
-      dataIndex: defaultGetId(widgetItem.type)
+      dataIndex: id,
     };
-    insertFormItem(formrender, newColumn, dropIndex, { path: currentPath, attributeName: attributeName });
+    const cloneColumns = [...columns];
+    cloneColumns.splice(dropIndex, 0, newColumn);
+    setWidgetItem(formrender, cloneColumns, columnsPath);
     updateContext();
-  };
-
-  const disabledDrop: DndCondition = (param) => {
-    // // 如果目标来自于attributeName，则不允许放进来
-    // const fromCollection = param?.from?.group?.collection;
-    // if (fromCollection?.attributeName) {
-    //   return true;
-    // }
   };
 
   return (
@@ -84,8 +76,8 @@ function TableDnd(props: TableDndProps, ref: any) {
       onUpdate={onUpdate}
       onAdd={onAdd}
       className='table-dnd'
-      options={{ hiddenFrom: true, disabledDrop: disabledDrop }}
-      collection={{ path: currentPath }}
+      options={{ hiddenFrom: true }}
+      collection={{ path: columnsPath }}
     >
       {children}
     </DndSortable>

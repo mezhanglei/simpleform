@@ -43,7 +43,7 @@ export interface FormChildrenProps<T extends Record<string, any> = {}> {
   formrender?: SimpleFormRender;
   options?: GenerateWidgetItem<T> | ((params: GenerateWidgetItem<T>) => GenerateWidgetItem<T>); // 组件公共传参
   uneval?: boolean;
-  components?: Record<any, React.ReactNode>; // 注册组件
+  components?: Record<string, any>; // 注册组件
   plugins?: Record<string, any>; // 外部模块
   inside?: CustomUnionType;
   widgetList?: WidgetList; // 渲染数据

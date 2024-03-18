@@ -1,10 +1,11 @@
 import React from 'react';
 import SvgIcon from '../SvgIcon';
-import { insertFormItem } from '../../../utils/utils';
+import { getListIndex, insertWidgetItem } from '../../../utils/utils';
 import BaseSelection from '../BaseSelection';
 import classnames from 'classnames';
 import './col-selection.less';
 import { CustomColProps } from './col';
+import { getParent } from '../../formrender';
 
 /**
  * 给表单中的控件外围添加选中框
@@ -17,32 +18,30 @@ function ColSelection(props: CustomColProps, ref: any) {
     children,
     style,
     className,
-    name,
     path,
-    field,
-    parent,
+    widgetItem,
     formrender: editor,
     form: editorForm,
     ...restProps
   } = props;
 
-  const currentPath = path;
-  const context = field?.context;
+  const context = widgetItem?.context;
+
   const { editorConfig } = context?.state || {};
 
   const addCol = () => {
-    const nextIndex = (field?.index as number) + 1;
+    const colIndex = getListIndex(editor, path);
+    const nextIndex = colIndex + 1;
     const newItem = {
       ...editorConfig?.['GridCol'],
       props: { span: 12 },
-      properties: {
-      }
+      widgetList: []
     };
-    insertFormItem(editor, newItem, nextIndex, { path: parent?.path });
+    insertWidgetItem(editor, newItem, nextIndex, getParent(path));
   };
 
   const deleteItem = () => {
-    currentPath && editor?.delItemByPath(currentPath);
+    path && editor?.delItemByPath(path);
   };
 
   const prefixCls = "col-selection";
@@ -52,7 +51,7 @@ function ColSelection(props: CustomColProps, ref: any) {
     <BaseSelection
       ref={ref}
       {...props}
-      configLabel={field?.panel?.label}
+      configLabel={widgetItem?.panel?.label}
       className={cls}
       tools={[<SvgIcon key="add" name="add" onClick={addCol} />, <SvgIcon key="shanchu" name="shanchu" onClick={deleteItem} />]}>
       {children}

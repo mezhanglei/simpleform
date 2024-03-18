@@ -18,6 +18,7 @@ export interface CustomOptions {
   panel?: {
     label?: string; // 配置组件的名
     icon?: string; // 配置组件的图标
+    nonform?: boolean; // 非表单控件
     includes?: string[]; // 子元素限制可以添加的组件类型
   };
   // 属性表单

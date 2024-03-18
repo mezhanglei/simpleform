@@ -1,3 +1,4 @@
+import Setting from './setting';
 import FieldSetting from '../../fieldSetting';
 
 export default {
@@ -10,5 +11,5 @@ export default {
   props: {
     style: { width: '100%' },
   },
-  setting: { ...FieldSetting }
+  setting: { ...Setting, ...FieldSetting }
 };

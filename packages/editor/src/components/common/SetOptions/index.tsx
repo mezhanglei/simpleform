@@ -5,7 +5,7 @@ import LinkageSetting from "./Linkage";
 import RequestSetting from './request';
 import OptionList from './list';
 import { EditorCodeMirror } from "../CodeMirror";
-import { getFormItem } from "../../../utils/utils";
+import { getWidgetItem } from "../../../utils/utils";
 import { joinFormPath, CommonWidgetProps } from "../../formrender";
 
 /**
@@ -45,12 +45,12 @@ const SetOptions: React.FC<SetOptionsProps> = (props) => {
   const context = widgetItem?.context;
   const { selected, editor } = context?.state || {};
   const buttons = useMemo(() => (OptionsKeys?.filter((key) => includes?.includes(key))), [includes]);
-  const optionSelect: OptionsKey = getFormItem(editor, selected?.path, joinFormPath(selected?.attributeName, 'props.optionSelect')) || buttons[0];
+  const optionSelect: OptionsKey = getWidgetItem(editor, joinFormPath(selected?.path, 'props.optionSelect')) || buttons[0];
 
   const selectTypeChange = (key?: OptionsKey) => {
     if (key) {
       onChange && onChange(undefined);
-      editor?.updateItemByPath(key, selected?.path, joinFormPath(selected?.attributeName, 'props.optionSelect'));
+      editor?.setItemByPath(key, joinFormPath(selected?.path, 'props.optionSelect'));
     }
   };
 

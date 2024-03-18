@@ -1,7 +1,7 @@
 import { deepMergeObject } from './object';
 import { nanoid } from 'nanoid';
-import { SimpleForm, EditorSelection, SimpleFormRender, getInitialValues, getPathEnd, joinFormPath, getParent } from '../components/formrender';
-import { FormEditorState } from '../context';
+import { SimpleForm, EditorSelection, SimpleFormRender, getInitialValues, getPathEnd, getParent, CustomWidgetItem } from '../components/formrender';
+import { ConfigSettingItem, FormEditorState } from '../context';
 
 export const defaultGetId = (key?: string) => {
   return typeof key == 'string' ? `${key.replace(/\./g, '')}_${nanoid(6)}` : '';
@@ -12,44 +12,27 @@ export const isNoSelected = (path?: string) => {
   if (!path || path === '#') return true;
 };
 
-// name的setting
-export const getNameSetting = (selected?: EditorSelection) => {
-  const selectedPath = selected?.path;
-  const attributeName = selected?.attributeName;
-  if (attributeName) return;
-  if (typeof selected?.path !== 'string') return;
-  // 获取选中的字段值
-  const endName = getPathEnd(selectedPath);
-  // 表单节点才允许展示
-  if (typeof endName === 'string') {
-    return {
-      name: {
-        label: '字段名',
-        type: 'Input'
-      }
-    };
-  }
-};
-
-// 获取当前选中位置序号
-export const getSelectedIndex = (editor?: SimpleFormRender | null, selected?: EditorSelection) => {
+// 根据目标路径推测其在父列表中的序号
+export const getListIndex = (editor?: SimpleFormRender | null, path?: string) => {
   if (!editor) return -1;
-  const len = Object.keys(editor.getProperties() || {}).length || 0;
-  if (isNoSelected(selected?.path)) return len;
-  const parent = selected?.attributeName ? editor.getItemByPath(selected.path, getParent(selected?.attributeName)) : editor.getItemByPath(selected?.parent?.path);
-  const endCode = (selected?.attributeName ? getPathEnd(selected?.attributeName) : getPathEnd(selected?.path))?.replace(/\]/, '').replace(/\[/, '');
-  const keys = Object.keys(parent);
+  const len = editor.getWidgetList().length || 0;
+  if (isNoSelected(path)) return len - 1;
+  const containerPath = getParent(path);
+  const container = editor.getItemByPath(containerPath);
+  const endName = getPathEnd(path);
+  const endCode = typeof endName == 'string' ? endName?.replace(/\]/, '').replace(/\[/, '') : endName;
+  const keys = Object.keys(container);
   const index = keys.findIndex((key) => key == endCode);
   return index;
 };
 
 // 根据节点的配置返回节点的初始值
-export const getSettingInitial = (setting?: any) => {
-  // 从配置表单中获取初始属性
+export const getSettingInitial = (setting?: ConfigSettingItem) => {
+  // // 从配置表单中获取初始属性
   const expandSetting = Object.values(setting || {}).reduce((pre, cur) => {
-    const result = deepMergeObject(pre, cur);
+    const result = [...pre, ...cur];
     return result;
-  }, {}) as any;
+  }, []) as any;
   const initialValues = getInitialValues(expandSetting);
   return initialValues;
 };
@@ -60,69 +43,27 @@ export const getConfigItem = (type: string | undefined, editorConfig?: FormEdito
   const item = editorConfig[type];
   const { setting, ...rest } = item;
   const initialValues = getSettingInitial(setting);
-  const field = deepMergeObject(initialValues, rest);
-  return field;
+  const widgetItem = deepMergeObject(initialValues, rest);
+  return widgetItem;
 };
 
 // 根据路径获取节点的值和属性
-export const getFormItem = (formrender?: SimpleFormRender | null, path?: string, attributeName?: string) => {
+export const getWidgetItem = (formrender?: SimpleFormRender | null, path?: string) => {
   if (isNoSelected(path) || !formrender) return;
-  const item = formrender.getItemByPath(path, attributeName);
+  const item = formrender.getItemByPath(path);
   return item;
 };
 
 // 插入新节点
-export const insertFormItem = (formrender?: SimpleFormRender | null, data?: any, index?: number, parent?: { path?: string, attributeName?: string }) => {
-  if (!formrender) return;
-  const { path, attributeName } = parent || {};
-  const parentItem = formrender.getItemByPath(path, attributeName);
-  const childs = attributeName ? parentItem : (path ? parentItem?.properties : parentItem);
-  const isInArray = childs instanceof Array;
-  if (isInArray) {
-    formrender?.insertItemByIndex(data, index, parent);
-  } else {
-    if (data?.type) {
-      const newName = defaultGetId(data?.type);
-      const newData = { [newName]: data };
-      formrender.insertItemByIndex(newData, index, parent);
-    }
-  }
-};
-
-// 更新节点的属性
-export const updateFormItem = (formrender?: SimpleFormRender | null, data?: any, path?: string, attributeName?: string) => {
-  if (isNoSelected(path) || !formrender) return;
-  if (attributeName) {
-    // 设置属性节点
-    formrender?.updateItemByPath(data, path, attributeName);
-  } else {
-    // 更新表单节点
-    const { name, ...rest } = data || {};
-    if (rest) {
-      formrender?.updateItemByPath(rest, path);
-    }
-    if (name) {
-      formrender?.updateNameByPath(name, path);
-    }
-  }
+export const insertWidgetItem = (formrender?: SimpleFormRender | null, data?: CustomWidgetItem, index?: number, parent?: string) => {
+  if (!formrender || !data) return;
+  formrender?.insertItemByIndex(data, index, parent);
 };
 
 // 覆盖设置节点的属性
-export const setFormItem = (formrender?: SimpleFormRender | null, data?: any, path?: string, attributeName?: string) => {
+export const setWidgetItem = (formrender?: SimpleFormRender | null, data?: any, path?: string) => {
   if (isNoSelected(path) || !formrender) return;
-  if (attributeName) {
-    // 设置属性节点
-    formrender?.setItemByPath(data, path, attributeName);
-  } else {
-    // 设置表单节点
-    const { name, ...rest } = data || {};
-    if (rest) {
-      formrender?.setItemByPath(rest, path);
-    }
-    if (name) {
-      formrender?.updateNameByPath(name, path);
-    }
-  }
+  formrender?.setItemByPath(data, path);
 };
 
 // 表单赋值
@@ -133,20 +74,9 @@ export const setFormValue = (form?: SimpleForm | null, name?: string, value?: an
   };
 };
 
-// 表单存储initialValue
-export const setFormInitialValue = (formrender?: SimpleFormRender | null, settingForm?: SimpleForm | null, selected?: EditorSelection, initialValue?: any) => {
-  updateFormItem(formrender, initialValue, selected?.path, joinFormPath(selected?.attributeName, 'initialValue'));
-  // 回填setting表单的intialValue选项
-  settingForm && settingForm.setFieldValue('initialValue', initialValue);
-};
-
 // 同步目标的编辑区域值到属性面板回显
 export const asyncSettingForm = (editor?: SimpleFormRender | null, settingForm?: SimpleForm | null, selected?: EditorSelection) => {
   if (isNoSelected(selected?.path) || !settingForm) return;
-  const item = getFormItem(editor, selected?.path, selected?.attributeName);
-  const attributeName = selected?.attributeName;
-  // 非属性节点需要该节点的字段名
-  const name = getPathEnd(selected?.path);
-  const settingValues = attributeName ? item : { ...item, name: name };
-  settingForm.setFieldsValue(settingValues);
+  const item = getWidgetItem(editor, selected?.path);
+  settingForm.setFieldsValue(item);
 };

@@ -1,54 +1,57 @@
-const baseSetting = {
-  props: {
-    properties: {
-      minRows: {
-        label: '最小行数',
-        type: 'InputNumber',
-        initialValue: 0
-      },
-      maxRows: {
-        label: '最大行数',
-        type: 'InputNumber',
-        initialValue: 50
-      },
-    }
+const baseSetting = [
+  {
+    label: '字段名',
+    name: 'name',
+    type: 'Input'
+  },
+  {
+    label: '最小行数',
+    name: 'props.minRows',
+    type: 'InputNumber',
+    initialValue: 0
+  },
+  {
+    label: '最大行数',
+    name: 'props.maxRows',
+    type: 'InputNumber',
+    initialValue: 50
   }
-};
+];
 
-const operationSetting = {
-  hidden: {
+const operationSetting = [
+  {
+    name: 'hidden',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
     props: { children: '隐藏' }
   },
-  props: {
-    properties: {
-      disabled: {
-        type: 'OperateCheckbox',
-        inline: true,
-        compact: true,
-        props: { children: '禁用' }
-      },
-      showBtn: {
-        type: 'OperateCheckbox',
-        inline: true,
-        compact: true,
-        props: { children: '可增删' }
-      },
-    }
-  }
-};
+  {
+    name: 'props.disabled',
+    type: 'OperateCheckbox',
+    inline: true,
+    compact: true,
+    props: { children: '禁用' }
+  },
+  {
+    name: 'props.showBtn',
+    type: 'OperateCheckbox',
+    inline: true,
+    compact: true,
+    props: { children: '可增删' }
+  },
+];
 
-const rulesSetting = {
-  rules: {
+const rulesSetting = [
+  {
+    name: 'rules',
     type: 'RulesGroup',
     compact: true,
     props: {
       includes: ['required']
     }
   },
-};
+];
 
 const setting = {
   '基础属性': baseSetting,

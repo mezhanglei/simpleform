@@ -1,16 +1,14 @@
 import React from 'react';
-import { CommonWidgetProps } from '../../formrender';
+import { EditorSelection } from '../../formrender';
 // 按钮弹窗富文本
-export const RichText = React.forwardRef<any, CommonWidgetProps<string>>((props, ref) => {
+export const RichText = React.forwardRef<any, EditorSelection>((props, ref) => {
 
   const {
-    value,
-    onChange,
+    widgetItem,
     ...rest
   } = props;
-
   return (
-    <div ref={ref} dangerouslySetInnerHTML={{ __html: value || '' }} {...rest}>
+    <div ref={ref} dangerouslySetInnerHTML={{ __html: widgetItem?.initialValue || '' }} {...rest}>
     </div>
   );
 });

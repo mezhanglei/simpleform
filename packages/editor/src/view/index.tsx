@@ -3,8 +3,8 @@ import classnames from 'classnames';
 import './index.less';
 import RootDnd from './RootDnd';
 import ComponentSelection from './selection';
-import DefaultFormRender, { CustomFormRenderProps } from '../components/formrender';
-import { setFormInitialValue } from '../utils/utils';
+import DefaultFormRender, { CustomFormRenderProps, joinFormPath } from '../components/formrender';
+import { setWidgetItem } from '../utils/utils';
 import { FormEditorContextProps, useEditorContext } from '../context';
 import PlatContainer from '../tools/platContainer';
 
@@ -17,7 +17,7 @@ export interface EditorViewProps {
 function EditorView(props: EditorViewProps) {
 
   const context = useEditorContext();
-  const { platType = 'pc', beforeSelected, editor, editorForm, settingForm, properties } = context.state;
+  const { platType = 'pc', beforeSelected, editor, editorForm, settingForm, widgetList } = context.state;
   const FormRender = context?.state?.FormRender || DefaultFormRender;
 
   const {
@@ -27,14 +27,15 @@ function EditorView(props: EditorViewProps) {
     ...restProps
   } = props;
 
-  const onPropertiesChange: CustomFormRenderProps['onPropertiesChange'] = (newData) => {
+  const onRenderChange: CustomFormRenderProps['onRenderChange'] = (newData) => {
     console.log(newData, '表单');
-    context.dispatch((old) => ({ ...old, properties: newData }));
+    context.dispatch((old) => ({ ...old, widgetList: newData }));
   };
 
   // 监听选中项改动
   const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = ({ value }) => {
-    setFormInitialValue(editor, settingForm, beforeSelected, value);
+    setWidgetItem(editor, value, joinFormPath(beforeSelected?.path, 'initialValue'));
+    settingForm && settingForm.setFieldValue('initialValue', value);
   };
 
   const cls = classnames("editor-view", className);
@@ -54,8 +55,8 @@ function EditorView(props: EditorViewProps) {
             options={{ isEditor: true, context: context }}
             formrender={editor}
             form={editorForm}
-            properties={properties}
-            onPropertiesChange={onPropertiesChange}
+            widgetList={widgetList}
+            onRenderChange={onRenderChange}
             onFieldsChange={onFieldsChange}
             inside={RootDnd}
             renderItem={renderItem}
@@ -68,7 +69,7 @@ function EditorView(props: EditorViewProps) {
 // 编辑区默认的选中框渲染
 const renderItem: CustomFormRenderProps['renderItem'] = (props) => {
   const { children } = props;
-  const isControl = props?.field?.properties ? false : true;
+  const isControl = props?.widgetItem?.widgetList ? false : true;
   // 只有输入控件才需要默认添加选区
   if (isControl) {
     return <ComponentSelection {...props} />;

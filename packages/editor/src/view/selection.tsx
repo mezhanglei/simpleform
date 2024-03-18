@@ -1,7 +1,8 @@
-import { insertFormItem } from '../utils/utils';
+import { getListIndex, insertWidgetItem } from '../utils/utils';
 import React, { CSSProperties } from 'react';
 import BaseSelection, { BaseSelectionProps } from '../components/common/BaseSelection';
 import SvgIcon from '../components/common/SvgIcon';
+import { getParent } from '../components/formrender';
 
 export interface ControlSelectionProps extends BaseSelectionProps {
   children?: any;
@@ -19,28 +20,26 @@ function ControlSelection(props: ControlSelectionProps, ref: any) {
     children,
     style,
     className,
-    name,
     path,
-    field,
-    parent,
+    widgetItem,
     formrender: editor,
     form: editorForm,
   } = props;
 
-  const currentPath = path;
-  const context = field?.context;
+  const context = widgetItem?.context;
   const { historyRecord } = context?.state || {};
 
   const copyItem = () => {
-    const nextIndex = (field?.index as number) + 1;
-    const newField = currentPath && editor?.getItemByPath(currentPath);
-    insertFormItem(editor, newField, nextIndex, { path: parent?.path });
+    const currentIndex = getListIndex(editor, path);
+    const nextIndex = currentIndex + 1;
+    const newItem = path && editor?.getItemByPath(path);
+    insertWidgetItem(editor, newItem, nextIndex, getParent(path));
     historyRecord?.save();
   };
 
   const deleteItem = (e: any) => {
     e.stopPropagation();
-    currentPath && editor?.delItemByPath(currentPath);
+    path && editor?.delItemByPath(path);
     historyRecord?.save();
   };
 
@@ -48,7 +47,7 @@ function ControlSelection(props: ControlSelectionProps, ref: any) {
     <BaseSelection
       ref={ref}
       {...props}
-      configLabel={field?.panel?.label}
+      configLabel={widgetItem?.panel?.label}
       tools={[<SvgIcon key="fuzhi" name="fuzhi" onClick={copyItem} />, <SvgIcon key="shanchu" name="shanchu" onClick={deleteItem} />]}
     >
       {children}

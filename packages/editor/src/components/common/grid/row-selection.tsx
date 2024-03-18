@@ -1,6 +1,6 @@
 import React from 'react';
 import SvgIcon from '../SvgIcon';
-import { insertFormItem } from '../../../utils/utils';
+import { insertWidgetItem } from '../../../utils/utils';
 import BaseSelection from '../BaseSelection';
 import classnames from 'classnames';
 import './row-selection.less';
@@ -17,33 +17,29 @@ function RowSelection(props: CustomRowProps, ref: any) {
     children,
     style,
     className,
-    name,
     path,
-    field,
-    parent,
+    widgetItem,
     formrender: editor,
     form: editorForm,
     ...restProps
   } = props;
 
-  const currentPath = path;
-  const context = field?.context;
+  const context = widgetItem?.context;
   const { editorConfig } = context?.state || {};
 
   const addCol = () => {
-    const currentItem = editor?.getItemByPath(currentPath);
-    const nextIndex = Object.keys(currentItem?.properties || {})?.length;
-    const newField = {
+    const widgetList = widgetItem?.widgetList;
+    const nextIndex = widgetList?.length || 0;
+    const newItem = {
       ...editorConfig?.['GridCol'],
       props: { span: 12 },
-      properties: {
-      }
+      widgetList: []
     };
-    insertFormItem(editor, newField, nextIndex, { path: currentPath });
+    insertWidgetItem(editor, newItem, nextIndex, path);
   };
 
   const deleteItem = () => {
-    currentPath && editor?.delItemByPath(currentPath);
+    path && editor?.delItemByPath(path);
   };
 
   const prefixCls = "row-selection";
@@ -53,7 +49,7 @@ function RowSelection(props: CustomRowProps, ref: any) {
     <BaseSelection
       ref={ref}
       {...props}
-      configLabel={field?.panel?.label}
+      configLabel={widgetItem?.panel?.label}
       className={cls}
       tools={[<SvgIcon key="add" name="add" onClick={addCol} />, <SvgIcon key="shanchu" name="shanchu" onClick={deleteItem} />]}>
       {children}

@@ -1,22 +1,26 @@
-const baseSetting = {
-  dataIndex: {
+const baseSetting = [
+  {
     label: '字段名',
+    name: 'dataIndex',
     type: 'Input'
   },
-  label: {
+  {
     label: '标题',
+    name: 'label',
     type: 'Input'
   },
-  width: {
+  {
     label: '列宽',
+    name: 'width',
     type: 'InputNumber',
     props: {
       min: 0,
       max: 300
     }
   },
-  align: {
+  {
     label: '对齐方式',
+    name: 'align',
     type: "Select",
     props: {
       style: { width: '100%' },
@@ -28,7 +32,7 @@ const baseSetting = {
       ]
     }
   },
-};
+];
 
 const setting = {
   '列属性': baseSetting,

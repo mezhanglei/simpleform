@@ -3,18 +3,16 @@ import GridRow from './row';
 
 export default {
   ...GridRow,
-  properties: {
-    col1: {
+  widgetList: [
+    {
       ...GridCol,
       props: { span: 12 },
-      properties: {
-      }
+      widgetList: []
     },
-    col2: {
+    {
       ...GridCol,
       props: { span: 12 },
-      properties: {
-      }
-    },
-  }
+      widgetList: []
+    }
+  ]
 };

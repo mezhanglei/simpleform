@@ -1,69 +1,75 @@
-const baseSetting = {
-  initialValue: {
+const baseSetting = [
+  {
+    label: '字段名',
+    name: 'name',
+    type: 'Input'
+  },
+  {
     label: '默认值',
+    name: 'initialValue',
     type: 'InputNumber',
   },
-  props: {
-    properties: {
-      min: {
-        label: '最小值',
-        type: 'InputNumber',
-        initialValue: 0
-      },
-      max: {
-        label: '最大值',
-        type: 'InputNumber',
-        initialValue: 100
-      },
-      step: {
-        label: '步长',
-        type: 'InputNumber',
-        initialValue: 1
-      },
-    }
+  {
+    label: '最小值',
+    name: 'props.min',
+    type: 'InputNumber',
+    initialValue: 0
+  },
+  {
+    label: '最大值',
+    name: 'props.max',
+    type: 'InputNumber',
+    initialValue: 100
+  },
+  {
+    label: '步长',
+    name: 'props.step',
+    type: 'InputNumber',
+    initialValue: 1
   }
-};
+];
 
-const operationSetting = {
-  hidden: {
+const operationSetting = [
+  {
+    name: 'hidden',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
     props: { children: '隐藏' }
   },
-  props: {
-    properties: {
-      disabled: {
-        type: 'OperateCheckbox',
-        inline: true,
-        compact: true,
-        props: { children: '禁用' }
-      },
-      reverse: {
-        type: 'OperateCheckbox',
-        inline: true,
-        compact: true,
-        props: { children: '反向' }
-      },
-      vertical: {
-        type: 'OperateCheckbox',
-        inline: true,
-        compact: true,
-        props: { children: '垂直' }
-      },
-    }
+  {
+    name: 'props.disabled',
+    type: 'OperateCheckbox',
+    inline: true,
+    compact: true,
+    props: { children: '禁用' }
+  },
+  {
+    name: 'props.reverse',
+    type: 'OperateCheckbox',
+    inline: true,
+    compact: true,
+    props: { children: '反向' }
+  },
+  {
+    name: 'props.vertical',
+    type: 'OperateCheckbox',
+    inline: true,
+    compact: true,
+    props: { children: '垂直' }
   }
-};
+];
 
-const rulesSetting = {
-  rules: {
+const rulesSetting = [
+  {
+    name: 'rules',
     type: 'RulesGroup',
     compact: true,
     props: {
       includes: ['required', 'max', 'min'],
     }
   },
-};
+];
 
 const setting = {
   '基础属性': baseSetting,

@@ -23,7 +23,7 @@ function EditorProvider(props: EditorProviderProps) {
     editorForm: editorForm,
     editorConfig: { ...EditorConfig, ...editorConfig },
     selected: {},
-    properties: {},
+    widgetList: [],
     ...rest
   });
 

@@ -23,7 +23,7 @@ export interface FormEditorState {
   FormRender?: React.ComponentType<any> | React.ForwardRefExoticComponent<any>;
   selected?: EditorSelection;
   beforeSelected?: EditorSelection;
-  properties?: FormDesignData;
+  widgetList?: FormDesignData;
   editorConfig?: Record<string, CustomWidgetItem>;
   platType?: PlatType;
   historyRecord?: SimpleUndo;
@@ -58,8 +58,8 @@ export function useEditorState(initialState: FormEditorState) {
   const historyRef = useRef(new SimpleUndo({
     maxLength: 10,
     provider: (done) => {
-      const properties = stateRef.current.properties;
-      done(JSON.stringify(properties));
+      const widgetList = stateRef.current.widgetList;
+      done(JSON.stringify(widgetList));
     }
   }));
   // 更新state

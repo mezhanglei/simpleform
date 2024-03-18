@@ -18,7 +18,7 @@ export interface EditorToolsProps {
 function EditorTools(props: EditorToolsProps) {
 
   const context = useEditorContext();
-  const { platType = 'pc', properties, historyRecord } = context.state;
+  const { platType = 'pc', widgetList, historyRecord } = context.state;
 
   const {
     style,
@@ -29,29 +29,29 @@ function EditorTools(props: EditorToolsProps) {
   } = props;
 
   const showPreview = () => {
-    showPreviewModal({ properties, plat: platType, context });
+    showPreviewModal({ data: widgetList, plat: platType, context });
   };
 
   const clearEditor = () => {
-    context.dispatch((old) => ({ ...old, properties: undefined }));
+    context.dispatch((old) => ({ ...old, widgetList: undefined }));
     historyRecord?.save();
   };
 
   const showExportJson = () => {
-    showExportJsonModal({ data: properties, title: '渲染JSON' });
+    showExportJsonModal({ data: widgetList, title: '渲染JSON' });
   };
 
   // 撤销
   const undo = () => {
     historyRecord?.undo((serialized) => {
-      context.dispatch((old) => ({ ...old, properties: JSON.parse(serialized || '{}') }));
+      context.dispatch((old) => ({ ...old, widgetList: JSON.parse(serialized || '{}') }));
     });
   };
 
   // 重做
   const redo = () => {
     historyRecord?.redo((serialized) => {
-      context.dispatch((old) => ({ ...old, properties: JSON.parse(serialized || '{}') }));
+      context.dispatch((old) => ({ ...old, widgetList: JSON.parse(serialized || '{}') }));
     });
   };
 

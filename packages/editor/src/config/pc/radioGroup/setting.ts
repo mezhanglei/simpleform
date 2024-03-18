@@ -1,73 +1,77 @@
-const baseSetting = {
-  initialValue: {
+const baseSetting = [
+  {
+    label: '字段名',
+    name: 'name',
+    type: 'Input'
+  },
+  {
     label: '默认值',
+    name: 'initialValue',
     type: 'Input',
   },
-  props: {
-    properties: {
-      options: {
-        type: 'SetOptions',
-        label: '选项数据',
-        props: {
-        }
-      },
-      optionType: {
-        label: "样式",
-        type: "Radio.Group",
-        initialValue: 'default',
-        props: {
-          style: { width: '100%' },
-          options: [
-            { label: '默认', value: 'default' },
-            { label: '按钮', value: 'button' }
-          ]
-        }
-      },
-      size: {
-        label: "尺寸",
-        type: "Radio.Group",
-        initialValue: 'middle',
-        props: {
-          style: { width: '100%' },
-          options: [
-            { label: '大', value: 'large' },
-            { label: '中', value: 'middle' },
-            { label: '小', value: 'small' }
-          ]
-        }
-      },
+  {
+    label: '选项数据',
+    name: 'props.options',
+    type: 'SetOptions',
+    props: {
+    }
+  },
+  {
+    label: "样式",
+    name: 'props.optionType',
+    type: "Radio.Group",
+    initialValue: 'default',
+    props: {
+      style: { width: '100%' },
+      options: [
+        { label: '默认', value: 'default' },
+        { label: '按钮', value: 'button' }
+      ]
+    }
+  },
+  {
+    label: "尺寸",
+    name: 'props.size',
+    type: "Radio.Group",
+    initialValue: 'middle',
+    props: {
+      style: { width: '100%' },
+      options: [
+        { label: '大', value: 'large' },
+        { label: '中', value: 'middle' },
+        { label: '小', value: 'small' }
+      ]
     }
   }
-};
+];
 
-const operationSetting = {
-  hidden: {
+const operationSetting = [
+  {
+    name: 'hidden',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
     props: { children: '隐藏' }
   },
-  props: {
-    properties: {
-      disabled: {
-        type: 'OperateCheckbox',
-        inline: true,
-        compact: true,
-        props: { children: '禁用' }
-      },
-    }
+  {
+    name: 'props.disabled',
+    type: 'OperateCheckbox',
+    inline: true,
+    compact: true,
+    props: { children: '禁用' }
   }
-};
+];
 
-const rulesSetting = {
-  rules: {
+const rulesSetting = [
+  {
+    name: 'rules',
     type: 'RulesGroup',
     compact: true,
     props: {
       includes: ['required'],
     }
   },
-};
+];
 
 const setting = {
   '基础属性': baseSetting,

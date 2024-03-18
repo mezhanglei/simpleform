@@ -1,18 +1,20 @@
-const baseSetting = {
-  initialValue: {
+const baseSetting = [
+  {
     label: '默认值',
+    name: 'initialValue',
     type: 'RichEditorModalBtn',
   },
-};
+];
 
-const operationSetting = {
-  hidden: {
+const operationSetting = [
+  {
+    name: 'hidden',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
     props: { children: '隐藏' }
   },
-};
+];
 
 const setting = {
   '基础属性': baseSetting,

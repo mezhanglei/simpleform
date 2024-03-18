@@ -4,8 +4,8 @@ export default {
   panel: {
     icon: 'grid',
     label: '栅格布局',
+    nonform: true,
   },
-  ignore: true,
   type: 'GridRow',
   setting: { ...GridRowSetting }
 };

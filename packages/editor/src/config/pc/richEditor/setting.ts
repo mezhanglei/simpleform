@@ -3,26 +3,6 @@ const baseSetting = [
     label: '字段名',
     name: 'name',
     type: 'Input'
-  },
-  {
-    label: '默认值',
-    name: 'initialValue',
-    type: 'Switch',
-    valueProp: 'checked',
-  },
-  {
-    label: "尺寸",
-    name: 'props.size',
-    type: "Radio.Group",
-    initialValue: 'middle',
-    props: {
-      style: { width: '100%' },
-      options: [
-        { label: '大', value: 'large' },
-        { label: '中', value: 'middle' },
-        { label: '小', value: 'small' }
-      ]
-    }
   }
 ];
 
@@ -49,7 +29,7 @@ const rulesSetting = [
     type: 'RulesGroup',
     compact: true,
     props: {
-      includes: ['required'],
+      includes: ['required', 'pattern', 'max', 'min'],
     }
   },
 ];

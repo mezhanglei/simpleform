@@ -1,47 +1,49 @@
-const baseSetting = {
-  initialValue: {
+const baseSetting = [
+  {
+    label: '字段名',
+    name: 'name',
+    type: 'Input'
+  },
+  {
     label: '默认值',
+    name: 'initialValue',
     type: 'CodeTextArea',
   },
-  props: {
-    properties: {
-      options: {
-        type: 'SetOptions',
-        label: '选项数据',
-        props: {
-        }
-      },
+  {
+    name: 'props.options',
+    type: 'SetOptions',
+    label: '选项数据',
+    props: {
     }
   }
-};
+];
 
-const operationSetting = {
-  hidden: {
+const operationSetting = [
+  {
+    name: 'hidden',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
     props: { children: '隐藏' }
   },
-  props: {
-    properties: {
-      disabled: {
-        type: 'OperateCheckbox',
-        inline: true,
-        compact: true,
-        props: { children: '禁用' }
-      },
-    }
-  }
-};
+  {
+    name: 'props.disabled',
+    type: 'OperateCheckbox',
+    inline: true,
+    compact: true,
+    props: { children: '禁用' }
+  },
+];
 
-const rulesSetting = {
-  rules: {
+const rulesSetting = [
+  {
+    name: 'rules',
     type: 'RulesGroup',
     props: {
       includes: ['required']
     }
   },
-};
+];
 
 const setting = {
   '基础属性': baseSetting,

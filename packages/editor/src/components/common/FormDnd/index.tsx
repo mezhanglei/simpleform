@@ -1,8 +1,8 @@
-import DndSortable, { DndCondition, DndSortableProps } from 'react-dragger-sort';
+import DndSortable, { DndSortableProps } from 'react-dragger-sort';
 import React from 'react';
 import './index.less';
-import { getConfigItem, insertFormItem } from '../../../utils/utils';
-import { EditorSelection } from '../../formrender';
+import { defaultGetId, getConfigItem, insertWidgetItem } from '../../../utils/utils';
+import { joinFormPath, EditorSelection } from '../../formrender';
 
 export interface ControlDndProps extends EditorSelection {
   children?: any;
@@ -13,8 +13,6 @@ function FormDnd(props: ControlDndProps, ref: any) {
   const { children, formrender, path, widgetItem, ...rest } = props;
   const context = widgetItem?.context;
   const { editorConfig, historyRecord } = context?.state || {};
-
-  const currentPath = path;
 
   const onUpdate: DndSortableProps['onUpdate'] = (params) => {
     const { from, to } = params;
@@ -52,19 +50,12 @@ function FormDnd(props: ControlDndProps, ref: any) {
     if (fromCollection?.type === 'panel') {
       const type = from?.id as string;
       const configItem = getConfigItem(type, editorConfig);
-      insertFormItem(formrender, configItem, dropIndex, { path: dropCollection?.path });
+      const newItem = configItem?.panel?.nonform ? configItem : Object.assign({ name: defaultGetId(type) }, configItem);
+      insertWidgetItem(formrender, newItem, dropIndex, dropCollection?.path);
     } else {
       formrender?.moveItemByPath({ index: fromIndex, parent: fromCollection?.path }, { index: dropIndex, parent: dropCollection?.path });
     }
     historyRecord?.save();
-  };
-
-  const disabledDrop: DndCondition = (param) => {
-    // 如果目标来自于attributeName，则不允许放进来
-    const fromCollection = param?.from?.group?.collection;
-    if (fromCollection?.attributeName) {
-      return true;
-    }
   };
 
   return (
@@ -73,8 +64,8 @@ function FormDnd(props: ControlDndProps, ref: any) {
       onUpdate={onUpdate}
       onAdd={onAdd}
       className='editor-dnd'
-      options={{ hiddenFrom: true, disabledDrop: disabledDrop }}
-      collection={{ path: currentPath }}
+      options={{ hiddenFrom: true }}
+      collection={{ path: path, name: widgetItem?.name }}
       {...rest}
     >
       {children}

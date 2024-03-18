@@ -19,7 +19,7 @@ const ExampleGroup = (props: CommonWidgetProps) => {
 
   return <FormRender
     form={form}
-    properties={data}
+    widgetList={data}
     onFieldsChange={handleChange}
     options={{ props: { disabled } }}
   />;

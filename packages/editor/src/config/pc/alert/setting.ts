@@ -1,57 +1,54 @@
-const baseSetting = {
-  // === 控件自身的props的设置
-  props: {
-    properties: {
-      message: {
-        label: '提示',
-        type: 'Input',
-      },
-      description: {
-        label: '提示描述',
-        type: 'Input',
-      },
-      type: {
-        label: "样式",
-        type: "Radio.Group",
-        initialValue: 'success',
-        props: {
-          style: { width: '100%' },
-          options: [
-            { label: 'success', value: 'success' },
-            { label: 'info', value: 'info' },
-            { label: 'warning', value: 'warning' },
-            { label: 'error', value: 'error' },
-          ]
-        }
-      },
+const baseSetting = [
+  {
+    label: '提示',
+    name: 'props.message',
+    type: 'Input',
+  },
+  {
+    label: '提示描述',
+    name: 'props.description',
+    type: 'Input',
+  },
+  {
+    label: "样式",
+    name: 'props.type',
+    type: "Radio.Group",
+    initialValue: 'success',
+    props: {
+      style: { width: '100%' },
+      options: [
+        { label: 'success', value: 'success' },
+        { label: 'info', value: 'info' },
+        { label: 'warning', value: 'warning' },
+        { label: 'error', value: 'error' },
+      ]
     }
   }
-};
+];
 
-const operationSetting = {
-  hidden: {
+const operationSetting = [
+  {
     type: 'OperateCheckbox',
+    name: 'hidden',
     inline: true,
     compact: true,
     props: { children: '隐藏' }
   },
-  props: {
-    properties: {
-      showIcon: {
-        type: 'Checkbox',
-        inline: true,
-        compact: true,
-        props: { children: '显示图标' }
-      },
-      closable: {
-        type: 'Checkbox',
-        inline: true,
-        compact: true,
-        props: { children: '可关闭' }
-      },
-    }
+  {
+    name: 'props.showIcon',
+    type: 'Checkbox',
+    inline: true,
+    compact: true,
+    props: { children: '显示图标' }
+  },
+  {
+    name: 'props.closable',
+    type: 'Checkbox',
+    inline: true,
+    compact: true,
+    props: { children: '可关闭' }
   }
-};
+];
 
 const setting = {
   '基础属性': baseSetting,

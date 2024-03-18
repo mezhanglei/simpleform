@@ -114,7 +114,7 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
             <FormRender
               tagName="div"
               initialValues={{ controlValue: value }}
-              properties={{ controlValue: { compact: true, ...(setting || {}) } }}
+              widgetList={[{ name: 'controlValue', compact: true, ...(setting || {}) }]}
               onFieldsChange={(params: any) => valueChange(params, index)}
             />
           </Col>

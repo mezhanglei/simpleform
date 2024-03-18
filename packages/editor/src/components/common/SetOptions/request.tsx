@@ -52,9 +52,10 @@ const RequestSetting = React.forwardRef<HTMLElement, RequestSettingProps>((props
     }
   }, [value]);
 
-  const properties = {
-    url: {
+  const widgetList = [
+    {
       label: '接口',
+      name: 'url',
       layout: 'horizontal',
       labelWidth: 80,
       required: true,
@@ -63,8 +64,9 @@ const RequestSetting = React.forwardRef<HTMLElement, RequestSettingProps>((props
         style: { width: '100%' },
       }
     },
-    method: {
+    {
       label: '请求方式',
+      name: 'method',
       layout: 'horizontal',
       labelWidth: 80,
       type: 'Select',
@@ -73,8 +75,9 @@ const RequestSetting = React.forwardRef<HTMLElement, RequestSettingProps>((props
         options: methodOptions
       }
     },
-    paramsType: {
+    {
       label: '提交方式',
+      name: 'paramsType',
       layout: 'horizontal',
       labelWidth: 80,
       hidden: "{{formvalues && formvalues.method === 'post'}}",
@@ -84,26 +87,29 @@ const RequestSetting = React.forwardRef<HTMLElement, RequestSettingProps>((props
         options: paramsTypeOptions
       }
     },
-    params: {
+    {
       label: '请求参数',
+      name: 'params',
       layout: 'horizontal',
       labelWidth: 80,
       typeRender: <EditorCodeMirrorModal />,
     },
-    headers: {
+    {
       label: 'header信息',
+      name: 'headers',
       layout: 'horizontal',
       labelWidth: 80,
       typeRender: <EditorCodeMirrorModal />,
     },
-    returnFn: {
+    {
       label: '解析函数',
+      name: 'returnFn',
       layout: 'horizontal',
       labelWidth: 80,
       initialValue: 'function (res){\n   return res.data;\n}',
       typeRender: <CodeTextArea style={{ width: '100%' }} />,
     },
-  };
+  ];
 
   const onFieldsChange: FormRenderProps['onFieldsChange'] = ({ name }) => {
     if (!name) return;
@@ -116,7 +122,7 @@ const RequestSetting = React.forwardRef<HTMLElement, RequestSettingProps>((props
       <FormRender
         tagName="div"
         form={requestForm}
-        properties={properties}
+        widgetList={widgetList}
         onFieldsChange={onFieldsChange}
       />
     </div>

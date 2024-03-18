@@ -6,7 +6,7 @@ import { useEditorContext } from '../context';
 // 根节点的拖放区域
 function RootDnd(props: ControlDndProps) {
   const context = useEditorContext();
-  return <FormDnd {...props} field={{ context: context }} />;
+  return <FormDnd {...props} widgetItem={{ context: context }} />;
 };
 
 export default RootDnd;

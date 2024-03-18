@@ -1,6 +1,6 @@
 import { deepClone } from "./utils/object";
 import { CustomUnionType, GenerateParams, WidgetItem, WidgetList } from "./types";
-import { getItemByPath, setItemByPath, moveSameLevel, moveDiffLevel, updateName, getKeyValueByIndex, insertItemByIndex } from "./utils/utils";
+import { getItemByPath, setItemByPath, moveSameLevel, moveDiffLevel, getKeyValueByIndex, insertItemByIndex } from "./utils/utils";
 import { createFormElement, getFormComponent } from "./utils/transform";
 import { joinFormPath } from "@simpleform/form";
 
@@ -78,17 +78,8 @@ export class SimpleFormRender {
     }
   };
 
-  // 更新节点的键
-  updateNameByPath = (endName?: string, path?: string) => {
-    const cloneData = this.getWidgetList();
-    if (cloneData) {
-      const newData = updateName(cloneData, endName, path);
-      this.setWidgetList(newData);
-    }
-  };
-
   // 插入值，默认末尾
-  insertItemByIndex = (data: WidgetItem | Array<WidgetItem>, index?: number, parent?: string) => {
+  insertItemByIndex = (data?: WidgetItem | Array<WidgetItem>, index?: number, parent?: string) => {
     const cloneData = this.getWidgetList();
     if (cloneData) {
       const newData = insertItemByIndex(cloneData, data, index, parent);

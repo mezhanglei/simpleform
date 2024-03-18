@@ -1,38 +1,33 @@
-const baseSetting = {
-  initialValue: {
-    label: '默认值',
-    type: 'Input',
-  },
-};
+const baseSetting = [{
+  label: '默认值',
+  name: 'initialValue',
+  type: 'Input',
+}];
 
-const operationSetting = {
-  hidden: {
+const operationSetting = [
+  {
+    name: 'hidden',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
     props: { children: '隐藏' }
   },
-  props: {
-    properties: {
-      disabled: {
-        type: 'OperateCheckbox',
-        inline: true,
-        compact: true,
-        props: { children: '禁用' }
-      },
-    }
-  }
-};
-
-const rulesSetting = {
-  rules: {
-    type: 'RulesGroup',
+  {
+    name: 'props.disabled',
+    type: 'OperateCheckbox',
+    inline: true,
     compact: true,
-    props: {
-      includes: ['required']
-    }
-  },
-};
+    props: { children: '禁用' }
+  }];
+
+const rulesSetting = [{
+  name: 'rules',
+  type: 'RulesGroup',
+  compact: true,
+  props: {
+    includes: ['required']
+  }
+}];
 
 const setting = {
   '基础属性': baseSetting,

@@ -32,7 +32,7 @@ export const isWithBracket = (code?: any) => {
 
 // 由前到后拼接当前项的表单的path
 export function joinFormPath(...args: Array<string | number | undefined>) {
-  const result = args?.reduce((pre, cur) => {
+  const result = args instanceof Array ? args.reduce((pre, cur) => {
     const curName = isEmpty(cur) ? '' : (typeof cur === 'number' ? `[${cur}]` : cur);
     const parent = isEmpty(pre) ? '' : (typeof pre === 'number' ? `[${pre}]` : pre);
     if (isWithBracket(curName)) {
@@ -40,7 +40,7 @@ export function joinFormPath(...args: Array<string | number | undefined>) {
     } else {
       return parent && curName ? `${parent}.${curName}` : (curName || parent);
     }
-  });
+  }, '') : '';
   return result as string;
 };
 

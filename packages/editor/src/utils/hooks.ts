@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { deepSet } from "../components/formrender";
-import { useEditorContext } from "../context";
 
 // 处理列表型的数据
 export function useTableData<T = any>(intialValue?: T[], onChange?: (data: T[]) => void) {

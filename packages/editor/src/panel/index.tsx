@@ -1,10 +1,11 @@
 import React, { CSSProperties } from 'react';
 import classnames from 'classnames';
 import './index.less';
-import { getConfigItem, getSelectedIndex, insertFormItem } from '../utils/utils';
+import { defaultGetId, getConfigItem, getListIndex, insertWidgetItem } from '../utils/utils';
 import DndSortable from 'react-dragger-sort';
 import { FormEditorContextProps, useEditorContext } from '../context';
 import { getParent } from '../components/formrender';
+import { Flex, Tag } from 'antd';
 
 export interface PanelTagProps {
   className?: string
@@ -48,9 +49,7 @@ const PanelTag = React.forwardRef((props: PanelTagProps, ref: any) => {
   const cls = classnames(prefixCls, className);
 
   return (
-    <span onClick={onChange} ref={ref} className={cls} style={style} {...restProps}>
-      {children}
-    </span>
+    <Tag onClick={onChange} ref={ref} className={cls} style={style} {...restProps}>{children}</Tag>
   );
 });
 
@@ -75,13 +74,10 @@ function EditorPanel(props: EditorPanelProps) {
   const cls = classnames(prefixCls, className);
 
   const onChange = (key: string) => {
-    const newIndex = getSelectedIndex(editor, selected) + 1; // 插入位置序号
+    const newIndex = getListIndex(editor, selected?.path) + 1; // 插入位置序号
     const configItem = getConfigItem(key, editorConfig); // 提取默认值
-    if (selected?.attributeName) {
-      insertFormItem(editor, configItem, newIndex, { path: selected?.path, attributeName: getParent(selected?.attributeName) });
-    } else {
-      insertFormItem(editor, configItem, newIndex, { path: selected?.parent?.path });
-    }
+    const newItem = configItem?.panel?.nonform ? configItem : Object.assign({ name: defaultGetId(configItem?.type) }, configItem);
+    insertWidgetItem(editor, newItem, newIndex, getParent(selected?.path));
     historyRecord?.save();
   };
 
@@ -104,13 +100,15 @@ function EditorPanel(props: EditorPanelProps) {
                     disabledSort: true
                   }}
                 >
-                  {
-                    list.map((key) => {
-                      const data = editorConfig?.[key] || {};
-                      const panel = data?.panel || {};
-                      return <PanelTag key={key} data-id={key} onChange={() => onChange?.(key)}>{panel.label}</PanelTag>;
-                    })
-                  }
+                  <Flex gap="8px 0" wrap="wrap" className={`${prefixCls}-body`}>
+                    {
+                      list.map((key) => {
+                        const data = editorConfig?.[key] || {};
+                        const panel = data?.panel || {};
+                        return <PanelTag key={key} data-id={key} onChange={() => onChange?.(key)}>{panel.label}</PanelTag>;
+                      })
+                    }
+                  </Flex>
                 </DndSortable>
               </div>
             );

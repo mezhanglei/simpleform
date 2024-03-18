@@ -4,32 +4,32 @@ export default {
     label: '表格布局',
   },
   type: 'Table',
-  ignore: true,
-  properties: [
+  props: {},
+  widgetList: [
     {
       type: 'TableRow',
-      properties: {
-        td1: {
+      widgetList: [
+        {
           type: 'TableCell',
-          ignore: true,
-          properties: {
-            name1: {
+          widgetList: [
+            {
               type: 'Input',
+              name: 'name1',
               props: {}
             }
-          }
+          ]
         },
-        td2: {
+        {
           type: 'TableCell',
-          ignore: true,
-          properties: {
-            name2: {
+          widgetList: [
+            {
               type: 'Input',
+              name: 'name2',
               props: {}
             }
-          }
-        },
-      }
-    },
-  ],
+          ]
+        }
+      ]
+    }
+  ]
 };

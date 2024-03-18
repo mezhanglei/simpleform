@@ -36,12 +36,16 @@ export const getPathLen = (path?: string) => {
 // 设置指定路径的值
 export const setItemByPath = (widgetList: WidgetList, data?: any, path?: string) => {
   const pathArr = pathToArr(path);
+  if (pathArr.length == 0) return data;
   const end = formatFormKey(pathArr.pop());
   let temp: any = widgetList;
   pathArr.forEach((item) => {
     const key = formatFormKey(item);
-    temp = temp[key];
+    temp = temp?.[key];
   });
+  if (!temp) {
+    return deepSet(widgetList, path, data);
+  }
   if (!isEmpty(end)) {
     if (data === undefined) {
       if (temp instanceof Array) {
@@ -73,7 +77,7 @@ export const getItemByPath = (widgetList?: WidgetList, path?: string) => {
   }
   pathArr.forEach((item) => {
     const key = formatFormKey(item);
-    temp = temp[key];
+    temp = temp?.[key];
   });
   return temp;
 };
@@ -81,12 +85,12 @@ export const getItemByPath = (widgetList?: WidgetList, path?: string) => {
 // 根据index获取目标项
 export const getKeyValueByIndex = (widgetList: WidgetList, index?: number, parent?: string) => {
   if (!(widgetList instanceof Array) || typeof index !== 'number') return;
-  const parentItem = getItemByPath(widgetList, parent);
-  if (!isObject(parentItem) && !(parentItem instanceof Array)) return;
-  const childKeys = Object.keys(parentItem || {});
-  const isList = parentItem instanceof Array;
+  const container = getItemByPath(widgetList, parent);
+  if (!isObject(container) && !(container instanceof Array)) return;
+  const childKeys = Object.keys(container || {});
+  const isList = container instanceof Array;
   const key = isList ? index : childKeys[index];
-  return [key, parentItem[key]] as [string | number, any];
+  return [key, container[key]] as [string | number, any];
 };
 
 // 转化为有序列表
@@ -118,17 +122,10 @@ const parseEntries = (entriesData?: { entries: Array<[string | number, any]>, is
   }
 };
 
-// 更新目标的name值
-export const updateName = (widgetList: WidgetList, newName?: string, path?: string) => {
-  if (typeof newName !== 'string') return widgetList;
-  const namePath = joinFormPath(path, 'name');
-  return setItemByPath(widgetList, newName, namePath);
-};
-
 // 插入数据
 export const insertItemByIndex = (widgetList: WidgetList, data?: WidgetItem | Array<WidgetItem>, index?: number, parent?: string) => {
-  const parentItem = getItemByPath(widgetList, parent);
-  const entriesData = toEntries(parentItem);
+  const container = getItemByPath(widgetList, parent);
+  const entriesData = toEntries(container);
   const isList = entriesData?.isList;
   const addItems = isList ? Object.entries(data instanceof Array ? data : [data]) : Object.entries(data || {});
   if (typeof index === 'number') {

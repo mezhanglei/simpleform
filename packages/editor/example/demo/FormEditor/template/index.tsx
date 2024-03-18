@@ -44,7 +44,7 @@ const ImportModal = React.forwardRef<HTMLDivElement, ImportModalProps>((props, r
   const cls = classnames(prefixCls, className);
 
   const load = (item?: TemplateItem) => {
-    context.dispatch((old) => ({ ...old, properties: item?.data }));
+    context.dispatch((old) => ({ ...old, widgetList: item?.data }));
     onSelect && onSelect(item);
     setModalOpen(false);
   };

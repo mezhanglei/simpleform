@@ -9,7 +9,7 @@ import ModalWrapper, { ModalWrapperProps } from '../components/common/GlobalModa
 import { create } from '../components/common/GlobalModal/createPromise';
 import DefaultFormRender, { CustomOptions, FormDesignData, useSimpleForm } from '../components/formrender';
 export interface PreviewModalProps extends ModalWrapperProps {
-  properties?: FormDesignData;
+  data?: FormDesignData;
   context?: CustomOptions['context'];
   plat?: PlatContainerProps['plat'];
 }
@@ -21,7 +21,7 @@ export const PreviewModal = React.forwardRef<HTMLDivElement, PreviewModalProps>(
     className,
     open,
     onClose,
-    properties,
+    data,
     plat,
     context,
     ...rest
@@ -89,7 +89,7 @@ export const PreviewModal = React.forwardRef<HTMLDivElement, PreviewModalProps>(
           <FormRender
             options={{ props: { disabled: disabled } }}
             form={form}
-            properties={properties}
+            widgetList={data}
           />
         </PlatContainer>
       </div>

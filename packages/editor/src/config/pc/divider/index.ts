@@ -4,6 +4,7 @@ export default {
   panel: {
     icon: 'divider',
     label: '分割线',
+    nonform: true,
   },
   type: 'Divider',
   labelWidth: 'auto',
@@ -13,6 +14,5 @@ export default {
     orientation: 'left',
     type: 'horizontal',
   },
-  ignore: true,
   setting: { ...Setting },
 };

@@ -55,21 +55,24 @@ const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
 
   useImperativeHandle(ref, () => ({ showRuleModal: () => editRef.current.click() }));
 
-  const properties = name ? {
-    [name]: selectType === 'dynamic' ? {
+  const widgetList = name ? [
+    selectType === 'dynamic' ? {
       label: '联动条件',
+      name: name,
       layout: 'horizontal',
       rules: [{ required: true, message: '请输入' }],
       labelWidth: 80,
       typeRender: <ShowSettingModal setting={{ ...setting, label: undefined }} />
     } : {
       ...setting,
+      name: name,
       rules: [{ required: true, message: '请输入' }],
       layout: 'horizontal',
       labelWidth: 80,
     },
-    message: {
+    {
       label: '提示信息',
+      name: 'message',
       layout: 'horizontal',
       rules: [{ required: true, message: '请输入' }],
       labelWidth: 80,
@@ -77,7 +80,7 @@ const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
       props: {
       }
     },
-  } : undefined;
+  ] : undefined;
 
   useEffect(() => {
     setRuleValue(value);
@@ -147,7 +150,7 @@ const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
         <FormRender
           tagName="div"
           form={currentForm}
-          properties={properties}
+          widgetList={widgetList}
         />
       </CustomModal>
     </div>
