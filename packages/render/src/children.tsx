@@ -245,7 +245,7 @@ export default function FormChildren(props: FormChildrenProps) {
       const widgetNode = formrender.createFormElement(typeRender || { type, props }, commonParams);
       if (isHaveWidgetList) {
         const widgetNodeChildren = widgetList?.map((item, index) => {
-          const childPath = joinFormPath(path, 'widgetList', `${[index]}`);
+          const childPath = joinFormPath(path, 'widgetList', index);
           const compileItem = getComileWidgetItem(item, childPath);
           return renderChild(compileItem, childPath);
         });
