@@ -3,7 +3,7 @@ import RuleItem, { RuleCoreProps, RuleCoreRefs } from "./core";
 
 const MinOrMaxComponent = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
 
-  return <RuleItem {...props} ref={ref} setting={{
+  return <RuleItem {...props} ref={ref} widgetConfig={{
     label: '数值',
     type: 'InputNumber',
     props: {

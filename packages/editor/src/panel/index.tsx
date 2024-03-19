@@ -100,15 +100,13 @@ function EditorPanel(props: EditorPanelProps) {
                     disabledSort: true
                   }}
                 >
-                  <Flex gap="8px 0" wrap="wrap" className={`${prefixCls}-body`}>
-                    {
-                      list.map((key) => {
-                        const data = editorConfig?.[key] || {};
-                        const panel = data?.panel || {};
-                        return <PanelTag key={key} data-id={key} onChange={() => onChange?.(key)}>{panel.label}</PanelTag>;
-                      })
-                    }
-                  </Flex>
+                  {
+                    list.map((key) => {
+                      const data = editorConfig?.[key] || {};
+                      const panel = data?.panel || {};
+                      return <PanelTag key={key} data-id={key} onChange={() => onChange?.(key)}>{panel.label}</PanelTag>;
+                    })
+                  }
                 </DndSortable>
               </div>
             );

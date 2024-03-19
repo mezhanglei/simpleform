@@ -8,7 +8,7 @@ const ShowSettingModal = (props: SettingModalProps) => {
   const {
     value,
     onChange,
-    setting,
+    widgetConfig,
     ...rest
   } = props;
 
@@ -24,7 +24,7 @@ const ShowSettingModal = (props: SettingModalProps) => {
   };
 
   return (
-    <LinkageSettingModal title="添加联动" {...rest} setting={setting} value={codeStr} onChange={handOk} displayElement={
+    <LinkageSettingModal title="添加联动" {...rest} widgetConfig={widgetConfig} value={codeStr} onChange={handOk} displayElement={
       (showModal) => (
         <div>
           <span>{typeof value === 'string' ? value : null}</span>

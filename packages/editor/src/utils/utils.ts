@@ -66,14 +66,6 @@ export const setWidgetItem = (formrender?: SimpleFormRender | null, data?: any, 
   formrender?.setItemByPath(data, path);
 };
 
-// 表单赋值
-export const setFormValue = (form?: SimpleForm | null, name?: string, value?: any) => {
-  if (isNoSelected(name) || !name || !form) return;
-  if (value !== undefined) {
-    form?.setFieldValue(name, value);
-  };
-};
-
 // 同步目标的编辑区域值到属性面板回显
 export const asyncSettingForm = (editor?: SimpleFormRender | null, settingForm?: SimpleForm | null, selected?: EditorSelection) => {
   if (isNoSelected(selected?.path) || !settingForm) return;

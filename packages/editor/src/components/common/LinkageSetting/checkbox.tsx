@@ -13,7 +13,7 @@ const OperateCheckbox = (props: SettingModalProps & CheckboxProps & CommonWidget
     value,
     onChange,
     children,
-    setting = { type: 'Switch', valueProp: 'checked' },
+    widgetConfig = { type: 'Switch', valueProp: 'checked' },
     ...rest
   } = props;
 
@@ -65,7 +65,7 @@ const OperateCheckbox = (props: SettingModalProps & CheckboxProps & CommonWidget
   };
 
   return (
-    <LinkageSettingModal {...rest} title="添加联动" setting={setting} onChange={handOk} value={codeStr} displayElement={
+    <LinkageSettingModal {...rest} title="添加联动" widgetConfig={widgetConfig} onChange={handOk} value={codeStr} displayElement={
       (showModal) => (
         <div className="operate-setting-checkbox">
           <Checkbox checked={checked} onChange={checkboxChange} {...rest}>

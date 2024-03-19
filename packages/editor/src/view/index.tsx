@@ -4,7 +4,7 @@ import './index.less';
 import RootDnd from './RootDnd';
 import ComponentSelection from './selection';
 import DefaultFormRender, { CustomFormRenderProps, joinFormPath } from '../components/formrender';
-import { setWidgetItem } from '../utils/utils';
+import { getWidgetItem, setWidgetItem } from '../utils/utils';
 import { FormEditorContextProps, useEditorContext } from '../context';
 import PlatContainer from '../tools/platContainer';
 
@@ -29,7 +29,11 @@ function EditorView(props: EditorViewProps) {
 
   const onRenderChange: CustomFormRenderProps['onRenderChange'] = (newData) => {
     console.log(newData, '表单');
-    context.dispatch((old) => ({ ...old, widgetList: newData }));
+    context.dispatch((old) => ({
+      ...old,
+      widgetList: newData,
+      selected: old.selected ? { ...old.selected, widgetItem: getWidgetItem(editor, old?.selected?.path) } : old.selected
+    }));
   };
 
   // 监听选中项改动

@@ -1,6 +1,6 @@
 import { arrayMove } from "./array";
-import { pathToArr, deepSet, joinFormPath, formatFormKey } from "@simpleform/form";
-import { isEmpty, isObject } from "./type";
+import { pathToArr, deepSet, joinFormPath, deepGet } from "@simpleform/form";
+import { isObject } from "./type";
 import { WidgetItem, WidgetList } from "../types";
 
 // 匹配字符串表达式
@@ -37,49 +37,15 @@ export const getPathLen = (path?: string) => {
 export const setItemByPath = (widgetList: WidgetList, data?: any, path?: string) => {
   const pathArr = pathToArr(path);
   if (pathArr.length == 0) return data;
-  const end = formatFormKey(pathArr.pop());
-  let temp: any = widgetList;
-  pathArr.forEach((item) => {
-    const key = formatFormKey(item);
-    temp = temp?.[key];
-  });
-  if (!temp) {
-    return deepSet(widgetList, path, data);
-  }
-  if (!isEmpty(end)) {
-    if (data === undefined) {
-      if (temp instanceof Array) {
-        const index = +end;
-        temp?.splice(index, 1);
-      } else {
-        delete temp[end];
-      }
-    } else {
-      // @ts-ignore
-      if (temp instanceof Array && temp[endCode] === undefined) {
-        const index = +end;
-        temp.splice(index, 0, data);
-      } else {
-        temp[end] = data;
-      }
-    }
-  }
-  return widgetList;
+  return deepSet(widgetList, path, data);
 };
 
 // 根据path获取指定路径的项
 export const getItemByPath = (widgetList?: WidgetList, path?: string) => {
   if (!(widgetList instanceof Array)) return;
   const pathArr = pathToArr(path);
-  let temp: any = widgetList;
-  if (pathArr.length === 0) {
-    return temp;
-  }
-  pathArr.forEach((item) => {
-    const key = formatFormKey(item);
-    temp = temp?.[key];
-  });
-  return temp;
+  if (pathArr.length == 0) return widgetList;
+  return deepGet(widgetList, path);
 };
 
 // 根据index获取目标项

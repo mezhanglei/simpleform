@@ -39,8 +39,12 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
   const onSelect = (selected: EditorSelection) => {
     const selectedItem = editor?.getItemByPath(selected?.path);
     const configSetting = editorConfig?.[selectedItem?.type || ''].setting;
-    const controlSetting = pickObject(configSetting, (key) => key !== '公共属性');
-    const mergeSetting = Object.assign({}, FormTableColSetting, controlSetting);
+    const baseSetting = configSetting?.['基础属性']?.filter((item) => item.name !== 'name');
+    const mergeSetting = Object.assign(FormTableColSetting, {
+      '基础属性': baseSetting,
+      '操作属性': configSetting?.['操作属性'],
+      '校验规则': configSetting?.['校验规则']
+    });
     context?.dispatch && context?.dispatch((old) => ({
       ...old,
       selected: Object.assign({ appendSetting: mergeSetting }, selected)

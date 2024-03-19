@@ -15,7 +15,7 @@ export interface RuleCoreRefs {
 export interface RuleCoreProps extends CommonWidgetProps<any> {
   name?: InputFormRuleKey;
   label?: string;
-  setting?: CustomWidgetItem;
+  widgetConfig?: CustomWidgetItem;
   className?: string;
 }
 
@@ -39,7 +39,7 @@ const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
     name,
     value,
     label,
-    setting,
+    widgetConfig,
     onChange,
     className,
     widgetItem,
@@ -62,9 +62,9 @@ const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
       layout: 'horizontal',
       rules: [{ required: true, message: '请输入' }],
       labelWidth: 80,
-      typeRender: <ShowSettingModal setting={{ ...setting, label: undefined }} />
+      typeRender: <ShowSettingModal widgetConfig={{ ...widgetConfig, label: undefined }} />
     } : {
-      ...setting,
+      ...widgetConfig,
       name: name,
       rules: [{ required: true, message: '请输入' }],
       layout: 'horizontal',

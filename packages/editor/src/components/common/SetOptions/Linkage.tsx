@@ -5,7 +5,7 @@ import ShowSettingModal from "../LinkageSetting/ShowSettingModal";
 // 联动设置
 const LinkageSetting: React.FC<SettingModalProps> = (props) => {
 
-  return <ShowSettingModal {...props} setting={{ type: 'CodeTextArea', }} />;
+  return <ShowSettingModal {...props} widgetConfig={{ type: 'CodeTextArea', }} />;
 };
 
 export default LinkageSetting;

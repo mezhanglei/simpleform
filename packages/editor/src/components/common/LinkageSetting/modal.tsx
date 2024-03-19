@@ -16,7 +16,7 @@ export type RuleSettingItem = {
   value?: unknown;
 }
 export interface SettingModalProps extends CustomModalProps, CommonWidgetProps<string> {
-  setting?: CustomWidgetItem;
+  widgetConfig?: CustomWidgetItem;
 }
 
 const prefixCls = 'dynamic-rules';
@@ -43,7 +43,7 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
   const {
     value,
     onChange,
-    setting,
+    widgetConfig,
     title,
     displayElement,
     widgetItem,
@@ -114,7 +114,7 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
             <FormRender
               tagName="div"
               initialValues={{ controlValue: value }}
-              widgetList={[{ name: 'controlValue', compact: true, ...(setting || {}) }]}
+              widgetList={[{ name: 'controlValue', compact: true, ...(widgetConfig || {}) }]}
               onFieldsChange={(params: any) => valueChange(params, index)}
             />
           </Col>

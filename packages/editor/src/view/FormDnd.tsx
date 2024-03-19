@@ -1,8 +1,8 @@
 import DndSortable, { DndSortableProps } from 'react-dragger-sort';
 import React from 'react';
-import './index.less';
-import { defaultGetId, getConfigItem, insertWidgetItem } from '../../../utils/utils';
-import { joinFormPath, EditorSelection } from '../../formrender';
+import './FormDnd.less';
+import { defaultGetId, getConfigItem, insertWidgetItem } from '../utils/utils';
+import { joinFormPath, EditorSelection } from '../components/formrender';
 
 export interface ControlDndProps extends EditorSelection {
   children?: any;

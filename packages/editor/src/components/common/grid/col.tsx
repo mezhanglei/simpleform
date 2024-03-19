@@ -3,9 +3,9 @@ import classnames from 'classnames';
 import React from 'react';
 import ColSelection from './col-selection';
 import './col.less';
-import FormDnd from '../FormDnd';
 import { BaseSelectionProps } from '../BaseSelection';
 import { CustomCol } from '../../formrender';
+import FormDnd from '../../../view/FormDnd';
 
 export type CustomColProps = ColProps & BaseSelectionProps;
 // col组件

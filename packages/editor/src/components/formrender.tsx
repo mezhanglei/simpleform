@@ -1,4 +1,4 @@
-import DefaultFormRender, { FormChildren as DefaultFormChildren, FormRenderProps, FormChildrenProps, GenerateParams, WidgetItem } from '@simpleform/render';
+import DefaultFormRender, { FormChildren as DefaultFormChildren, FormRenderProps, FormChildrenProps, GenerateParams, WidgetItem } from '@simpleform/render/src';
 import React from 'react';
 import dayjs from 'dayjs';
 import '@simpleform/render/lib/css/main.css';
@@ -7,7 +7,7 @@ import { ConfigSettingItem, FormEditorContextProps } from '../context';
 import createRequest from './common/request';
 import bindRequest from './bind-request';
 
-export * from '@simpleform/render';
+export * from '@simpleform/render/src';
 export { createRequest, bindRequest };
 
 // 自定义传参

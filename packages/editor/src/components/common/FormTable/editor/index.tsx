@@ -5,7 +5,7 @@ import ColumnSelection from "./column-selection";
 import TableDnd from './dnd';
 import { FormTableProps } from "..";
 import pickAttrs from '../../../../utils/pickAttrs';
-import { CustomFormRenderProps, Form, joinFormPath } from "../../../formrender";
+import { CustomFormRenderProps, Form } from "../../../formrender";
 
 const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
   columns = [],
@@ -45,16 +45,15 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
         {
           columns?.map((column, colIndex) => {
             const { title, type, props, ...restColumn } = column;
-            const columnPath = joinFormPath(rest?.path, `props.columns[${colIndex}]`, 'initialValue');
             const columnInstance = rest?.formrender && rest.formrender.createFormElement({ type: type, props: Object.assign({ disabled, form: rest?.form, formrender: rest?.formrender }, props) });
             return (
-              <ColumnSelection key={columnPath} className={Classes.TableSelection} {...rest} column={column} colIndex={colIndex}>
+              <ColumnSelection key={colIndex} className={Classes.TableSelection} {...rest} column={column} colIndex={colIndex}>
                 <div className={Classes.TableCol}>
                   <div className={Classes.TableColHead}>
                     {title}
                   </div>
                   <div className={Classes.TableColBody}>
-                    <Form.Item {...restColumn} label="" name={columnPath} onFieldsChange={onFieldsChange}>
+                    <Form.Item {...restColumn} label="" onFieldsChange={onFieldsChange}>
                       {React.isValidElement(columnInstance) ? ({ bindProps }: any) => React.cloneElement(columnInstance, bindProps) : columnInstance}
                     </Form.Item>
                   </div>
