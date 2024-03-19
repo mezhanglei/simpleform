@@ -2,7 +2,7 @@ import DndSortable, { DndSortableProps } from 'react-dragger-sort';
 import React from 'react';
 import './FormDnd.less';
 import { defaultGetId, getConfigItem, insertWidgetItem } from '../utils/utils';
-import { joinFormPath, CommonWidgetProps } from '../components/formrender';
+import { CommonWidgetProps } from '../components/formrender';
 
 export interface ControlDndProps extends CommonWidgetProps {
   children?: any;
@@ -13,6 +13,11 @@ function FormDnd(props: ControlDndProps, ref: any) {
   const { children, formrender, path, widgetItem, ...rest } = props;
   const context = widgetItem?.context;
   const { editorConfig, historyRecord } = context?.state || {};
+
+  const updateContext = () => {
+    context?.dispatch && context.dispatch((old) => ({ ...old, selected: {} }));
+    historyRecord?.save();
+  };
 
   const onUpdate: DndSortableProps['onUpdate'] = (params) => {
     const { from, to } = params;
@@ -29,7 +34,7 @@ function FormDnd(props: ControlDndProps, ref: any) {
     const dropCollection = dropGroup?.collection;
     const dropIndex = to?.index;
     formrender?.moveItemByPath({ index: fromIndex, parent: fromCollection?.path }, { index: dropIndex, parent: dropCollection?.path });
-    historyRecord?.save();
+    updateContext();
   };
 
   const onAdd: DndSortableProps['onAdd'] = (params) => {
@@ -49,14 +54,13 @@ function FormDnd(props: ControlDndProps, ref: any) {
     // 从侧边栏插入进来
     if (fromCollection?.type === 'panel') {
       const type = from?.id as string;
-      if (!type) return;
       const configItem = getConfigItem(type, editorConfig);
       const newItem = configItem?.panel?.nonform ? configItem : Object.assign({ name: defaultGetId(type) }, configItem);
       insertWidgetItem(formrender, newItem, dropIndex, dropCollection?.path);
     } else {
       formrender?.moveItemByPath({ index: fromIndex, parent: fromCollection?.path }, { index: dropIndex, parent: dropCollection?.path });
     }
-    historyRecord?.save();
+    updateContext();
   };
 
   return (

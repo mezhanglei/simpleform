@@ -47,26 +47,24 @@ function TableDnd(props: TableDndProps, ref: any) {
     const fromIndex = from?.index;
     if (typeof fromIndex != 'number') return;
     const dropIndex = to?.index || 0;
-    let widgetItem;
     // 从侧边栏插入进来
     if (fromCollection?.type === 'panel') {
       const type = from?.id as string;
-      widgetItem = getConfigItem(type, editorConfig);
+      const widgetItem = getConfigItem(type, editorConfig);
+      // 拼接column
+      const id = defaultGetId(widgetItem.type);
+      const newColumn = {
+        ...widgetItem,
+        title: widgetItem?.label,
+        dataIndex: id,
+      };
+      const cloneColumns = [...columns];
+      cloneColumns.splice(dropIndex, 0, newColumn);
+      setWidgetItem(formrender, cloneColumns, columnsPath);
       // 从表单节点中插入
     } else {
-      widgetItem = formrender && formrender.getItemByIndex(fromIndex, fromCollection?.path);
-      formrender && formrender.setItemByIndex(undefined, fromIndex, fromCollection?.path);
+      formrender?.moveItemByPath({ index: fromIndex, parent: fromCollection?.path }, { index: dropIndex, parent: columnsPath });
     }
-    // 拼接column
-    const id = defaultGetId(widgetItem.type);
-    const newColumn = {
-      ...widgetItem,
-      title: widgetItem?.label,
-      dataIndex: id,
-    };
-    const cloneColumns = [...columns];
-    cloneColumns.splice(dropIndex, 0, newColumn);
-    setWidgetItem(formrender, cloneColumns, columnsPath);
     updateContext();
   };
 
