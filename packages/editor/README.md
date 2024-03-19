@@ -86,7 +86,6 @@ const EditorConfig = {
   'example': {
     // EditorPanel's data
     panel: {
-      icon: '',
       label: 'example-demo',
     },
     label: '',
@@ -193,11 +192,9 @@ import FormRender from './FormRender';
 
 export default function Demo(props) {
   // JSON
-  const JSON_Data = {
-    
-  }
+  const JSON_Data = []
 
-  return <FormRender properties={JSON_Data} />;
+  return <FormRender widgetList={JSON_Data} />;
 }
 
 ```
