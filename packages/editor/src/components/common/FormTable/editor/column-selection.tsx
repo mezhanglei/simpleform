@@ -2,9 +2,8 @@ import React from 'react';
 import Icon from '../../SvgIcon';
 import { defaultGetId, setWidgetItem } from '../../../../utils/utils';
 import FormTableColSetting from './column-setting';
-import { pickObject } from '../../../../utils/object';
 import BaseSelection, { BaseSelectionProps } from '../../BaseSelection';
-import { joinFormPath, CustomWidgetItem, EditorSelection } from '../../../formrender';
+import { joinFormPath, CustomWidgetItem } from '../../../formrender';
 
 export interface ColumnSelectionProps extends BaseSelectionProps {
   colIndex: number;
@@ -36,7 +35,7 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
   const context = widgetItem?.context;
   const { editorConfig } = context?.state || {};
 
-  const onSelect = (selected: EditorSelection) => {
+  const onSelect: BaseSelectionProps['onSelect'] = (selected) => {
     const selectedItem = editor?.getItemByPath(selected?.path);
     const configSetting = editorConfig?.[selectedItem?.type || ''].setting;
     const baseSetting = configSetting?.['基础属性']?.filter((item) => item.name !== 'name');

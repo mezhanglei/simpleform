@@ -1,10 +1,10 @@
 import DndSortable, { arrayMove, DndSortableProps } from 'react-dragger-sort';
 import React from 'react';
 import './dnd.less';
-import { defaultGetId, getConfigItem, insertWidgetItem, setWidgetItem } from '../../../../utils/utils';
-import { joinFormPath, EditorSelection } from '../../../formrender';
+import { defaultGetId, getConfigItem, setWidgetItem } from '../../../../utils/utils';
+import { joinFormPath, CommonWidgetProps } from '../../../formrender';
 
-export interface TableDndProps extends EditorSelection {
+export interface TableDndProps extends CommonWidgetProps {
   children?: any;
 }
 

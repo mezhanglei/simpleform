@@ -2,12 +2,13 @@ import classnames from 'classnames';
 import React, { useState } from 'react';
 import './index.less';
 import pickAttrs from '../../../utils/pickAttrs';
-import { EditorSelection } from '../../../components/formrender';
+import { FormEditorState } from '../../../context';
+import { CommonWidgetProps } from '../../../components/formrender';
 
-export interface BaseSelectionProps extends EditorSelection, Omit<React.HtmlHTMLAttributes<HTMLDivElement>, 'onSelect'> {
+export interface BaseSelectionProps extends CommonWidgetProps, Omit<React.HtmlHTMLAttributes<HTMLDivElement>, 'onSelect' | 'onChange'> {
   tools?: any[]; // 工具栏
   configLabel?: string; // 当前组件的名字
-  onSelect?: (selected: EditorSelection) => void;
+  onSelect?: (selected: FormEditorState['selected']) => void;
 }
 
 /**
@@ -38,8 +39,7 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
   const isSelected = path ? path === selected?.path : false;
 
   const nextSelected = {
-    path: path,
-    widgetItem: widgetItem
+    path: path
   };
 
   const chooseItem = (e: any) => {

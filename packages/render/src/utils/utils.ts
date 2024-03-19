@@ -140,13 +140,11 @@ export const moveDiffLevel = (widgetList: WidgetList, from: { parent?: string, i
   const toLen = getPathLen(toParentPath);
   // 先计算内部变动，再计算外部变动
   if (fromLen > toLen || !toLen) {
-    setItemByPath(widgetList, undefined, fromPath);
-    const result = insertItemByIndex(widgetList, insertItem, toIndex, toParentPath);
-    return result;
+    const result = setItemByPath(widgetList, undefined, fromPath);
+    return insertItemByIndex(result, insertItem, toIndex, toParentPath);
   } else {
     const result = insertItemByIndex(widgetList, insertItem, toIndex, toParentPath);
-    result && setItemByPath(result, undefined, fromPath);
-    return result;
+    return setItemByPath(result, undefined, fromPath);
   }
 };
 

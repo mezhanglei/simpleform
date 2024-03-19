@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from 'react';
-import { CustomWidgetItem, EditorSelection, FormDesignData, SimpleFormRender, SimpleForm } from './components/formrender';
+import { CustomWidgetItem, FormDesignData, SimpleFormRender, SimpleForm } from './components/formrender';
 import { PlatType } from './tools/platContainer';
 import SimpleUndo from './utils/simple-undo';
 
@@ -21,8 +21,8 @@ export interface FormEditorState {
   editor?: SimpleFormRender;
   settingForm?: SimpleForm | null;
   FormRender?: React.ComponentType<any> | React.ForwardRefExoticComponent<any>;
-  selected?: EditorSelection;
-  beforeSelected?: EditorSelection;
+  selected?: { path?: string; appendSetting?: ConfigSettingItem };
+  beforeSelected?: { path?: string; appendSetting?: ConfigSettingItem };
   widgetList?: FormDesignData;
   editorConfig?: Record<string, CustomWidgetItem>;
   platType?: PlatType;

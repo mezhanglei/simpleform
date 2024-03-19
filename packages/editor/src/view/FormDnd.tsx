@@ -2,9 +2,9 @@ import DndSortable, { DndSortableProps } from 'react-dragger-sort';
 import React from 'react';
 import './FormDnd.less';
 import { defaultGetId, getConfigItem, insertWidgetItem } from '../utils/utils';
-import { joinFormPath, EditorSelection } from '../components/formrender';
+import { joinFormPath, CommonWidgetProps } from '../components/formrender';
 
-export interface ControlDndProps extends EditorSelection {
+export interface ControlDndProps extends CommonWidgetProps {
   children?: any;
 }
 
@@ -49,6 +49,7 @@ function FormDnd(props: ControlDndProps, ref: any) {
     // 从侧边栏插入进来
     if (fromCollection?.type === 'panel') {
       const type = from?.id as string;
+      if (!type) return;
       const configItem = getConfigItem(type, editorConfig);
       const newItem = configItem?.panel?.nonform ? configItem : Object.assign({ name: defaultGetId(type) }, configItem);
       insertWidgetItem(formrender, newItem, dropIndex, dropCollection?.path);

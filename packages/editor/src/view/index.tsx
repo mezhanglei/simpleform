@@ -31,8 +31,7 @@ function EditorView(props: EditorViewProps) {
     console.log(newData, '表单');
     context.dispatch((old) => ({
       ...old,
-      widgetList: newData,
-      selected: old.selected ? { ...old.selected, widgetItem: getWidgetItem(editor, old?.selected?.path) } : old.selected
+      widgetList: newData
     }));
   };
 

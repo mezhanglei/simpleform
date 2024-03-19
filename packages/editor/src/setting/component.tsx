@@ -28,7 +28,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
     if (!selected) return;
     const selectedItem = editor?.getItemByPath(selected?.path);
     const configSetting = editorConfig?.[selectedItem?.type || '']?.setting;
-    const appendSetting = selected.appendSetting;
+    const appendSetting = selected?.appendSetting;
     return appendSetting || configSetting;
   }, [editor, selectedPath, editorConfig]);
 

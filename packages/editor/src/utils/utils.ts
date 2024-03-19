@@ -1,6 +1,6 @@
 import { deepMergeObject } from './object';
 import { nanoid } from 'nanoid';
-import { SimpleForm, EditorSelection, SimpleFormRender, getInitialValues, getPathEnd, getParent, CustomWidgetItem } from '../components/formrender';
+import { SimpleForm, SimpleFormRender, getInitialValues, getPathEnd, getParent, CustomWidgetItem } from '../components/formrender';
 import { ConfigSettingItem, FormEditorState } from '../context';
 
 export const defaultGetId = (key?: string) => {
@@ -67,7 +67,7 @@ export const setWidgetItem = (formrender?: SimpleFormRender | null, data?: any, 
 };
 
 // 同步目标的编辑区域值到属性面板回显
-export const asyncSettingForm = (editor?: SimpleFormRender | null, settingForm?: SimpleForm | null, selected?: EditorSelection) => {
+export const asyncSettingForm = (editor?: SimpleFormRender | null, settingForm?: SimpleForm | null, selected?: FormEditorState['selected']) => {
   if (isNoSelected(selected?.path) || !settingForm) return;
   const item = getWidgetItem(editor, selected?.path);
   settingForm.setFieldsValue(item);

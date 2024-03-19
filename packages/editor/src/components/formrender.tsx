@@ -28,14 +28,12 @@ export interface CustomOptions {
 export type CustomWidgetItem<T = WidgetItem> = T & CustomOptions;
 // 表单渲染数据的类型
 export type FormDesignData = Array<CustomWidgetItem>;
-// 选中项类型
-export type EditorSelection = { appendSetting?: ConfigSettingItem } & GenerateParams<CustomOptions>;
 // 控件的公共输入项props
 export type CommonWidgetProps<T = any> = {
   value?: T;
   onChange?: (val?: T) => void;
   disabled?: boolean;
-} & EditorSelection;
+} & GenerateParams<CustomOptions>;
 
 export type CustomFormChildrenProps = FormChildrenProps<CustomOptions>;
 export function FormChildren(props: CustomFormChildrenProps) {
