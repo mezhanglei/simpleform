@@ -12,9 +12,9 @@ import {
   TimePicker,
   Cascader,
   Alert,
-  Divider,
 } from 'antd';
 import bindRequest from '../bind-request';
+import { CustomDivider } from '../common/Divider';
 import FileUpload from './FileUpload';
 import ImageUpload from './ImageUpload';
 
@@ -44,7 +44,7 @@ const widgets: any = {
   "TimePicker.RangePicker": TimePicker.RangePicker, // 时分秒范围控件
   "Cascader": bindRequest(Cascader),
   "Alert": Alert, // 提示组件
-  "Divider": Divider, // 分割线组件
+  "Divider": bindRequest(CustomDivider), // 分割线组件
   // 自定义组件
   "FileUpload": FileUpload, // 文件上传
   "ImageUpload": ImageUpload, // 图片上传

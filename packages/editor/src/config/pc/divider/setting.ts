@@ -1,7 +1,7 @@
 const baseSetting = [
   {
     label: '标题',
-    name: 'props.children',
+    name: 'props.label',
     type: 'Input',
   },
   {

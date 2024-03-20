@@ -70,10 +70,12 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
 
   const newColumns = useMemo(() => {
     const result = columns?.map((col, colIndex) => {
-      const { dataIndex, title, type, props, ...restCol } = col;
+      const { name, label, type, props, ...restCol } = col;
+      const dataIndex = name; // 列属性
+      const title = label; // 列标题
       return {
         ...restCol,
-        dataIndex: dataIndex,
+        dataIndex: name,
         title: title,
         onCell: (record: unknown, rowIndex?: number) => {
           const colName = joinFormPath(curName, rowIndex, dataIndex); // 表单字段

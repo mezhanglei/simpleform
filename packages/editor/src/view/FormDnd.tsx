@@ -29,10 +29,10 @@ function FormDnd(props: ControlDndProps, ref: any) {
 
   const onAdd: SortableOptions['onAdd'] = (params) => {
     console.log(params, '跨域拖放');
-    const isPanel = params?.item?.dataset?.type == 'panel';
+    const isPanel = params?.item?.dataset?.group == 'panel';
     // 从侧边栏插入进来
     if (isPanel) {
-      const fromId = params?.item?.dataset?.id;
+      const fromId = params?.item?.dataset?.type;
       const dropIndex = params?.newIndex;
       const dropParent = path;
       const dropPath = joinFormPath(dropParent, dropIndex);

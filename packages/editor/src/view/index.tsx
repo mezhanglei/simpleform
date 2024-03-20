@@ -72,9 +72,9 @@ function EditorView(props: EditorViewProps) {
 // 编辑区默认的选中框渲染
 const renderItem: CustomFormRenderProps['renderItem'] = (props) => {
   const { children } = props;
-  const isControl = props?.widgetItem?.widgetList ? false : true;
-  // 只有输入控件才需要默认添加选区
-  if (isControl) {
+  const isItem = props?.widgetItem?.widgetList ? false : true;
+  // 单个组件批量添加选区
+  if (isItem) {
     return <ComponentSelection data-path={props.path} {...props} />;
   }
   return children;

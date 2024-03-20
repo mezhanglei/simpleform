@@ -10,7 +10,7 @@ export default {
   labelWidth: 'auto',
   props: {
     style: { width: '100%' },
-    children: '分割线',
+    label: '分割线',
     orientation: 'left',
     type: 'horizontal',
   },

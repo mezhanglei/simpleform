@@ -1,7 +1,7 @@
 const baseSetting = [
   {
     label: '字段名',
-    name: 'dataIndex',
+    name: 'name',
     type: 'Input'
   },
   {

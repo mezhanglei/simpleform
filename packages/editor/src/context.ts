@@ -58,7 +58,7 @@ export function useEditorState(initialState: FormEditorState) {
   const historyRef = useRef(new SimpleUndo({
     maxLength: 10,
     provider: (done) => {
-      const widgetList = stateRef.current.widgetList;
+      const widgetList = stateRef.current.widgetList || [];
       done(JSON.stringify(widgetList));
     }
   }));

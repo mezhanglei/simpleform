@@ -108,7 +108,7 @@ function EditorPanel(props: EditorPanelProps) {
                     list.map((key) => {
                       const data = editorConfig?.[key] || {};
                       const panel = data?.panel || {};
-                      return <PanelTag key={key} data-type='panel' onChange={() => onChange?.(key)}>{panel.label}</PanelTag>;
+                      return <PanelTag key={key} data-type={key} data-group='panel' onChange={() => onChange?.(key)}>{panel.label}</PanelTag>;
                     })
                   }
                 </ReactSortable>

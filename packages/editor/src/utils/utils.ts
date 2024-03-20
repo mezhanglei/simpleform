@@ -72,7 +72,7 @@ export const setWidgetItem = (formrender?: SimpleFormRender | null, data?: any, 
   formrender?.setItemByPath(data, path);
 };
 
-// 同步目标的编辑区域值到属性面板回显
+// 同步选中项到属性面板回显
 export const asyncSettingForm = (editor?: SimpleFormRender | null, settingForm?: SimpleForm | null, selected?: FormEditorState['selected']) => {
   if (isNoSelected(selected?.path) || !settingForm) return;
   const item = getWidgetItem(editor, selected?.path);

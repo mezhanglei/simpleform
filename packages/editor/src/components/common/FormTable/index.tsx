@@ -19,7 +19,6 @@ export interface CustomColumnType<T = any> extends ColumnType<T>, CustomWidgetIt
   title: string;
   type?: string;
   props?: any;
-  dataIndex: string;
   initialValue?: any;
   render?: (val: unknown, record?: unknown, rowIndex?: number, colIndex?: number) => any;
 }

@@ -54,9 +54,7 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
     const nextColIndex = colIndex + 1;
     const cloneColumns = [...columns];
     const newColumn = {
-      ...column,
-      title: column?.label,
-      dataIndex: defaultGetId(column?.type),
+      ...column
     };
     cloneColumns.splice(nextColIndex, 0, newColumn);
     setWidgetItem(editor, cloneColumns, colmunsPath);

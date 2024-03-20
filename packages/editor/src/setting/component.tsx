@@ -20,7 +20,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   } = props;
 
   const context = useEditorContext();
-  const { selected, editor, editorForm, editorConfig } = context.state;
+  const { selected, editor, editorConfig } = context.state;
   const selectedPath = selected?.path;
   const form = useSimpleForm();
   const cls = classnames(prefixCls, className);
@@ -37,13 +37,10 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   }, []);
 
   useEffect(() => {
-    if (!form) return;
-    // 选中后先重置值, 防止值和渲染不同步导致报错
-    form.reset();
-    // 渲染结束后再处理值
-    setTimeout(() => {
-      asyncSettingForm(editor, form, selected);
-    }, 50);
+    asyncSettingForm(editor, form, selected);
+    return () => {
+      form && form.reset();
+    };
   }, [selectedPath]);
 
   const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = ({ name, value }) => {

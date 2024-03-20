@@ -44,13 +44,13 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
       <TableDnd {...rest}>
         {
           columns?.map((column, colIndex) => {
-            const { title, type, props, ...restColumn } = column;
+            const { label, type, props, ...restColumn } = column;
             const columnInstance = rest?.formrender && rest.formrender.createFormElement({ type: type, props: Object.assign({ disabled, form: rest?.form, formrender: rest?.formrender }, props) });
             return (
               <ColumnSelection key={colIndex} className={Classes.TableSelection} {...rest} column={column} colIndex={colIndex}>
                 <div className={Classes.TableCol}>
                   <div className={Classes.TableColHead}>
-                    {title}
+                    {label}
                   </div>
                   <div className={Classes.TableColBody}>
                     <Form.Item {...restColumn} label="" onFieldsChange={onFieldsChange}>
