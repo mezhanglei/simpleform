@@ -1,4 +1,4 @@
-import { getListIndex, insertWidgetItem } from '../utils/utils';
+import { getListIndex, getWidgetItem, insertWidgetItem } from '../utils/utils';
 import React, { CSSProperties } from 'react';
 import BaseSelection, { BaseSelectionProps } from './BaseSelection';
 import SvgIcon from '../components/common/SvgIcon';
@@ -32,7 +32,7 @@ function ControlSelection(props: ControlSelectionProps, ref: any) {
   const copyItem = () => {
     const currentIndex = getListIndex(editor, path);
     const nextIndex = currentIndex + 1;
-    const newItem = path && editor?.getItemByPath(path);
+    const newItem = getWidgetItem(editor, path);
     insertWidgetItem(editor, newItem, nextIndex, getParent(path));
     historyRecord?.save();
   };

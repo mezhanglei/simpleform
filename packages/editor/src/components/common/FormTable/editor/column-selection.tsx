@@ -1,6 +1,6 @@
 import React from 'react';
 import Icon from '../../SvgIcon';
-import { defaultGetId, setWidgetItem } from '../../../../utils/utils';
+import { defaultGetId, getWidgetItem, setWidgetItem } from '../../../../utils/utils';
 import FormTableColSetting from './column-setting';
 import BaseSelection, { BaseSelectionProps } from '../../../../view/BaseSelection';
 import { joinFormPath, CustomWidgetItem } from '../../../formrender';
@@ -36,7 +36,7 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
   const { editorConfig } = context?.state || {};
 
   const onSelect: BaseSelectionProps['onSelect'] = (selected) => {
-    const selectedItem = editor?.getItemByPath(selected?.path);
+    const selectedItem = getWidgetItem(editor, selected?.path);
     const configSetting = editorConfig?.[selectedItem?.type || ''].setting;
     const baseSetting = configSetting?.['基础属性']?.filter((item) => item.name !== 'name');
     const mergeSetting = Object.assign(FormTableColSetting, {

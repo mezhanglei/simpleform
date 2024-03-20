@@ -7,6 +7,7 @@ import SvgIcon from '../components/common/SvgIcon';
 import { PlatOptions } from './platContainer';
 import { showPreviewModal } from './preview';
 import { showExportJsonModal } from './exportJson';
+import { setWidgetItem } from '../utils/utils';
 
 export interface EditorToolsProps {
   className?: string;
@@ -18,7 +19,7 @@ export interface EditorToolsProps {
 function EditorTools(props: EditorToolsProps) {
 
   const context = useEditorContext();
-  const { platType = 'pc', widgetList, historyRecord } = context.state;
+  const { platType = 'pc', widgetList, editor, historyRecord } = context.state;
 
   const {
     style,
@@ -33,7 +34,7 @@ function EditorTools(props: EditorToolsProps) {
   };
 
   const clearEditor = () => {
-    context.dispatch((old) => ({ ...old, widgetList: undefined }));
+    setWidgetItem(editor, []);
     historyRecord?.save();
   };
 
@@ -44,14 +45,14 @@ function EditorTools(props: EditorToolsProps) {
   // 撤销
   const undo = () => {
     historyRecord?.undo((serialized) => {
-      context.dispatch((old) => ({ ...old, widgetList: JSON.parse(serialized || '{}') }));
+      setWidgetItem(editor, JSON.parse(serialized || '[]'));
     });
   };
 
   // 重做
   const redo = () => {
     historyRecord?.redo((serialized) => {
-      context.dispatch((old) => ({ ...old, widgetList: JSON.parse(serialized || '{}') }));
+      setWidgetItem(editor, JSON.parse(serialized || '[]'));
     });
   };
 

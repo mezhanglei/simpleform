@@ -42,16 +42,13 @@ export const setItemByPath = (widgetList: WidgetList, data?: any, path?: string)
 
 // 根据path获取指定路径的项
 export const getItemByPath = (widgetList?: WidgetList, path?: string) => {
-  if (!(widgetList instanceof Array)) return;
-  const pathArr = pathToArr(path);
-  if (pathArr.length == 0) return widgetList;
   return deepGet(widgetList, path);
 };
 
 // 根据index获取目标项
 export const getKeyValueByIndex = (widgetList: WidgetList, index?: number, parent?: string) => {
   if (!(widgetList instanceof Array) || typeof index !== 'number') return;
-  const container = getItemByPath(widgetList, parent);
+  const container = parent ? getItemByPath(widgetList, parent) : widgetList;
   if (!isObject(container) && !(container instanceof Array)) return;
   const childKeys = Object.keys(container || {});
   const isList = container instanceof Array;
@@ -90,7 +87,7 @@ const parseEntries = (entriesData?: { entries: Array<[string | number, any]>, is
 
 // 插入数据
 export const insertItemByIndex = (widgetList: WidgetList, data?: WidgetItem | Array<WidgetItem>, index?: number, parent?: string) => {
-  const container = getItemByPath(widgetList, parent);
+  const container = parent ? getItemByPath(widgetList, parent) : widgetList;
   const entriesData = toEntries(container);
   const isList = entriesData?.isList;
   const addItems = isList ? Object.entries(data instanceof Array ? data : [data]) : Object.entries(data || {});
@@ -113,7 +110,7 @@ export const moveSameLevel = (widgetList: WidgetList, from: { parent?: string, i
   let toIndex = to?.index;
   // 同域排序
   if (fromParentPath === toParentPath) {
-    const fromParent = getItemByPath(widgetList, fromParentPath);
+    const fromParent = fromParentPath ? getItemByPath(widgetList, fromParentPath) : widgetList;
     // 转成列表以便排序
     const entriesData = toEntries(fromParent);
     const entries = entriesData?.entries;

@@ -86,7 +86,7 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
             path: colPath,
             widgetItem: col,
           };
-          const formControl = formrender && formrender.createFormElement({ type, props: Object.assign({ disabled }, columnParams, props) });
+          const formControl = formrender?.createFormElement({ type, props: Object.assign({ disabled }, columnParams, props) });
           return {
             record,
             name: colName, // 拼接路径

@@ -155,7 +155,7 @@ const ImageUpload = React.forwardRef<any, ImageUploadProps>((props, ref) => {
       <Upload
         ref={ref}
         multiple={multiple}
-        fileList={fileList}
+        fileList={fileList instanceof Array ? fileList : []}
         accept={accept}
         listType={listType}
         onPreview={handlePreview}

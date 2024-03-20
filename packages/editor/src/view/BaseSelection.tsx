@@ -5,6 +5,7 @@ import pickAttrs from '../utils/pickAttrs';
 import { FormEditorState } from '../context';
 import SvgIcon from '../components/common/SvgIcon';
 import { CommonWidgetProps } from '../components/formrender';
+import { delWidgetItem } from '../utils/utils';
 
 export interface BaseSelectionProps extends CommonWidgetProps, Omit<React.HtmlHTMLAttributes<HTMLDivElement>, 'onSelect' | 'onChange'> {
   tools?: any[]; // 工具栏
@@ -60,7 +61,7 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
   const deleteColumn = (e: any) => {
     e.stopPropagation();
     context?.dispatch && context?.dispatch((old) => ({ ...old, selected: {} }));
-    path && editor?.delItemByPath(path);
+    delWidgetItem(editor, path);
     historyRecord?.save();
   };
 

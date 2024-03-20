@@ -116,7 +116,7 @@ const FileUpload = React.forwardRef<any, FileUploadProps>((props, ref) => {
       ref={ref}
       multiple={multiple}
       accept={accept}
-      fileList={fileList}
+      fileList={fileList instanceof Array ? fileList : []}
       {...UploadProps}
       {...rest}
     >

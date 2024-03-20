@@ -1,4 +1,4 @@
-import DefaultFormRender, { FormChildren as DefaultFormChildren, FormRenderProps, FormChildrenProps, GenerateParams, WidgetItem } from '@simpleform/render';
+import DefaultFormRender, { FormChildren as DefaultFormChildren, FormRenderProps, FormChildrenProps, GenerateParams, WidgetItem } from '@simpleform/render/src';
 import React from 'react';
 import dayjs from 'dayjs';
 import '@simpleform/render/lib/css/main.css';
@@ -7,11 +7,12 @@ import { ConfigSettingItem, FormEditorContextProps } from '../context';
 import createRequest from './common/request';
 import bindRequest from './bind-request';
 
-export * from '@simpleform/render';
+export * from '@simpleform/render/src';
 export { createRequest, bindRequest };
 
 // 自定义传参
 export interface CustomOptions {
+  uuid?: string; // 唯一id
   isEditor?: boolean; // 是否为编辑态
   context?: FormEditorContextProps; // 编辑器上下文环境
   // 配置信息

@@ -5,7 +5,7 @@ import LinkageSetting from "./Linkage";
 import RequestSetting from './request';
 import OptionList from './list';
 import { EditorCodeMirror } from "../CodeMirror";
-import { getWidgetItem } from "../../../utils/utils";
+import { getWidgetItem, setWidgetItem } from "../../../utils/utils";
 import { joinFormPath, CommonWidgetProps } from "../../formrender";
 
 /**
@@ -50,7 +50,7 @@ const SetOptions: React.FC<SetOptionsProps> = (props) => {
   const selectTypeChange = (key?: OptionsKey) => {
     if (key) {
       onChange && onChange(undefined);
-      editor?.setItemByPath(key, joinFormPath(selected?.path, 'props.optionSelect'));
+      setWidgetItem(editor, key, joinFormPath(selected?.path, 'props.optionSelect'));
     }
   };
 

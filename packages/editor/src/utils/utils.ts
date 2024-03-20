@@ -15,10 +15,11 @@ export const isNoSelected = (path?: string) => {
 // 根据目标路径推测其在父列表中的序号
 export const getListIndex = (editor?: SimpleFormRender | null, path?: string) => {
   if (!editor) return -1;
-  const len = editor.getWidgetList().length || 0;
+  const widgetList = editor.getWidgetList();
+  const len = widgetList.length || 0;
   if (isNoSelected(path)) return len - 1;
   const containerPath = getParent(path);
-  const container = editor.getItemByPath(containerPath);
+  const container = containerPath ? getWidgetItem(editor, containerPath) : widgetList;
   const endName = getPathEnd(path);
   const endCode = typeof endName == 'string' ? endName?.replace(/\]/, '').replace(/\[/, '') : endName;
   const keys = Object.keys(container);
@@ -49,7 +50,7 @@ export const getConfigItem = (type: string | undefined, editorConfig?: FormEdito
 
 // 根据路径获取节点的值和属性
 export const getWidgetItem = (formrender?: SimpleFormRender | null, path?: string) => {
-  if (isNoSelected(path) || !formrender) return;
+  if (!formrender) return;
   const item = formrender.getItemByPath(path);
   return item;
 };
@@ -63,13 +64,20 @@ export const moveWidgetItem = (formrender?: SimpleFormRender | null, from?: { in
 // 插入新节点
 export const insertWidgetItem = (formrender?: SimpleFormRender | null, data?: CustomWidgetItem, index?: number, parent?: string) => {
   if (!formrender || !data) return;
-  formrender?.insertItemByIndex(data, index, parent);
+  const newData = data?.uuid ? data : Object.assign({ uuid: defaultGetId(data?.type) }, data);
+  formrender?.insertItemByIndex(newData, index, parent);
 };
 
-// 覆盖设置节点的属性
+// 设置节点的属性
 export const setWidgetItem = (formrender?: SimpleFormRender | null, data?: any, path?: string) => {
-  if (isNoSelected(path) || !formrender) return;
+  if (!formrender) return;
   formrender?.setItemByPath(data, path);
+};
+
+// 删除节点
+export const delWidgetItem = (formrender?: SimpleFormRender | null, path?: string) => {
+  if (isNoSelected(path) || !formrender) return;
+  formrender?.delItemByPath(path);
 };
 
 // 同步选中项到属性面板回显

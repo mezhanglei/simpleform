@@ -1,7 +1,7 @@
 import React, { CSSProperties, useEffect, useMemo } from 'react';
 import classnames from 'classnames';
 import { CustomFormRenderProps, Form, FormChildren, joinFormPath, useSimpleForm } from '../components/formrender';
-import { asyncSettingForm } from '../utils/utils';
+import { asyncSettingForm, getWidgetItem, setWidgetItem } from '../utils/utils';
 import './component.less';
 import CustomCollapse from '../components/common/Collapse';
 import { useEditorContext } from '../context';
@@ -26,7 +26,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   const cls = classnames(prefixCls, className);
   const configSetting = useMemo(() => {
     if (!selected) return;
-    const selectedItem = editor?.getItemByPath(selected?.path);
+    const selectedItem = getWidgetItem(editor, selected?.path);
     const configSetting = editorConfig?.[selectedItem?.type || '']?.setting;
     const appendSetting = selected?.appendSetting;
     return appendSetting || configSetting;
@@ -48,7 +48,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
 
   const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = ({ name, value }) => {
     const curPath = joinFormPath(selectedPath, name);
-    editor?.setItemByPath(value, curPath);
+    setWidgetItem(editor, value, curPath);
   };
 
   const renderCommonList = () => {
