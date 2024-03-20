@@ -120,7 +120,7 @@ export const moveSameLevel = (widgetList: WidgetList, from: { parent?: string, i
     toIndex = typeof toIndex === 'number' ? toIndex : entries?.length;
     entriesData.entries = arrayMove(entries, fromIndex, toIndex);
     const result = parseEntries(entriesData);
-    return result;
+    return setItemByPath(widgetList, result, fromParentPath);
   }
 };
 

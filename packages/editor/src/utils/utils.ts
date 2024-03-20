@@ -54,6 +54,12 @@ export const getWidgetItem = (formrender?: SimpleFormRender | null, path?: strin
   return item;
 };
 
+// 移动新节点
+export const moveWidgetItem = (formrender?: SimpleFormRender | null, from?: { index: number; parent?: string }, to?: { index?: number; parent?: string }) => {
+  if (!formrender || !from || !to) return;
+  formrender?.moveItemByPath(from, to);
+};
+
 // 插入新节点
 export const insertWidgetItem = (formrender?: SimpleFormRender | null, data?: CustomWidgetItem, index?: number, parent?: string) => {
   if (!formrender || !data) return;

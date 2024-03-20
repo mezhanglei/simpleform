@@ -182,12 +182,13 @@ export default function FormChildren(props: FormChildrenProps) {
     return cloneChilds;
   };
 
-  const renderChild = (item?: GenerateWidgetItem, path?: string) => {
+  const renderChild = (item: GenerateWidgetItem | undefined, path: string | undefined, index: number) => {
     if (!item) return;
     const optionsProps = typeof options === 'function' ? options(item) : options;
     const mergeItem = Object.assign({}, optionsProps, item, { props: Object.assign({}, optionsProps?.props, item?.props) });
     if (mergeItem?.hidden === true) return;
     const commonParams = {
+      index,
       path,
       widgetItem: mergeItem,
       formrender,
@@ -244,10 +245,10 @@ export default function FormChildren(props: FormChildrenProps) {
       const isHaveWidgetList = widgetList instanceof Array ? true : false;
       const widgetNode = formrender.createFormElement(typeRender || { type, props }, commonParams);
       if (isHaveWidgetList) {
-        const widgetNodeChildren = widgetList?.map((item, index) => {
-          const childPath = joinFormPath(path, 'widgetList', index);
-          const compileItem = getComileWidgetItem(item, childPath);
-          return renderChild(compileItem, childPath);
+        const widgetNodeChildren = widgetList?.map((child, childIndex) => {
+          const childPath = joinFormPath(path, 'widgetList', childIndex);
+          const compileItem = getComileWidgetItem(child, childPath);
+          return renderChild(compileItem, childPath, childIndex);
         });
         const withSideChildren = withSide(widgetNodeChildren, inside, renderList, commonParams);
         const result = React.isValidElement(widgetNode) ?
@@ -263,7 +264,7 @@ export default function FormChildren(props: FormChildrenProps) {
   const childs = (widgetList || []).map((item, index) => {
     const curPath = `[${index}]`;
     const compileItem = getComileWidgetItem(item, curPath);
-    return renderChild(compileItem, curPath);
+    return renderChild(compileItem, curPath, index);
   });
 
   return withSide(childs, inside, renderList, { formrender, form });

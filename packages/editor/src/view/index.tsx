@@ -4,7 +4,7 @@ import './index.less';
 import RootDnd from './RootDnd';
 import ComponentSelection from './selection';
 import DefaultFormRender, { CustomFormRenderProps, joinFormPath } from '../components/formrender';
-import { getWidgetItem, setWidgetItem } from '../utils/utils';
+import { setWidgetItem } from '../utils/utils';
 import { FormEditorContextProps, useEditorContext } from '../context';
 import PlatContainer from '../tools/platContainer';
 
@@ -75,7 +75,7 @@ const renderItem: CustomFormRenderProps['renderItem'] = (props) => {
   const isControl = props?.widgetItem?.widgetList ? false : true;
   // 只有输入控件才需要默认添加选区
   if (isControl) {
-    return <ComponentSelection {...props} />;
+    return <ComponentSelection data-path={props.path} {...props} />;
   }
   return children;
 };

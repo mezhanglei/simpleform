@@ -1,80 +1,74 @@
-import DndSortable, { DndSortableProps } from 'react-dragger-sort';
+import { ReactSortable, SortableOptions } from "react-sortablejs";
 import React from 'react';
 import './FormDnd.less';
-import { defaultGetId, getConfigItem, insertWidgetItem } from '../utils/utils';
-import { CommonWidgetProps } from '../components/formrender';
+import { defaultGetId, getConfigItem, insertWidgetItem, moveWidgetItem } from '../utils/utils';
+import { CommonWidgetProps, getParent, joinFormPath } from '../components/formrender';
 
 export interface ControlDndProps extends CommonWidgetProps {
   children?: any;
+  dndList: Array<any>;
 }
 
 // 控件的拖放区域组件
 function FormDnd(props: ControlDndProps, ref: any) {
-  const { children, formrender, path, widgetItem, ...rest } = props;
+  const { children, formrender, path, widgetItem, dndList, ...rest } = props;
   const context = widgetItem?.context;
   const { editorConfig, historyRecord } = context?.state || {};
 
-  const updateContext = () => {
-    context?.dispatch && context.dispatch((old) => ({ ...old, selected: {} }));
+  const onUpdate: SortableOptions['onUpdate'] = (params) => {
+    const fromParent = getParent(params?.item?.dataset?.path);
+    const fromIndex = params?.oldIndex;
+    if (typeof fromIndex !== 'number') return;
+    const dropIndex = params?.newIndex;
+    const dropPath = joinFormPath(path, dropIndex);
+    moveWidgetItem(formrender, { index: fromIndex, parent: fromParent }, { index: dropIndex, parent: fromParent });
+    context?.dispatch && context.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: dropPath }) }));
+    historyRecord?.save();
+    console.log(params, fromParent, dropPath, '同域拖放');
+  };
+
+  const onAdd: SortableOptions['onAdd'] = (params) => {
+    console.log(params, '跨域拖放');
+    const isPanel = params?.item?.dataset?.type == 'panel';
+    // 从侧边栏插入进来
+    if (isPanel) {
+      const fromId = params?.item?.dataset?.id;
+      const dropIndex = params?.newIndex;
+      const dropParent = path;
+      const dropPath = joinFormPath(dropParent, dropIndex);
+      const configItem = getConfigItem(fromId, editorConfig);
+      const newItem = configItem?.panel?.nonform ? configItem : Object.assign({ name: defaultGetId(fromId) }, configItem);
+      insertWidgetItem(formrender, newItem, dropIndex, path);
+      context?.dispatch && context.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: dropPath }) }));
+    } else {
+      const fromParent = getParent(params?.item?.dataset?.path);
+      const fromIndex = params?.oldIndex;
+      if (typeof fromIndex !== 'number') return;
+      const dropIndex = params?.newIndex;
+      const dropParent = path;
+      const dropPath = joinFormPath(dropParent, dropIndex);
+      moveWidgetItem(formrender, { index: fromIndex, parent: fromParent }, { index: dropIndex, parent: dropParent });
+      context?.dispatch && context.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: dropPath }) }));
+    }
     historyRecord?.save();
   };
 
-  const onUpdate: DndSortableProps['onUpdate'] = (params) => {
-    const { from, to } = params;
-    console.log(params, '同域拖放');
-    // 拖拽区域信息
-    const fromGroup = from.group;
-    // 额外传递的信息
-    const fromCollection = fromGroup?.collection;
-    const fromIndex = from?.index;
-    if (typeof fromIndex != 'number') return;
-    // 拖放区域的信息
-    const dropGroup = to?.group;
-    // 额外传递的信息
-    const dropCollection = dropGroup?.collection;
-    const dropIndex = to?.index;
-    formrender?.moveItemByPath({ index: fromIndex, parent: fromCollection?.path }, { index: dropIndex, parent: dropCollection?.path });
-    updateContext();
-  };
-
-  const onAdd: DndSortableProps['onAdd'] = (params) => {
-    const { from, to } = params;
-    console.log(params, '跨域拖放');
-    // 拖拽区域信息
-    const fromGroup = from.group;
-    // 额外传递的信息
-    const fromCollection = fromGroup?.collection;
-    const fromIndex = from?.index;
-    if (typeof fromIndex != 'number') return;
-    // 拖放区域的信息
-    const dropGroup = to?.group;
-    // 额外传递的信息
-    const dropCollection = dropGroup?.collection;
-    const dropIndex = to?.index || 0;
-    // 从侧边栏插入进来
-    if (fromCollection?.type === 'panel') {
-      const type = from?.id as string;
-      const configItem = getConfigItem(type, editorConfig);
-      const newItem = configItem?.panel?.nonform ? configItem : Object.assign({ name: defaultGetId(type) }, configItem);
-      insertWidgetItem(formrender, newItem, dropIndex, dropCollection?.path);
-    } else {
-      formrender?.moveItemByPath({ index: fromIndex, parent: fromCollection?.path }, { index: dropIndex, parent: dropCollection?.path });
-    }
-    updateContext();
-  };
-
   return (
-    <DndSortable
+    <ReactSortable
+      list={dndList}
+      setList={() => { }}
+      group={{
+        name: "sort-field",
+        put: ['sort-field', 'panel']
+      }}
       ref={ref}
       onUpdate={onUpdate}
       onAdd={onAdd}
       className='editor-dnd'
-      options={{ hiddenFrom: true }}
-      collection={{ path: path, name: widgetItem?.name }}
       {...rest}
     >
       {children}
-    </DndSortable>
+    </ReactSortable>
   );
 };
 

@@ -2,10 +2,10 @@ import React, { CSSProperties } from 'react';
 import classnames from 'classnames';
 import './index.less';
 import { defaultGetId, getConfigItem, getListIndex, insertWidgetItem } from '../utils/utils';
-import DndSortable from 'react-dragger-sort';
+import { ReactSortable } from "react-sortablejs";
 import { FormEditorContextProps, useEditorContext } from '../context';
 import { getParent } from '../components/formrender';
-import { Flex, Tag } from 'antd';
+import { Tag } from 'antd';
 
 export interface PanelTagProps {
   className?: string
@@ -91,23 +91,27 @@ function EditorPanel(props: EditorPanelProps) {
             return (
               <div key={title} className='panel-list'>
                 <div className={`panel-list-title`}>{title}</div>
-                <DndSortable
+                <ReactSortable
+                  list={list}
+                  setList={() => { }}
+                  forceFallback={true}
+                  sort={false}
                   className='elements-list'
-                  collection={{ type: 'panel' }}
-                  options={{
-                    disabledDrop: true,
-                    hiddenFrom: false,
-                    disabledSort: true
+                  animation={200}
+                  group={{
+                    name: "panel",
+                    pull: "clone",
+                    put: false,
                   }}
                 >
                   {
                     list.map((key) => {
                       const data = editorConfig?.[key] || {};
                       const panel = data?.panel || {};
-                      return <PanelTag key={key} data-id={key} onChange={() => onChange?.(key)}>{panel.label}</PanelTag>;
+                      return <PanelTag key={key} data-type='panel' onChange={() => onChange?.(key)}>{panel.label}</PanelTag>;
                     })
                   }
-                </DndSortable>
+                </ReactSortable>
               </div>
             );
           })
