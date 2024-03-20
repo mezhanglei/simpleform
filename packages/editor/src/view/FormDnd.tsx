@@ -59,6 +59,7 @@ function FormDnd(props: ControlDndProps, ref: any) {
       setList={() => { }}
       group={{
         name: "sort-field",
+        pull: "clone",
         put: ['sort-field', 'panel']
       }}
       ref={ref}

@@ -57,6 +57,7 @@ function TableDnd(props: TableDndProps, ref: any) {
       setList={() => { }}
       group={{
         name: "table-columns",
+        pull: "clone",
         put: ['sort-field', 'panel']
       }}
       ref={ref}
