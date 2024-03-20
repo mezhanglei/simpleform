@@ -1,6 +1,6 @@
 import { getListIndex, insertWidgetItem } from '../utils/utils';
 import React, { CSSProperties } from 'react';
-import BaseSelection, { BaseSelectionProps } from '../components/common/BaseSelection';
+import BaseSelection, { BaseSelectionProps } from './BaseSelection';
 import SvgIcon from '../components/common/SvgIcon';
 import { getParent } from '../components/formrender';
 
@@ -37,18 +37,12 @@ function ControlSelection(props: ControlSelectionProps, ref: any) {
     historyRecord?.save();
   };
 
-  const deleteItem = (e: any) => {
-    e.stopPropagation();
-    path && editor?.delItemByPath(path);
-    historyRecord?.save();
-  };
-
   return (
     <BaseSelection
       ref={ref}
       {...props}
       configLabel={widgetItem?.panel?.label}
-      tools={[<SvgIcon key="fuzhi" name="fuzhi" onClick={copyItem} />, <SvgIcon key="shanchu" name="shanchu" onClick={deleteItem} />]}
+      tools={[<SvgIcon key="fuzhi" name="fuzhi" onClick={copyItem} />]}
     >
       {children}
     </BaseSelection>

@@ -2,7 +2,7 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-3.0.4-green)](https://www.npmjs.com/package/@simpleform/editor)
+[![](https://img.shields.io/badge/version-3.0.5-green)](https://www.npmjs.com/package/@simpleform/editor)
 
 > 基于`react`实现的表单设计器，支持自定义组件，模板导入导出，可视化设计等表单设计功能，二次开发非常简单。
 
@@ -37,6 +37,7 @@ yarn add @simpleform/editor
 ```javascript
 import React from 'react';
 import { FormRender as DefaultFormRender, FormChildren as DefaultFormChildren, createRequest, CustomFormChildrenProps, CustomFormRenderProps } from '@simpleform/editor';
+import '@simpleform/editor/lib/css/main.css';
 
 export * from '@simpleform/editor';
 // import Example from './Example';
@@ -132,6 +133,7 @@ import { EditorPanel, EditorProvider, EditorProviderProps, EditorSetting, Editor
 import FormRender from '../FormRender';
 import EditorConfig from './config';
 import panelData from './config/panelData';
+import '@simpleform/editor/lib/css/main.css';
 // import ImportModal from './template';
 import './index.less';
 

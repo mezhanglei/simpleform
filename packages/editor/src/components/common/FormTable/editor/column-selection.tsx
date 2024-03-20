@@ -2,7 +2,7 @@ import React from 'react';
 import Icon from '../../SvgIcon';
 import { defaultGetId, setWidgetItem } from '../../../../utils/utils';
 import FormTableColSetting from './column-setting';
-import BaseSelection, { BaseSelectionProps } from '../../BaseSelection';
+import BaseSelection, { BaseSelectionProps } from '../../../../view/BaseSelection';
 import { joinFormPath, CustomWidgetItem } from '../../../formrender';
 
 export interface ColumnSelectionProps extends BaseSelectionProps {
@@ -60,14 +60,6 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
     setWidgetItem(editor, cloneColumns, colmunsPath);
   };
 
-  const deleteColumn = (e: any) => {
-    e.stopPropagation();
-    context?.dispatch && context?.dispatch((old) => ({ ...old, selected: {} }));
-    const cloneColumns = [...columns];
-    cloneColumns.splice(colIndex, 1);
-    setWidgetItem(editor, cloneColumns, colmunsPath);
-  };
-
   return (
     <BaseSelection
       ref={ref}
@@ -75,7 +67,7 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
       path={colmunPath}
       configLabel="表格列"
       onSelect={onSelect}
-      tools={[<Icon key="fuzhi" name="fuzhi" onClick={copyItem} />, <Icon key="shanchu" name="shanchu" onClick={deleteColumn} />]}>
+      tools={[<Icon key="fuzhi" name="fuzhi" onClick={copyItem} />]}>
       {children}
     </BaseSelection>
   );

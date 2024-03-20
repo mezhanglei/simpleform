@@ -1,9 +1,10 @@
 import classnames from 'classnames';
 import React, { useState } from 'react';
-import './index.less';
-import pickAttrs from '../../../utils/pickAttrs';
-import { FormEditorState } from '../../../context';
-import { CommonWidgetProps } from '../../../components/formrender';
+import './BaseSelection.less';
+import pickAttrs from '../utils/pickAttrs';
+import { FormEditorState } from '../context';
+import SvgIcon from '../components/common/SvgIcon';
+import { CommonWidgetProps } from '../components/formrender';
 
 export interface BaseSelectionProps extends CommonWidgetProps, Omit<React.HtmlHTMLAttributes<HTMLDivElement>, 'onSelect' | 'onChange'> {
   tools?: any[]; // 工具栏
@@ -33,9 +34,11 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
     ...restProps
   } = props;
 
+  const prefixCls = "editor-selection";
+  const overCls = `${prefixCls}-over`;
   const [isOver, setIsOver] = useState<boolean>(false);
   const context = widgetItem?.context;
-  const { selected } = context?.state || {};
+  const { selected, historyRecord } = context?.state || {};
   const isSelected = path ? path === selected?.path : false;
 
   const nextSelected = {
@@ -54,8 +57,13 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
     }));
   };
 
-  const prefixCls = "editor-selection";
-  const overCls = `${prefixCls}-over`;
+  const deleteColumn = (e: any) => {
+    e.stopPropagation();
+    context?.dispatch && context?.dispatch((old) => ({ ...old, selected: {} }));
+    path && editor?.delItemByPath(path);
+    historyRecord?.save();
+  };
+
   const handleMouseOver = (e: any) => {
     e.stopPropagation();
     const target = e.currentTarget as HTMLElement;
@@ -88,11 +96,13 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
     mask: `${prefixCls}-mask`,
     tools: `${prefixCls}-tools`,
     label: `${prefixCls}-label`,
+    close: `${prefixCls}-close`,
   };
 
   return (
     <div ref={ref} className={cls} {...pickAttrs(restProps)} onClick={chooseItem} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
       {isOver && !isSelected && configLabel && <div className={classes.label}>{configLabel}</div>}
+      {isOver && <SvgIcon className={classes.close} key="close" name="close" onClick={deleteColumn} />}
       {isSelected && <div className={classes.tools}>{tools}</div>}
       {children}
     </div>

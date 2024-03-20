@@ -2,7 +2,7 @@
 
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-3.0.4-green)](https://www.npmjs.com/package/@simpleform/editor)
+[![](https://img.shields.io/badge/version-3.0.5-green)](https://www.npmjs.com/package/@simpleform/editor)
 
 > Based on `react` implementation of the form designer , support for custom components , template import and export , visual design and other form design features , the secondary development is very simple .
 
@@ -40,6 +40,7 @@ Three steps: registering the `FormRender` component, `FormEditor` config that co
 ```javascript
 import React from 'react';
 import { FormRender as DefaultFormRender, FormChildren as DefaultFormChildren, createRequest, CustomFormChildrenProps, CustomFormRenderProps } from '@simpleform/editor';
+import '@simpleform/editor/lib/css/main.css';
 
 export * from '@simpleform/editor';
 // import Example from './Example';
@@ -134,6 +135,7 @@ import { EditorPanel, EditorProvider, EditorProviderProps, EditorSetting, Editor
 import FormRender from '../FormRender';
 import EditorConfig from './config';
 import panelData from './config/panelData';
+import '@simpleform/editor/lib/css/main.css';
 // import ImportModal from './template';
 import './index.less';
 

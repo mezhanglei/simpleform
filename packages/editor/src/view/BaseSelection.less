@@ -20,6 +20,7 @@
     color: #fff;
     opacity: 0.5;
   }
+
   &-tools {
     position: absolute;
     right: 0;
@@ -35,6 +36,7 @@
       cursor: pointer;
     }
   }
+
   &-mask {
     position: absolute;
     width: 100%;
@@ -42,6 +44,16 @@
     left: 0;
     top: 0;
     z-index: 1;
+  }
+
+  &-close {
+    font-size: 20px;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    z-index: 9999;
+    color: @form-primary-color;
+    cursor: pointer;
   }
 }
 

@@ -37,7 +37,10 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   }, []);
 
   useEffect(() => {
-    asyncSettingForm(editor, form, selected);
+    // 切换时需要重置后再进行表单设置
+    setTimeout(() => {
+      asyncSettingForm(editor, form, selected);
+    }, 50);
     return () => {
       form && form.reset();
     };

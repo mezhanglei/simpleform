@@ -1,7 +1,7 @@
 import React from 'react';
 import SvgIcon from '../SvgIcon';
 import { getListIndex, insertWidgetItem } from '../../../utils/utils';
-import BaseSelection from '../BaseSelection';
+import BaseSelection from '../../../view/BaseSelection';
 import classnames from 'classnames';
 import './col-selection.less';
 import { CustomColProps } from './col';
@@ -40,10 +40,6 @@ function ColSelection(props: CustomColProps, ref: any) {
     insertWidgetItem(editor, newItem, nextIndex, getParent(path));
   };
 
-  const deleteItem = () => {
-    path && editor?.delItemByPath(path);
-  };
-
   const prefixCls = "col-selection";
   const cls = classnames(prefixCls, className);
 
@@ -53,7 +49,7 @@ function ColSelection(props: CustomColProps, ref: any) {
       {...props}
       configLabel={widgetItem?.panel?.label}
       className={cls}
-      tools={[<SvgIcon key="add" name="add" onClick={addCol} />, <SvgIcon key="shanchu" name="shanchu" onClick={deleteItem} />]}>
+      tools={[<SvgIcon key="add" name="add" onClick={addCol} />]}>
       {children}
     </BaseSelection>
   );
