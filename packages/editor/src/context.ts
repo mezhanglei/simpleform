@@ -11,7 +11,7 @@ export interface TemplateItem {
 }
 
 // 配置属性类型
-export interface ConfigSettingItem {
+export interface ConfigWidgetSetting {
   [title: string]: FormDesignData
 }
 
@@ -21,8 +21,8 @@ export interface FormEditorState {
   editor?: SimpleFormRender;
   settingForm?: SimpleForm | null;
   FormRender?: React.ComponentType<any> | React.ForwardRefExoticComponent<any>;
-  selected?: { path?: string; setting?: ConfigSettingItem };
-  beforeSelected?: { path?: string; setting?: ConfigSettingItem };
+  selected?: { path?: string; setting?: ConfigWidgetSetting };
+  beforeSelected?: { path?: string; setting?: ConfigWidgetSetting };
   widgetList?: FormDesignData;
   editorConfig?: Record<string, CustomWidgetItem>;
   platType?: PlatType;

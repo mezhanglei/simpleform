@@ -3,7 +3,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import '@simpleform/render/lib/css/main.css';
 import widgets from '.';
-import { ConfigSettingItem, FormEditorContextProps } from '../context';
+import { ConfigWidgetSetting, FormEditorContextProps } from '../context';
 import createRequest from './common/request';
 import bindRequest from './bind-request';
 
@@ -23,7 +23,7 @@ export interface CustomOptions {
     includes?: string[]; // 子元素限制可以添加的组件类型
   };
   // 属性表单
-  setting?: ConfigSettingItem;
+  setting?: ConfigWidgetSetting;
 }
 // 自定义表单节点信息
 export type CustomWidgetItem<T = WidgetItem> = T & CustomOptions;

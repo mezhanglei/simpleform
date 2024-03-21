@@ -1,7 +1,7 @@
 import { deepMergeObject } from './object';
 import { nanoid } from 'nanoid';
 import { SimpleForm, SimpleFormRender, getInitialValues, getPathEnd, getParent, CustomWidgetItem } from '../components/formrender';
-import { ConfigSettingItem, FormEditorState } from '../context';
+import { ConfigWidgetSetting, FormEditorState } from '../context';
 
 export const defaultGetId = (key?: string) => {
   return typeof key == 'string' ? `${key.replace(/\./g, '')}_${nanoid(6)}` : '';
@@ -28,7 +28,7 @@ export const getListIndex = (editor?: SimpleFormRender | null, path?: string) =>
 };
 
 // 从配置中获取初始值
-export const getSettingInitial = (setting?: ConfigSettingItem) => {
+export const getSettingInitial = (setting?: ConfigWidgetSetting) => {
   // // 从配置表单中获取初始属性
   const expandSetting = Object.values(setting || {}).reduce((pre, cur) => {
     const result = [...pre, ...cur];
