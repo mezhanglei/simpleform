@@ -32,14 +32,14 @@ export const FormItem = React.forwardRef<any, FormItemProps>((props, ref) => {
   } = fieldProps;
 
   const [error] = useFormError(form, name);
-  const ignore = rest?.ignore || rest?.readOnly;
+  const nonform = rest?.nonform || rest?.readOnly;
   const isHaveRequired = useMemo(() => (rules instanceof Array && rules?.find((rule) => rule?.required === true)), [rules]);
-  const required = isHaveRequired && ignore !== true ? true : rest?.required;
+  const required = isHaveRequired && nonform !== true ? true : rest?.required;
   const FieldComponent = component;
 
   const childs = (
     <ItemCore
-      ignore={ignore}
+      nonform={nonform}
       name={name}
       index={index}
       trigger={trigger}
@@ -59,7 +59,7 @@ export const FormItem = React.forwardRef<any, FormItemProps>((props, ref) => {
 
   return (
     FieldComponent ?
-      <FieldComponent {...fieldProps} required={required} ref={ref} error={ignore !== true && error}>
+      <FieldComponent {...fieldProps} required={required} ref={ref} error={nonform !== true && error}>
         {childs}
       </FieldComponent>
       : childs

@@ -12,7 +12,6 @@ export { createRequest, bindRequest };
 
 // 自定义传参
 export interface CustomOptions {
-  uuid?: string; // 唯一id
   isEditor?: boolean; // 是否为编辑态
   context?: FormEditorContextProps; // 编辑器上下文环境
   // 配置信息

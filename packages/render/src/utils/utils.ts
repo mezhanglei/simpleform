@@ -162,7 +162,7 @@ export const getInitialValues = (widgetList?: WidgetList) => {
       } else {
         // @ts-ignore
         const val = item[key];
-        if (key === 'initialValue' && val !== undefined) {
+        if (key === 'initialValue' && item?.name && val !== undefined) {
           initialValues = deepSet(initialValues, item.name, val);
         }
       }

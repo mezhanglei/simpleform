@@ -64,7 +64,7 @@ export const moveWidgetItem = (formrender?: SimpleFormRender | null, from?: { in
 // 插入新节点
 export const insertWidgetItem = (formrender?: SimpleFormRender | null, data?: CustomWidgetItem, index?: number, parent?: string) => {
   if (!formrender || !data) return;
-  const newData = Object.assign(data, { uuid: defaultGetId(data?.type) });
+  const newData = data;
   formrender?.insertItemByIndex(newData, index, parent);
 };
 

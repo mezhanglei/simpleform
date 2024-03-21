@@ -12,7 +12,7 @@ export interface FieldChangedParams {
 
 export interface ItemCoreProps {
   name?: string;
-  ignore?: boolean;
+  nonform?: boolean;
   index?: number;
   trigger?: TriggerType; // 设置收集字段值变更的时机
   validateTrigger?: TriggerType | TriggerType[];
@@ -73,8 +73,8 @@ export const ItemCore = (props: ItemCoreProps) => {
 
   const fieldProps = { ...restProps, valueProp, valueGetter, trigger };
 
-  const ignore = rest?.ignore || rest?.readOnly;
-  const currentPath = (isEmpty(name) || ignore === true) ? undefined : name;
+  const nonform = rest?.nonform || rest?.readOnly;
+  const currentPath = (isEmpty(name) || nonform === true) ? undefined : name;
   const initValue = initialValue ?? deepGet(initialValues, currentPath);
   const storeValue = form && form.getFieldValue(currentPath);
   const initialItemValue = storeValue ?? initValue;
@@ -102,9 +102,7 @@ export const ItemCore = (props: ItemCoreProps) => {
   useEffect(() => {
     if (!currentPath || !form) return;
     // 回填form.initialValues和回填form.values
-    if (initialItemValue !== undefined) {
-      form.setInitialValues(currentPath, initialItemValue);
-    }
+    form.setInitialValues(currentPath, initialItemValue);
     onFieldsMounted && onFieldsMounted({ name: currentPath, value: initialItemValue }, form?.getFieldValue());
     return () => {
       // 清除该表单域的props(在设置值的前面)

@@ -100,7 +100,7 @@ export class SimpleForm<T extends Object = any> {
     if (!path) return;
     const props = this.getFieldProps(path);
     const currentValue = this.getFieldValue(path);
-    const { valueProp, valueSetter, trigger, validateTrigger, rules } = props || {};
+    const { valueProp, valueSetter, trigger, validateTrigger, rules, nonform } = props || {};
     const valuePropName = getValuePropName(valueProp);
     const triggers = getTriggers(trigger, validateTrigger, getRulesTriggers(rules));
     const childValue = typeof valueSetter === 'function' ? valueSetter(currentValue) : (valueSetter ? undefined : currentValue);
@@ -114,7 +114,7 @@ export class SimpleForm<T extends Object = any> {
         this.bindChange(path, eventName, ...args);
       };
     });
-    return bindProps;
+    return nonform === true ? {} : bindProps;
   }
 
   // 设置表单域
@@ -240,9 +240,9 @@ export class SimpleForm<T extends Object = any> {
       this.setFieldError(path, undefined);
       const fieldProps = this.getFieldProps(path) || {};
       const value = this.getFieldValue(path);
-      const ignore = fieldProps?.ignore;
+      const nonform = fieldProps?.nonform;
       const canTrigger = isCanTrigger(eventName, fieldProps?.['validateTrigger']);
-      if (canTrigger && ignore !== true) {
+      if (canTrigger && nonform !== true) {
         const rules = fieldProps['rules'] as FormRule[];
         const error = await handleRules(rules, value, eventName);
         if (error) {

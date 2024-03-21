@@ -20,7 +20,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   } = props;
 
   const context = useEditorContext();
-  const { selected, editor, editorConfig } = context?.state || {};
+  const { selected, editor, editorForm, editorConfig } = context?.state || {};
   const selectedPath = selected?.path;
   const form = useSimpleForm();
   const cls = classnames(prefixCls, className);
@@ -49,6 +49,11 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = ({ name, value }) => {
     const curPath = joinFormPath(selectedPath, name);
     setWidgetItem(editor, value, curPath);
+    // 同步编辑区域初始值展示
+    if (name === 'initialValue') {
+      const item = getWidgetItem(editor, selectedPath);
+      editorForm?.setFieldValue(item.name, value);
+    }
   };
 
   const renderCommonList = () => {

@@ -45,14 +45,16 @@ function EditorTools(props: EditorToolsProps) {
   // 撤销
   const undo = () => {
     historyRecord?.undo((serialized) => {
-      setWidgetItem(editor, JSON.parse(serialized || '[]'));
+      const newData = JSON.parse(serialized || '[]');
+      setWidgetItem(editor, newData);
     });
   };
 
   // 重做
   const redo = () => {
     historyRecord?.redo((serialized) => {
-      setWidgetItem(editor, JSON.parse(serialized || '[]'));
+      const newData = JSON.parse(serialized || '[]');
+      setWidgetItem(editor, newData);
     });
   };
 

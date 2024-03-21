@@ -2,16 +2,19 @@ import React from "react";
 import classnames from "classnames";
 import './index.less';
 import ColumnSelection from "./column-selection";
-import TableDnd from './dnd';
 import { FormTableProps } from "..";
 import pickAttrs from '../../../../utils/pickAttrs';
-import { CustomFormRenderProps, Form } from "../../../formrender";
+import { CustomFormRenderProps, Form, joinFormPath } from "../../../formrender";
+import FormDnd from "../../../../view/FormDnd";
 
 const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
   columns = [],
   disabled,
   className,
   style,
+  path,
+  value,
+  onChange,
   ...rest
 }, ref) => {
 
@@ -31,9 +34,12 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
   const context = widgetItem?.context;
   const { settingForm } = context?.state || {};
 
-  const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = ({ value }) => {
+  // 监听列控件设置值
+  const columnInputChange: CustomFormRenderProps['onValuesChange'] = ({ value }) => {
     settingForm && settingForm.setFieldValue('initialValue', value);
   };
+
+  const columnsPath = joinFormPath(path, 'props.columns');
 
   return (
     <div
@@ -41,19 +47,29 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
       {...pickAttrs(rest)}
       style={style}
       ref={ref}>
-      <TableDnd {...rest}>
+      <FormDnd
+        className='table-dnd'
+        {...rest}
+        dndPath={columnsPath}
+        dndList={widgetItem?.props?.columns}
+        group={{
+          name: "table-columns",
+          pull: "clone",
+          put: ['sort-field', 'panel']
+        }}
+      >
         {
           columns?.map((column, colIndex) => {
             const { label, type, props, ...restColumn } = column;
             const columnInstance = rest?.formrender && rest.formrender.createFormElement({ type: type, props: Object.assign({ disabled, form: rest?.form, formrender: rest?.formrender }, props) });
             return (
-              <ColumnSelection key={colIndex} className={Classes.TableSelection} {...rest} column={column} colIndex={colIndex}>
+              <ColumnSelection key={colIndex} className={Classes.TableSelection} {...rest} path={columnsPath} column={column} colIndex={colIndex}>
                 <div className={Classes.TableCol}>
                   <div className={Classes.TableColHead}>
                     {label}
                   </div>
                   <div className={Classes.TableColBody}>
-                    <Form.Item {...restColumn} label="" onFieldsChange={onFieldsChange}>
+                    <Form.Item {...restColumn} label="" onValuesChange={columnInputChange}>
                       {React.isValidElement(columnInstance) ? ({ bindProps }: any) => React.cloneElement(columnInstance, bindProps) : columnInstance}
                     </Form.Item>
                   </div>
@@ -62,7 +78,7 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
             );
           })
         }
-      </TableDnd>
+      </FormDnd>
       {!columns?.length && <span className={Classes.placeholder}>将控件拖拽到此处</span>}
     </div>
   );

@@ -1,6 +1,6 @@
 import React from 'react';
 import Icon from '../../SvgIcon';
-import { defaultGetId, getWidgetItem, setWidgetItem } from '../../../../utils/utils';
+import { getWidgetItem, setWidgetItem } from '../../../../utils/utils';
 import FormTableColSetting from './column-setting';
 import BaseSelection, { BaseSelectionProps } from '../../../../view/BaseSelection';
 import { joinFormPath, CustomWidgetItem } from '../../../formrender';
@@ -30,8 +30,7 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
   } = props;
 
   const columns = widgetItem?.props?.columns || [];
-  const colmunsPath = joinFormPath(path, 'props.columns');
-  const colmunPath = joinFormPath(colmunsPath, colIndex);
+  const colmunPath = joinFormPath(path, colIndex);
   const context = widgetItem?.context;
   const { editorConfig } = context?.state || {};
 
@@ -57,7 +56,7 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
       ...column
     };
     cloneColumns.splice(nextColIndex, 0, newColumn);
-    setWidgetItem(editor, cloneColumns, colmunsPath);
+    setWidgetItem(editor, cloneColumns, path);
   };
 
   return (

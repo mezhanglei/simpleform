@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import './index.less';
 import RootDnd from './RootDnd';
 import ComponentSelection from './selection';
-import DefaultFormRender, { CustomFormRenderProps, getInitialValues, joinFormPath } from '../components/formrender';
+import DefaultFormRender, { CustomFormRenderProps, joinFormPath } from '../components/formrender';
 import { setWidgetItem } from '../utils/utils';
 import { FormEditorContextProps, useEditorContext } from '../context';
 import PlatContainer from '../tools/platContainer';
@@ -33,12 +33,9 @@ function EditorView(props: EditorViewProps) {
       ...old,
       widgetList: newData || []
     }));
-    // 从渲染数据中同步表单值
-    const initialValues = getInitialValues(newData) || {};
-    editorForm?.setFieldsValue(initialValues);
   };
 
-  // 监听选中项改动
+  // 监听编辑区域的初始表单值
   const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = ({ value }) => {
     setWidgetItem(editor, value, joinFormPath(beforeSelected?.path, 'initialValue'));
     settingForm && settingForm.setFieldValue('initialValue', value);
@@ -78,7 +75,7 @@ const renderItem: CustomFormRenderProps['renderItem'] = (props) => {
   const isItem = props?.widgetItem?.widgetList ? false : true;
   // 单个组件批量添加选区
   if (isItem) {
-    return <ComponentSelection data-path={props.path} {...props} key={props?.widgetItem?.uuid} />;
+    return <ComponentSelection data-path={props.path} {...props} />;
   }
   return children;
 };
