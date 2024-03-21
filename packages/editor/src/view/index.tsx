@@ -17,7 +17,7 @@ export interface EditorViewProps {
 function EditorView(props: EditorViewProps) {
 
   const context = useEditorContext();
-  const { platType = 'pc', beforeSelected, editor, editorForm, settingForm, widgetList } = context.state;
+  const { platType = 'pc', beforeSelected, editor, editorForm, settingForm, widgetList } = context?.state || {};
   const FormRender = context?.state?.FormRender || DefaultFormRender;
 
   const {
@@ -29,7 +29,7 @@ function EditorView(props: EditorViewProps) {
 
   const onRenderChange: CustomFormRenderProps['onRenderChange'] = (newData) => {
     console.log(newData, '表单');
-    context.dispatch((old) => ({
+    context?.dispatch((old) => ({
       ...old,
       widgetList: newData || []
     }));

@@ -103,7 +103,7 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
   return (
     <div ref={ref} className={cls} {...pickAttrs(restProps)} onClick={chooseItem} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
       {isOver && !isSelected && configLabel && <div className={classes.label}>{configLabel}</div>}
-      {isOver && <SvgIcon className={classes.close} key="close" name="close" onClick={deleteColumn} />}
+      {(isOver || isSelected) && <SvgIcon className={classes.close} key="close" name="close" onClick={deleteColumn} />}
       {isSelected && <div className={classes.tools}>{tools}</div>}
       {children}
     </div>

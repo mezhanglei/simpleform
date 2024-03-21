@@ -27,7 +27,7 @@ export const getListIndex = (editor?: SimpleFormRender | null, path?: string) =>
   return index;
 };
 
-// 根据节点的配置返回节点的初始值
+// 从配置中获取初始值
 export const getSettingInitial = (setting?: ConfigSettingItem) => {
   // // 从配置表单中获取初始属性
   const expandSetting = Object.values(setting || {}).reduce((pre, cur) => {
@@ -64,7 +64,7 @@ export const moveWidgetItem = (formrender?: SimpleFormRender | null, from?: { in
 // 插入新节点
 export const insertWidgetItem = (formrender?: SimpleFormRender | null, data?: CustomWidgetItem, index?: number, parent?: string) => {
   if (!formrender || !data) return;
-  const newData = data?.uuid ? data : Object.assign({ uuid: defaultGetId(data?.type) }, data);
+  const newData = Object.assign(data, { uuid: defaultGetId(data?.type) });
   formrender?.insertItemByIndex(newData, index, parent);
 };
 

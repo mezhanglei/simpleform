@@ -21,8 +21,8 @@ export interface FormEditorState {
   editor?: SimpleFormRender;
   settingForm?: SimpleForm | null;
   FormRender?: React.ComponentType<any> | React.ForwardRefExoticComponent<any>;
-  selected?: { path?: string; appendSetting?: ConfigSettingItem };
-  beforeSelected?: { path?: string; appendSetting?: ConfigSettingItem };
+  selected?: { path?: string; setting?: ConfigSettingItem };
+  beforeSelected?: { path?: string; setting?: ConfigSettingItem };
   widgetList?: FormDesignData;
   editorConfig?: Record<string, CustomWidgetItem>;
   platType?: PlatType;
@@ -72,9 +72,8 @@ export function useEditorState(initialState: FormEditorState) {
   return [Object.assign({ historyRecord: historyRef.current }, state), dispatch] as const;
 };
 
-
 // 编辑器的context
-export const FormEditorContext = React.createContext<FormEditorContextProps>({});
+export const FormEditorContext = React.createContext<FormEditorContextProps>({ state: {}, dispatch: () => { } });
 
 // 消费context的值
 export function useEditorContext() {

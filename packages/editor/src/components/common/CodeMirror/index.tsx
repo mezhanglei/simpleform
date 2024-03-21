@@ -100,8 +100,8 @@ export const EditorCodeMirrorModal = (props: EditorCodeMirrorProps) => {
   const handleOk = (closeModal: () => void) => {
     const codemirror = codemirrorRef.current;
     if (!codemirror) return;
-    const code = codemirror.getCode() || '';
-    const codeStr = codemirror.getStr() || '';
+    const code = codemirror.getCode?.() || '';
+    const codeStr = codemirror.getStr?.() || '';
     closeModal();
     setCodeStr(codeStr);
     onChange && onChange(code);

@@ -22,7 +22,7 @@ function FormDnd(props: ControlDndProps, ref: any) {
     const dropIndex = params?.newIndex;
     const dropPath = joinFormPath(path, dropIndex);
     moveWidgetItem(formrender, { index: fromIndex, parent: fromParent }, { index: dropIndex, parent: fromParent });
-    context?.dispatch && context.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: dropPath }) }));
+    context?.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: dropPath }) }));
     historyRecord?.save();
     console.log(params, fromParent, dropPath, '同域拖放');
   };
@@ -39,7 +39,7 @@ function FormDnd(props: ControlDndProps, ref: any) {
       const configItem = getConfigItem(fromId, editorConfig);
       const newItem = configItem?.panel?.nonform ? configItem : Object.assign({ name: defaultGetId(fromId) }, configItem);
       insertWidgetItem(formrender, newItem, dropIndex, path);
-      context?.dispatch && context.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: dropPath }) }));
+      context?.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: dropPath }) }));
     } else {
       const fromParent = getParent(params?.item?.dataset?.path);
       const fromIndex = params?.oldIndex;
@@ -48,7 +48,7 @@ function FormDnd(props: ControlDndProps, ref: any) {
       const dropParent = path;
       const dropPath = joinFormPath(dropParent, dropIndex);
       moveWidgetItem(formrender, { index: fromIndex, parent: fromParent }, { index: dropIndex, parent: dropParent });
-      context?.dispatch && context.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: dropPath }) }));
+      context?.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: dropPath }) }));
     }
     historyRecord?.save();
   };

@@ -389,7 +389,7 @@ Sourced from [@simpleform/form](../form);
 - `setItemByPath`: `(data?: any, path?: string) => void` Sets the corresponding node according to `path`.
 - `delItemByPath`: `(path?: string) => void` Removes the node corresponding to the path `path`.
 - `insertItemByIndex`: `(data: WidgetItem | WidgetItem[], index?: number, parent?: string) => void` Adds a node based on the serial number and the path of the parent node.
-- `getItemByPath`: `(path?: string) => void` Get the node corresponding to the path `path`.
+- `getItemByPath`: `(path: string) => void` Get the node corresponding to the path `path`.
 - `moveItemByPath`: `(from: { parent?: string, index: number }, to: { parent?: string, index?: number })` Swap options in the tree from one position to another
 - `setWidgetList`: `(data?: WidgetList) => void` Sets the `widgetList` attribute of the form.
 

@@ -46,7 +46,7 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
     });
     context?.dispatch && context?.dispatch((old) => ({
       ...old,
-      selected: Object.assign({ appendSetting: mergeSetting }, selected)
+      selected: Object.assign({ setting: mergeSetting }, selected)
     }));
   };
 

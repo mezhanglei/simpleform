@@ -1,7 +1,7 @@
 import React, { CSSProperties } from 'react';
 import classnames from 'classnames';
 import './index.less';
-import { Button, Divider, Radio, Tooltip } from 'antd';
+import { Button, Divider, Flex, Radio, Tooltip } from 'antd';
 import { FormEditorContextProps, useEditorContext } from '../context';
 import SvgIcon from '../components/common/SvgIcon';
 import { PlatOptions } from './platContainer';
@@ -19,7 +19,7 @@ export interface EditorToolsProps {
 function EditorTools(props: EditorToolsProps) {
 
   const context = useEditorContext();
-  const { platType = 'pc', widgetList, editor, historyRecord } = context.state;
+  const { platType = 'pc', widgetList, editor, historyRecord } = context?.state || {};
 
   const {
     style,
@@ -93,12 +93,12 @@ function EditorTools(props: EditorToolsProps) {
             buttonStyle="solid"
           />
         </div>
-        <div>
+        <Flex wrap="wrap" gap="small" align="center">
           {renderTools ? renderTools(context) : null}
           <Button type='link' onClick={showPreview}>预览</Button>
           <Button type='link' onClick={clearEditor}>清空</Button>
           <Button type='link' onClick={showExportJson}>生成JSON</Button>
-        </div>
+        </Flex>
       </header>
   );
 };

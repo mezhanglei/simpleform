@@ -70,12 +70,12 @@ function EditorPanel(props: EditorPanelProps) {
   } = props;
 
   const context = useEditorContext();
-  const { selected, editor, editorConfig, historyRecord } = context.state;
+  const { selected, editor, editorConfig, historyRecord } = context?.state;
   const cls = classnames(prefixCls, className);
 
   const onChange = (key: string) => {
     const newIndex = getListIndex(editor, selected?.path) + 1; // 插入位置序号
-    const configItem = getConfigItem(key, editorConfig); // 提取默认值
+    const configItem = getConfigItem(key, editorConfig); // 插入新组件
     const newItem = configItem?.panel?.nonform ? configItem : Object.assign({ name: defaultGetId(configItem?.type) }, configItem);
     insertWidgetItem(editor, newItem, newIndex, getParent(selected?.path));
     historyRecord?.save();

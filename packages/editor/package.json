@@ -1,6 +1,6 @@
 {
   "name": "@simpleform/editor",
-  "version": "3.0.6",
+  "version": "3.0.7",
   "description": "editor for simple form",
   "author": "mezhanglei <496623925@qq.com>",
   "homepage": "https://github.com/mezhanglei/simpleform#readme",
@@ -28,6 +28,7 @@
   "scripts": {
     "build:dist": "cross-env NODE_ENV=dist webpack --progress --config ./build/webpack.prod.js",
     "build": "cross-env NODE_ENV=prod webpack --progress --config ./build/webpack.prod.js && tsc -d",
+    "tslint": "tsc -d",
     "stats": "cross-env NODE_ENV=prod webpack --progress --config ./build/webpack.prod.js --json > stats.json",
     "start": "cross-env NODE_ENV=dev webpack serve --config ./build/webpack.dev.js",
     "lint": "eslint --ext=.js,.ts,.jsx,.tsx src/",
@@ -47,7 +48,9 @@
     "@codemirror/lang-json": "^6.0.1",
     "@simpleform/form": "^2.0.9",
     "@simpleform/render": "^3.0.6",
+    "@types/file-saver": "^2.0.7",
     "@types/js-beautify": "^1.14.3",
+    "@types/quill": "^2.0.14",
     "@uiw/react-codemirror": "^4.21.21",
     "axios": "^1.6.2",
     "classnames": "^2.3.2",

@@ -20,7 +20,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
   } = props;
 
   const context = useEditorContext();
-  const { selected, editor, editorConfig } = context.state;
+  const { selected, editor, editorConfig } = context?.state || {};
   const selectedPath = selected?.path;
   const form = useSimpleForm();
   const cls = classnames(prefixCls, className);
@@ -28,12 +28,12 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
     if (!selected) return;
     const selectedItem = getWidgetItem(editor, selected?.path);
     const configSetting = editorConfig?.[selectedItem?.type || '']?.setting;
-    const appendSetting = selected?.appendSetting;
-    return appendSetting || configSetting;
+    const setting = selected?.setting;
+    return setting || configSetting;
   }, [editor, selectedPath, editorConfig]);
 
   useEffect(() => {
-    context.dispatch((old) => ({ ...old, settingForm: form }));
+    context?.dispatch((old) => ({ ...old, settingForm: form }));
   }, []);
 
   useEffect(() => {

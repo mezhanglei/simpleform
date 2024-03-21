@@ -95,7 +95,7 @@ const FileUpload = React.forwardRef<any, FileUploadProps>((props, ref) => {
           cloneData[insertIndex] = { ...file, percent: complete };
           setFileList(cloneData);
         }
-      }).then((res) => {
+      }).then((res: any) => {
         const data = res.data;
         const params = uploadCallback ? uploadCallback(data) : {};
         cloneData[insertIndex] = { ...file, status: 'success', ...params };

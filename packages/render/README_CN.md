@@ -393,7 +393,7 @@ export default function Demo(props) {
 - `setItemByPath`: `(data?: any, path?: string) => void` 根据`path`设置对应的节点
 - `delItemByPath`: `(path?: string) => void` 删除路径`path`对应的节点
 - `insertItemByIndex`: `(data: WidgetItem | WidgetItem[], index?: number, parent?: string) => void` 根据序号和父节点路径添加节点
-- `getItemByPath`: `(path?: string) => void` 获取路径`path`对应的节点
+- `getItemByPath`: `(path: string) => void` 获取路径`path`对应的节点
 - `moveItemByPath`: `(from: { parent?: string, index: number }, to: { parent?: string, index?: number })` 把树中的选项从一个位置调换到另外一个位置
 - `setWidgetList`: `(data?: WidgetList) => void` 设置表单的`widgetList`属性;
 
