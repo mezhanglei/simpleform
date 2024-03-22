@@ -27,7 +27,10 @@ const GridCol = React.forwardRef<any, CustomColProps>((props, ref) => {
     <CustomCol ref={ref} style={style} className={cls} {...rest}>
       {isEditor ?
         <ColSelection {...rest} >
-          <FormDnd {...rest} dndPath={joinFormPath(rest?.path, 'widgetList')} dndList={widgetItem?.widgetList || []}>
+          <FormDnd
+            {...rest}
+            dndPath={joinFormPath(rest?.path, 'widgetList')}
+            dndList={widgetItem?.widgetList || []}>
             {children}
           </FormDnd>
         </ColSelection>

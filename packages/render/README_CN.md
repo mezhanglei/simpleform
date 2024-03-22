@@ -2,7 +2,7 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-3.0.7-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-3.0.9-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 轻量级动态表单引擎，实现动态渲染表单很简单.
 
@@ -308,67 +308,107 @@ export default function Demo(props) {
 }
 ```
 ### 4. 数组数据
-支持数组渲染
+复杂的列表渲染增删改功能demo
 ```javascript
-import React, { useState } from 'react';
-import FormRender, { useSimpleForm } from './form-render';
+import React, { useEffect, useState } from 'react';
+import FormRender, { CustomFormRenderProps, useSimpleForm } from './form-render';
 import { Button } from 'antd';
-export default function Demo(props) {
-  const form = useSimpleForm();
-  const widgetList =
-    [
-      {
-        label: "list-0",
-        name: 'list[0]',
-        rules: [{ required: true, message: 'list[0] empty' }],
-        initialValue: 1,
-        type: 'Input',
-        props: {}
-      },
-      {
-        label: "list-1",
-        name: 'list[1]',
-        rules: [{ required: true, message: 'list[1] empty' }],
-        initialValue: 2,
-        type: 'Input',
-        props: {}
-      },
-      {
-        label: "list-2",
-        name: 'list[2]',
-        rules: [{ required: true, message: 'list[2] empty' }],
-        initialValue: 3,
-        type: 'Input',
-        props: {}
-      },
-      {
-        label: "list-3",
-        name: 'list[3]',
-        rules: [{ required: true, message: 'list[3] empty' }],
-        initialValue: 4,
-        type: 'Input',
-        props: {}
-      },
-    ];
 
-  const onSubmit = async (e) => {
-    e?.preventDefault?.();
-    const result = await form.validate();
-    console.log(result, 'result');
+const OptionList = React.forwardRef<HTMLElement, any>((props, ref) => {
+
+  const {
+    value,
+    onChange,
+    ...rest
+  } = props;
+
+  const intialValue = [{ label: '', value: '' }];
+  const [dataSource, setDataSource] = useState<Array<any>>([]);
+  const form = useSimpleForm();
+
+  useEffect(() => {
+    const options = value || [...intialValue];
+    setDataSource(options);
+    form.setFieldsValue(options);
+  }, [value]);
+
+  const widgetList = dataSource.map((item, index) => ({
+    type: 'row',
+    props: {
+      gutter: 12,
+      align: 'middle',
+      className: classes.item
+    },
+    widgetList: [
+      {
+        name: `[${index}]label`,
+        compact: true,
+        outside: { type: 'col', props: { span: 9 } },
+        rules: [{ required: true }],
+        type: 'Input',
+        props: {
+          placeholder: 'label',
+          style: { width: '100%' }
+        }
+      },
+      {
+        name: `[${index}]value`,
+        compact: true,
+        outside: { type: 'col', props: { span: 9 } },
+        rules: [{ required: true }],
+        type: 'Input',
+        props: {
+          placeholder: 'value',
+          style: { width: '100%' }
+        }
+      },
+      {
+        outside: { type: 'col', props: { span: 6 } },
+        typeRender: <Button type="link" onClick={() => deleteItem(index)}>delete</Button>
+      },
+    ]
+  }));
+
+  const deleteItem = (index: number) => {
+    const oldData = [...dataSource];
+    if (!oldData) return;
+    const newData = [...oldData];
+    newData.splice(index, 1);
+    setDataSource(newData);
+    form.setFieldsValue(newData);
+    onChange && onChange(newData);
+  };
+
+  const addItem = () => {
+    const { error } = await form.validate();
+    if (error) {
+      return;
+    }
+    const newData = dataSource.concat(intialValue);
+    form.setFieldsValue(newData);
+    setDataSource(newData);
+  };
+
+  const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = (_, values) => {
+    setDataSource(values);
+    onChange && onChange(values);
   };
 
   return (
-    <div style={{ padding: '0 8px' }}>
+    <div>
       <FormRender
         form={form}
         widgetList={widgetList}
+        onFieldsChange={onFieldsChange}
       />
-      <div style={{ marginLeft: '120px' }}>
-        <Button onClick={onSubmit}>submit</Button>
-      </div>
+      <Button type="link" onClick={addItem}>
+        add
+      </Button>
     </div>
   );
-}
+});
+
+export default OptionList;
 ```
 
 ## API
@@ -465,8 +505,8 @@ export interface GenerateParams<T = {}> {
   form?: SimpleForm;
 };
 ```
-### 表单的中涉及的path路径规则
-表单允许嵌套，所以表单中会涉及寻找某个属性。其路径遵循一定的规则
+### 表单控件name字段的规则
+`name`字段可表示数组或对象中某个属性字段的位置路径
 
 举例：
 - `a[0]`表示数组a下面的第一个选项

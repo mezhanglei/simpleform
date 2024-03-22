@@ -53,8 +53,9 @@ export const pickObject = <T = any>(obj: T | undefined, keys: string[] | ((key?:
 };
 
 // 根据路径获取目标对象中的单个值或多个值
-export function deepGet(obj: object | undefined, keys?: string | Array<string | number>): any {
+export function deepGet(obj: any, keys?: string | Array<string | number>): any {
   if (!keys?.length) return;
+  if (typeof obj !== 'object') return;
   if (keys instanceof Array) {
     const result = obj instanceof Array ? [] : {};
     for (let key of keys) {
@@ -72,6 +73,9 @@ export function deepGet(obj: object | undefined, keys?: string | Array<string | 
 export function deepSet<T = any>(obj: T, path?: string | Array<string | number>, value?: any) {
   const parts = pathToArr(path);
   if (!parts?.length) return obj;
+  if (isEmpty(deepGet(obj, path)) && value === undefined) {
+    return obj;
+  }
 
   // 判断是否为数组序号
   const isNumberIndex = (code?: string | number) => {
@@ -104,11 +108,6 @@ export function deepSet<T = any>(obj: T, path?: string | Array<string | number>,
     } else {
       const currentValue = temp[current];
       if (isEmpty(currentValue)) {
-        // 如果目标值也是赋值undefined则提前结束查找
-        if (value == undefined) {
-          handleTarget();
-          return root;
-        }
         temp[current] = isNumberIndex(next) ? [] : {};
       }
     }

@@ -1,9 +1,7 @@
-import { Col, Select, Input, Row } from "antd";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import './modal.less';
-import { useTableData } from "../../../utils/hooks";
 import SvgIcon from "../SvgIcon";
-import DefaultFormRender, { CommonWidgetProps, CustomWidgetItem, FieldChangedParams } from "../../formrender";
+import DefaultFormRender, { useSimpleForm, CommonWidgetProps, CustomWidgetItem, CustomFormRenderProps } from "../../formrender";
 import { codeToRule, ruleToCodeStr } from "./utils";
 import CustomModal, { CustomModalProps } from "../AntdModal";
 
@@ -50,24 +48,93 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
     ...rest
   } = props;
 
-  const initialValue: RuleSettingItem[] = [{}];
-
-  const {
-    dataSource,
-    setDataSource,
-    addItem,
-    updateItem,
-    deleteItem
-  } = useTableData<RuleSettingItem>(initialValue);
-
+  const initialValue: RuleSettingItem[] = [{ assemble: '||' }];
   const context = widgetItem?.context;
   const FormRender = context?.state?.FormRender || DefaultFormRender;
+  const form = useSimpleForm();
+  const [dataSource, setDataSource] = useState<RuleSettingItem[]>([]);
 
   useEffect(() => {
     const currentValue = typeof value === 'string' ? value : undefined;
     const ruleData = codeToRule(currentValue);
-    setDataSource(ruleData.length ? ruleData : initialValue);
+    const options = ruleData.length ? ruleData : [...initialValue]
+    setDataSource(options);
+    form.setFieldsValue(options);
   }, [value]);
+
+  const widgetList = dataSource.map((item, index) => ({
+    widgetList: [
+      {
+        name: `[${index}]assemble`,
+        compact: true,
+        hidden: index === 0,
+        type: 'Select',
+        props: {
+          className: classes.assemble,
+          options: assembleOptions
+        }
+      },
+      {
+        type: 'row',
+        props: {
+          gutter: 8,
+          className: classes.row,
+          align: "middle"
+        },
+        widgetList: [
+          {
+            outside: { type: 'col', props: { span: 1 } },
+            typeRender: <span className={classes.itemPrefix}>当</span>
+          },
+          {
+            outside: { type: 'col', props: { span: 8 } },
+            compact: true,
+            name: `[${index}]code`,
+            type: "Input.TextArea",
+            props: {
+              placeholder: "formvalues['表单字段'] == 值",
+            }
+          },
+          {
+            outside: { type: 'col', props: { span: 5 } },
+            typeRender: <span className={classes.itemSuffix}>时，设置为</span>
+          },
+          {
+            outside: { type: 'col', props: { span: 5 } },
+            name: `[${index}]value`,
+            compact: true,
+            ...widgetConfig
+          },
+          {
+            outside: { type: 'col', props: { span: 5 } },
+            typeRender: index === 0 ?
+              <SvgIcon name="add" className={classes.icon} onClick={() => addNewItem()} />
+              :
+              <SvgIcon name="delete" className={classes.icon} onClick={() => deleteItem(index)} />
+          }
+        ]
+      }
+    ]
+  }));
+
+  const addNewItem = () => {
+    const newDataSource = dataSource.concat(initialValue);
+    form.setFieldsValue(newDataSource);
+    setDataSource(newDataSource);
+  };
+
+  const deleteItem = (index: number) => {
+    const oldData = [...dataSource];
+    if (!oldData) return;
+    const newData = [...oldData];
+    newData.splice(index, 1);
+    form.setFieldsValue(newData);
+    setDataSource(newData);
+  };
+
+  const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = (_, values) => {
+    setDataSource(values);
+  };
 
   const handleOk = (closeModal: () => void) => {
     closeModal();
@@ -75,67 +142,14 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
     onChange && onChange(codeStr);
   };
 
-  const assembleChange = (val: any, rowIndex: number) => {
-    updateItem(val, rowIndex, "assemble");
-  };
-
-  const codeChange = (val: any, rowIndex: number) => {
-    updateItem(val, rowIndex, "code");
-  };
-
-  const valueChange = ({ value }: FieldChangedParams, index: number) => {
-    updateItem(value, index, "value");
-  };
-
-  const addNewItem = () => {
-    addItem([{ assemble: '||' }]);
-  };
-
-  const renderItem = (item: RuleSettingItem, index: number) => {
-    const { assemble, code, value } = item || {};
-    return (
-      <div key={index} className={classes.item}>
-        {
-          assemble ?
-            <Select className={classes.assemble} value={assemble} options={assembleOptions} onChange={(val) => assembleChange(val, index)} />
-            : null
-        }
-        <Row gutter={8} className={classes.row} align="middle">
-          <Col span={1}>
-            <span className={classes.itemPrefix}>当</span>
-          </Col>
-          <Col span={8}>
-            <Input.TextArea placeholder="formvalues['表单字段'] == 值" value={code} onChange={(e) => codeChange(e?.target?.value, index)} />
-          </Col>
-          <Col span={5}>
-            <span className={classes.itemSuffix}>时，设置为</span>
-          </Col>
-          <Col flex={1} style={{ width: '0' }}>
-            <FormRender
-              tagName="div"
-              initialValues={{ controlValue: value }}
-              widgetList={[{ name: 'controlValue', compact: true, ...(widgetConfig || {}) }]}
-              onFieldsChange={(params: any) => valueChange(params, index)}
-            />
-          </Col>
-          <Col span={2}>
-            {
-              index === 0 ?
-                <SvgIcon name="add" className={classes.icon} onClick={addNewItem} />
-                :
-                <SvgIcon name="delete" className={classes.icon} onClick={() => deleteItem(index)} />
-            }
-          </Col>
-        </Row>
-      </div>
-    );
-  };
 
   return (
     <CustomModal onOk={handleOk} className={classes.cls} title={title} displayElement={displayElement}>
-      {
-        dataSource instanceof Array && dataSource?.map((item, index) => renderItem(item, index))
-      }
+      <FormRender
+        form={form}
+        widgetList={widgetList}
+        onFieldsChange={onFieldsChange}
+      />
     </CustomModal>
   );
 });

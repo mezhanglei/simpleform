@@ -8,6 +8,8 @@ export interface ControlDndProps extends Omit<CommonWidgetProps, 'onChange'>, Pa
   className?: string;
   style?: CSSProperties;
   children?: any;
+  dndPath?: string;
+  dndList?: Array<any>;
 }
 
 // 控件的拖放区域组件

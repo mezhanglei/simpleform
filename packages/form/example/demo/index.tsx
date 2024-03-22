@@ -6,13 +6,11 @@ import { Form, useSimpleForm, useFormValues } from '../../src';
 export default function Demo() {
 
   const form = useSimpleForm();
-  const [state, setState] = useState()
 
   const onSubmit = async (e) => {
     e.preventDefault();
     const { error, values } = await form.validate();
     console.log(error, values, 'error ang values');
-    setState(1)
   };
 
   const validator = (value) => {
@@ -21,13 +19,9 @@ export default function Demo() {
     }
   };
 
-  const handleChange = () => {
-    console.log(state, '监听');
-  };
-
   return (
     <Form initialValues={{ name1: 1111 }} form={form} onSubmit={onSubmit}>
-      <Form.Item tooltip='11111' onFieldsChange={handleChange} label="Name1" name="name1" rules={[{ required: true, message: 'name1 is Empty' }, { validator: validator, message: '自定义校验' }]}>
+      <Form.Item tooltip='11111' label="Name1" name="name1" rules={[{ required: true, message: 'name1 is Empty' }, { validator: validator, message: '自定义校验' }]}>
         {/* {({ bindProps }) => (
           <div>
             <input {...bindProps} />

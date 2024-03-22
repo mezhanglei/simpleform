@@ -38,13 +38,13 @@ const handleRule = async (rule?: FormRule | undefined, value?: any, eventName?: 
         if (typeof error.message == 'string') {
           return error.message;
         }
-        return defaultMessage;
+        return defaultMessage || true;
       }
       // 其他字段的校验，返回true表示报错
       // @ts-ignore
     } else if (typeof configRule === 'function') {
       if (configRule(ruleValue, value) === true) {
-        return defaultMessage;
+        return defaultMessage || true;
       }
     }
   }
