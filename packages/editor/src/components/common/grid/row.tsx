@@ -3,7 +3,7 @@ import RowSelection from './row-selection';
 import { RowProps } from 'antd';
 import classnames from 'classnames';
 import './row.less';
-import { CustomRow } from '../../formrender';
+import { CustomRow } from '../../../formrender';
 import { BaseSelectionProps } from '../../../view/BaseSelection';
 
 export type CustomRowProps = RowProps & BaseSelectionProps;

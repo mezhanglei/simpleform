@@ -5,7 +5,7 @@ import BaseSelection from '../../../view/BaseSelection';
 import classnames from 'classnames';
 import './row-selection.less';
 import { CustomRowProps } from './row';
-import { joinFormPath } from '../../formrender';
+import { joinFormPath } from '../../../formrender';
 
 /**
  * 给表单中的控件外围添加选中框

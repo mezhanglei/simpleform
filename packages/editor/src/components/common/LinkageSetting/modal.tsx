@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import './modal.less';
 import SvgIcon from "../SvgIcon";
-import DefaultFormRender, { useSimpleForm, CommonWidgetProps, CustomWidgetItem, CustomFormRenderProps } from "../../formrender";
+import DefaultFormRender, { useSimpleForm, CommonWidgetProps, CustomWidgetItem, CustomFormRenderProps } from "../../../formrender";
 import { codeToRule, ruleToCodeStr } from "./utils";
 import CustomModal, { CustomModalProps } from "../AntdModal";
 

@@ -5,7 +5,7 @@ import './index.less';
 import CustomModal from '../AntdModal';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
-import { CommonWidgetProps } from '../../formrender';
+import { CommonWidgetProps } from '../../../formrender';
 
 
 export interface RichEditorProps extends CommonWidgetProps<string> {

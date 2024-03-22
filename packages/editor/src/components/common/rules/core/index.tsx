@@ -3,7 +3,7 @@ import SvgIcon from "../../SvgIcon";
 import './index.less';
 import CustomModal from "../../AntdModal";
 import classNames from "classnames";
-import DefaultFormRender, { Form, useSimpleForm, matchExpression, CommonWidgetProps, CustomWidgetItem } from "../../../formrender";
+import DefaultFormRender, { Form, useSimpleForm, matchExpression, CommonWidgetProps, CustomWidgetItem } from "../../../../formrender";
 import { Radio } from "antd";
 import ShowSettingModal from "../../LinkageSetting/ShowSettingModal";
 import { InputFormRule, InputFormRuleKey } from "..";

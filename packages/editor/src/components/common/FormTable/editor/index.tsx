@@ -4,8 +4,8 @@ import './index.less';
 import ColumnSelection from "./column-selection";
 import { FormTableProps } from "..";
 import pickAttrs from '../../../../utils/pickAttrs';
-import { CustomFormRenderProps, Form, joinFormPath } from "../../../formrender";
-import FormDnd from "../../../../view/FormDnd";
+import { CustomFormRenderProps, Form, joinFormPath } from "../../../../formrender";
+import BaseDnd from "../../../../view/BaseDnd";
 
 const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
   columns = [],
@@ -47,7 +47,7 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
       {...pickAttrs(rest)}
       style={style}
       ref={ref}>
-      <FormDnd
+      <BaseDnd
         className='table-dnd'
         {...rest}
         dndPath={columnsPath}
@@ -78,7 +78,7 @@ const EditorTable = React.forwardRef<HTMLTableElement, FormTableProps>(({
             );
           })
         }
-      </FormDnd>
+      </BaseDnd>
       {!columns?.length && <span className={Classes.placeholder}>将控件拖拽到此处</span>}
     </div>
   );

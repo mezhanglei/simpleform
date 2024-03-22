@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSimpleFormRender, useSimpleForm } from './components/formrender';
+import { useSimpleFormRender, useSimpleForm } from './formrender';
 import { FormEditorContext, FormEditorState, useEditorState } from './context';
 import EditorConfig from './config';
 

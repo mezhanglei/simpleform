@@ -5,7 +5,7 @@ import { UploadFile } from 'antd/lib/upload/interface';
 import { objectToFormData } from '../../../utils/object';
 import { getBase64 } from './util';
 import { IMAGE_MIME_KEYS, isImageFile } from '../../../utils/mime';
-import { CommonWidgetProps } from '../../../components/formrender';
+import { CommonWidgetProps } from '../../../formrender';
 
 // 扩展后的文件类型
 export type FileItem = UploadFile & RcFile & Record<string, any>;

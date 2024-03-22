@@ -3,7 +3,7 @@ import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import './index.less';
 import { pickObject } from "../../../utils/object";
-import { CommonWidgetProps } from "../../formrender";
+import { CommonWidgetProps } from "../../../formrender";
 import RequiredComponent from "./required";
 import MinOrMaxComponent from "./minOrMax";
 import PatternComponent from "./pattern";

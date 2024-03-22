@@ -2,7 +2,7 @@ import classNames from "classnames";
 import React, { CSSProperties, useEffect } from "react";
 import CodeTextArea from "../CodeTextarea";
 import { EditorCodeMirrorModal } from "../CodeMirror";
-import DefaultFormRender, { useSimpleForm, FormRenderProps, CommonWidgetProps } from "../../formrender";
+import DefaultFormRender, { useSimpleForm, FormRenderProps, CommonWidgetProps } from "../../../formrender";
 
 export interface RequestResponseConfig {
   url?: string; // 请求的路径

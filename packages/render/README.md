@@ -439,7 +439,7 @@ Sourced from [@simpleform/form](../form);
 ## Other
 
 ### widgetList structure description
-Each item in the `widgetList` list is a rendering node, divided into a form control node and nonform node.
+Each item in the `widgetList` list is a rendering node, rendered from `type` and `props`. divided into a form control node and nonform node.
 - Form control nodes.
 Nodes with the `name` attribute are form control nodes and carry the form field component (`Form.Item`) by default, for example:
 ```javascript

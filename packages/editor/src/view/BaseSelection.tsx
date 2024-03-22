@@ -4,7 +4,7 @@ import './BaseSelection.less';
 import pickAttrs from '../utils/pickAttrs';
 import { FormEditorState } from '../context';
 import SvgIcon from '../components/common/SvgIcon';
-import { CommonWidgetProps } from '../components/formrender';
+import { CommonWidgetProps } from '../formrender';
 import { delWidgetItem } from '../utils/utils';
 
 export interface BaseSelectionProps extends CommonWidgetProps, Omit<React.HtmlHTMLAttributes<HTMLDivElement>, 'onSelect' | 'onChange'> {

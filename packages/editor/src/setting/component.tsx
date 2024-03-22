@@ -1,6 +1,6 @@
 import React, { CSSProperties, useEffect, useMemo } from 'react';
 import classnames from 'classnames';
-import { CustomFormRenderProps, Form, FormChildren, joinFormPath, useSimpleForm } from '../components/formrender';
+import { CustomFormRenderProps, Form, FormChildren, joinFormPath, useSimpleForm } from '../formrender';
 import { asyncSettingForm, getWidgetItem, setWidgetItem } from '../utils/utils';
 import './component.less';
 import CustomCollapse from '../components/common/Collapse';

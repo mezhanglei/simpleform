@@ -5,7 +5,7 @@ import BaseSelection from '../../../view/BaseSelection';
 import classnames from 'classnames';
 import './col-selection.less';
 import { CustomColProps } from './col';
-import { getParent } from '../../formrender';
+import { getParent } from '../../../formrender';
 
 /**
  * 给表单中的控件外围添加选中框

@@ -443,7 +443,7 @@ export default OptionList;
 ## 其他
 
 ### widgetList结构说明
-`widgetList`列表中每一项均为一个渲染节点, 分为表单控件节点和非控件节点
+`widgetList`列表中每一项均为一个渲染节点, 由`type`和`props`渲染而成, 分为表单控件节点和非控件节点
 - 表单控件节点:
 具有`name`属性的节点为表单控件节点，默认携带表单域组件(`Form.Item`)，举例：
 ```javascript

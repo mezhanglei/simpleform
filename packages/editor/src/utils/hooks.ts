@@ -1,5 +1,21 @@
 import { useRef, useState } from "react";
-import { deepSet } from "../components/formrender";
+import { deepSet } from "../formrender";
+
+export function useMethod<T extends (...args: any[]) => any>(method: T) {
+  const { current } = useRef<{ method: T, func: T | undefined }>({
+    method,
+    func: undefined,
+  });
+  current.method = method;
+
+  // 只初始化一次
+  if (!current.func) {
+    // 返回给使用方的变量
+    current.func = ((...args: unknown[]) => current.method.call(current.method, ...args)) as T;
+  }
+
+  return current.func;
+}
 
 // 处理列表型的数据
 export function useTableData<T = any>(intialValue?: T[], onChange?: (data: T[]) => void) {

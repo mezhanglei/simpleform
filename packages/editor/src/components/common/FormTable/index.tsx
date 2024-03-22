@@ -1,6 +1,6 @@
 import { ColumnType, TableProps } from 'antd/lib/table';
 import React, { CSSProperties } from 'react';
-import { CommonWidgetProps, CustomWidgetItem, GenerateWidgetItem } from '../../formrender';
+import { CommonWidgetProps, CustomWidgetItem, GenerateWidgetItem } from '../../../formrender';
 import EditorTable from './editor';
 import FormTable from './render';
 

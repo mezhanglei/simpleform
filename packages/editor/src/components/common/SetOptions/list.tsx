@@ -2,7 +2,7 @@ import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import './list.less';
 import SvgIcon from "../SvgIcon";
-import DefaultFormRender, { CommonWidgetProps, CustomFormRenderProps, useSimpleForm } from "../../formrender";
+import DefaultFormRender, { CommonWidgetProps, CustomFormRenderProps, useSimpleForm } from "../../../formrender";
 
 interface OptionItem { label?: string, value?: string }
 export interface OptionListProps extends CommonWidgetProps<Array<OptionItem>> {

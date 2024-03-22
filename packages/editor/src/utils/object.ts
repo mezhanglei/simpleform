@@ -1,4 +1,4 @@
-import { deepGet } from "../components/formrender";
+import { deepGet } from "../formrender";
 import { copy } from "copy-anything";
 import { isEmpty, isObject } from "./type";
 

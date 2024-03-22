@@ -2,7 +2,7 @@ import { getListIndex, getWidgetItem, insertWidgetItem } from '../utils/utils';
 import React, { CSSProperties } from 'react';
 import BaseSelection, { BaseSelectionProps } from './BaseSelection';
 import SvgIcon from '../components/common/SvgIcon';
-import { getParent } from '../components/formrender';
+import { getParent } from '../formrender';
 
 export interface ControlSelectionProps extends BaseSelectionProps {
   children?: any;

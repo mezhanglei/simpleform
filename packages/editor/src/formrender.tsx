@@ -2,10 +2,10 @@ import DefaultFormRender, { FormChildren as DefaultFormChildren, FormRenderProps
 import React from 'react';
 import dayjs from 'dayjs';
 import '@simpleform/render/lib/css/main.css';
-import widgets from '.';
-import { ConfigWidgetSetting, FormEditorContextProps } from '../context';
-import createRequest from '../utils/request';
-import bindRequest from './bind-request';
+import widgets from './components';
+import { ConfigWidgetSetting, FormEditorContextProps } from './context';
+import createRequest from './utils/request';
+import bindRequest from './components/bind-request';
 
 export * from '@simpleform/render';
 export { createRequest, bindRequest };

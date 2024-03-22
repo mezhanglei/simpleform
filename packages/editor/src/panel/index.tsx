@@ -4,7 +4,7 @@ import './index.less';
 import { defaultGetId, getConfigItem, getListIndex, insertWidgetItem } from '../utils/utils';
 import { ReactSortable } from "react-sortablejs";
 import { FormEditorContextProps, useEditorContext } from '../context';
-import { getParent } from '../components/formrender';
+import { getParent } from '../formrender';
 import { Tag } from 'antd';
 
 export interface PanelTagProps {

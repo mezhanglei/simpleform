@@ -3,7 +3,7 @@ import Icon from '../../SvgIcon';
 import { getWidgetItem, setWidgetItem } from '../../../../utils/utils';
 import FormTableColSetting from './column-setting';
 import BaseSelection, { BaseSelectionProps } from '../../../../view/BaseSelection';
-import { joinFormPath, CustomWidgetItem } from '../../../formrender';
+import { joinFormPath, CustomWidgetItem } from '../../../../formrender';
 
 export interface ColumnSelectionProps extends BaseSelectionProps {
   colIndex: number;

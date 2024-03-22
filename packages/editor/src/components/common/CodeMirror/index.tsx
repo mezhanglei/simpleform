@@ -8,7 +8,7 @@ import { convertToString, evalString } from '../../../utils/string';
 import { javascript } from '@codemirror/lang-javascript';
 import CodeMirror, { ViewUpdate } from '@uiw/react-codemirror';
 import { json } from "@codemirror/lang-json";
-import { CommonWidgetProps } from "../../formrender";
+import { CommonWidgetProps } from "../../../formrender";
 
 const prefixCls = 'custom-editor';
 const classes = {

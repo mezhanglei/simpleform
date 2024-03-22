@@ -6,7 +6,7 @@ import RequestSetting from './request';
 import OptionList from './list';
 import { EditorCodeMirror } from "../CodeMirror";
 import { getWidgetItem, setWidgetItem } from "../../../utils/utils";
-import { joinFormPath, CommonWidgetProps } from "../../formrender";
+import { joinFormPath, CommonWidgetProps } from "../../../formrender";
 
 /**
  * 数据源的配置组件。

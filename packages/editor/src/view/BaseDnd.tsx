@@ -1,8 +1,8 @@
 import { ReactSortable, ReactSortableProps } from "react-sortablejs";
 import React, { CSSProperties } from 'react';
-import './FormDnd.less';
+import './BaseDnd.less';
 import { defaultGetId, getConfigItem, insertWidgetItem, moveWidgetItem } from '../utils/utils';
-import { CommonWidgetProps, getParent, joinFormPath } from '../components/formrender';
+import { CommonWidgetProps, getParent, joinFormPath } from '../formrender';
 
 export interface ControlDndProps extends Omit<CommonWidgetProps, 'onChange'>, Partial<ReactSortableProps<any>> {
   className?: string;
@@ -13,7 +13,7 @@ export interface ControlDndProps extends Omit<CommonWidgetProps, 'onChange'>, Pa
 }
 
 // 控件的拖放区域组件
-function FormDnd(props: ControlDndProps & Record<string, any>, ref: any) {
+function BaseDnd(props: ControlDndProps & Record<string, any>, ref: any) {
   const { children, formrender, widgetItem, dndPath, dndList = [], setList = () => { }, ...rest } = props;
   const context = widgetItem?.context;
   const { editorConfig, historyRecord } = context?.state || {};
@@ -73,4 +73,4 @@ function FormDnd(props: ControlDndProps & Record<string, any>, ref: any) {
   );
 };
 
-export default React.forwardRef(FormDnd);
+export default React.forwardRef(BaseDnd);

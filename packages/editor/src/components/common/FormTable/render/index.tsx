@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { Button, message, Table, TableProps } from "antd";
-import { Form, joinFormPath } from "../../../formrender";
+import { Form, joinFormPath } from "../../../../formrender";
 import { TableCell } from "./components";
 import './index.less';
 import { useTableData } from "../../../../utils/hooks";

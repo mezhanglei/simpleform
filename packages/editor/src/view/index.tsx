@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import './index.less';
 import RootDnd from './RootDnd';
 import ComponentSelection from './selection';
-import DefaultFormRender, { CustomFormRenderProps, joinFormPath } from '../components/formrender';
+import DefaultFormRender, { CustomFormRenderProps, joinFormPath } from '../formrender';
 import { setWidgetItem } from '../utils/utils';
 import { FormEditorContextProps, useEditorContext } from '../context';
 import PlatContainer from '../tools/platContainer';
