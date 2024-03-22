@@ -39,6 +39,7 @@ const rulesSetting = [
   {
     name: 'rules',
     type: 'RulesGroup',
+    compact: true,
     props: {
       includes: ['required']
     }

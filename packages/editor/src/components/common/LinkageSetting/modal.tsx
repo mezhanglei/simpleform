@@ -48,7 +48,7 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
     ...rest
   } = props;
 
-  const initialValue: RuleSettingItem[] = [{ assemble: '||' }];
+  const initialValue: RuleSettingItem[] = [{}];
   const context = widgetItem?.context;
   const FormRender = context?.state?.FormRender || DefaultFormRender;
   const form = useSimpleForm();
@@ -57,7 +57,7 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
   useEffect(() => {
     const currentValue = typeof value === 'string' ? value : undefined;
     const ruleData = codeToRule(currentValue);
-    const options = ruleData.length ? ruleData : [...initialValue]
+    const options = ruleData.length ? ruleData : [...initialValue];
     setDataSource(options);
     form.setFieldsValue(options);
   }, [value]);
@@ -118,7 +118,7 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
   }));
 
   const addNewItem = () => {
-    const newDataSource = dataSource.concat(initialValue);
+    const newDataSource = dataSource.concat([{ assemble: '||' }]);
     form.setFieldsValue(newDataSource);
     setDataSource(newDataSource);
   };
@@ -146,6 +146,7 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
   return (
     <CustomModal onOk={handleOk} className={classes.cls} title={title} displayElement={displayElement}>
       <FormRender
+        tagName="div"
         form={form}
         widgetList={widgetList}
         onFieldsChange={onFieldsChange}

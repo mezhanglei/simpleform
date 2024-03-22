@@ -2,7 +2,7 @@
 
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-3.1.1-green)](https://www.npmjs.com/package/@simpleform/editor)
+[![](https://img.shields.io/badge/version-3.1.2-green)](https://www.npmjs.com/package/@simpleform/editor)
 
 > Based on `react` implementation of the form designer , support for custom components , template import and export , visual design and other form design features , the secondary development is very simple .
 
@@ -35,7 +35,7 @@ yarn add @simpleform/editor
 ```
 
 ## Quick Start
-Three steps: registering the `FormRender` component, `FormEditor` config that component, and config the `EditPanel` showcase list. Please check the code in `packages/editor/example/demo`.
+Three steps: registering the `FormRender` component, `FormEditor` config `editorConfig` of that component, and config the `EditPanel` showcase list. Please check the code in `packages/editor/example/demo`.
 ### 1.First customize the FormRender
 ```javascript
 import React from 'react';

@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import '@simpleform/render/lib/css/main.css';
 import widgets from '.';
 import { ConfigWidgetSetting, FormEditorContextProps } from '../context';
-import createRequest from './common/request';
+import createRequest from '../utils/request';
 import bindRequest from './bind-request';
 
 export * from '@simpleform/render';

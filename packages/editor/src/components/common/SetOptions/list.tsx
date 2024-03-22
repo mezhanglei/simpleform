@@ -31,7 +31,7 @@ const OptionList = React.forwardRef<HTMLElement, OptionListProps>((props, ref) =
   const form = useSimpleForm();
 
   useEffect(() => {
-    const options = value || [...intialValue];
+    const options = value instanceof Array ? value : [...intialValue];
     setDataSource(options);
     form.setFieldsValue(options);
   }, [value]);
@@ -101,6 +101,7 @@ const OptionList = React.forwardRef<HTMLElement, OptionListProps>((props, ref) =
   return (
     <div>
       <FormRender
+        tagName="div"
         form={form}
         widgetList={widgetList}
         onFieldsChange={onFieldsChange}

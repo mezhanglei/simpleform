@@ -2,7 +2,7 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-3.1.1-green)](https://www.npmjs.com/package/@simpleform/editor)
+[![](https://img.shields.io/badge/version-3.1.2-green)](https://www.npmjs.com/package/@simpleform/editor)
 
 > 基于`react`实现的表单设计器，支持自定义组件，模板导入导出，可视化设计等表单设计功能，二次开发非常简单。
 
@@ -32,7 +32,7 @@ yarn add @simpleform/editor
 ```
 
 ## 快速开始
-一共三步：注册渲染器`FormRender`的组件、`FormEditor`中配置该组件的信息、最后配置编辑器的`EditPanel`展示列表, 具体代码请在`packages/editor/example/demo`路径下查看
+一共三步：注册渲染器`FormRender`的组件、`FormEditor`中配置该组件的`editorConfig`、最后配置编辑器的`EditPanel`展示列表即可使用, 具体代码请在`packages/editor/example/demo`路径下查看
 ### 1.首先自定义渲染器FormRender
 ```javascript
 import React from 'react';
