@@ -337,7 +337,6 @@ const OptionList = React.forwardRef<HTMLElement, any>((props, ref) => {
     props: {
       gutter: 12,
       align: 'middle',
-      className: classes.item
     },
     widgetList: [
       {
