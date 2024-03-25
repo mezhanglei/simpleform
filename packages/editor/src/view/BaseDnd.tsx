@@ -1,6 +1,5 @@
 import { ReactSortable, ReactSortableProps } from "react-sortablejs";
 import React, { CSSProperties } from 'react';
-import './BaseDnd.less';
 import { defaultGetId, getConfigItem, insertWidgetItem, moveWidgetItem } from '../utils/utils';
 import { CommonWidgetProps, getParent, joinFormPath } from '../formrender';
 
