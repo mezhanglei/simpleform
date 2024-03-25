@@ -279,7 +279,7 @@ export class SimpleForm<T extends Object = any> {
       path: path
     });
     return () => {
-      this.formItemListeners = this.formItemListeners.filter((sub) => sub.path !== path);
+      this.unsubscribeFormItem();
     };
   }
   // 卸载
@@ -310,7 +310,7 @@ export class SimpleForm<T extends Object = any> {
       path: path
     });
     return () => {
-      this.formValueListeners = this.formValueListeners.filter((sub) => sub.path !== path);
+      this.unsubscribeFormValue(path);
     };
   }
   // 卸载
@@ -338,7 +338,7 @@ export class SimpleForm<T extends Object = any> {
   public subscribeFormValues(listener: FormListener['onChange']) {
     this.formValuesListeners.push(listener);
     return () => {
-      this.formValuesListeners = [];
+      this.unsubscribeFormValues();
     };
   }
   // 卸载
@@ -357,7 +357,7 @@ export class SimpleForm<T extends Object = any> {
       path: path
     });
     return () => {
-      this.errorListeners = this.errorListeners.filter((sub) => sub.path !== path);
+      this.unsubscribeError();
     };
   }
   // 卸载
