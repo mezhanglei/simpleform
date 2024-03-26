@@ -1,15 +1,9 @@
 import { copy } from 'copy-anything';
-import compare from 'react-fast-compare';
 import { isEmpty } from './type';
 import { isWithBracket } from './utils';
 
 export function deepClone<T = any>(value: T) {
   return copy(value);
-}
-
-// 判断两个值是否相等
-export function isEqual(a: any, b: any) {
-  return compare(a, b);
 }
 
 // 接收路径字符串或数组字符串，返回数组字符串表示路径

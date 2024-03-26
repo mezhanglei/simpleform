@@ -2,7 +2,7 @@ import { getValuePropName, isExitPrefix } from './utils/utils';
 import { deepClone, deepGet, deepSet } from './utils/object';
 import { handleRules, FormRule, isCanTrigger } from './validator';
 import { getRulesTriggers, getTriggers, ItemCoreProps, TriggerType } from './item-core';
-import { isObject } from './utils/type';
+import { isEmpty, isObject } from './utils/type';
 
 export type FormListener = { path: string, onChange: (newValue?: any, oldValue?: any) => void }
 
@@ -143,6 +143,10 @@ export class SimpleForm<T extends Object = any> {
 
   // 设置初始值
   public setInitialValues(path: string, initialValue: any) {
+    const oldValue = deepGet(this.lastValues, path);
+    if(isEmpty(oldValue) && initialValue == undefined) {
+      return;
+    }
     this.initialValues = deepSet(this.initialValues, path, initialValue);
     // 旧表单值存储
     this.lastValues = deepClone(this.values);

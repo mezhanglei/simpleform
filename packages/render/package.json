@@ -1,6 +1,6 @@
 {
   "name": "@simpleform/render",
-  "version": "3.0.10",
+  "version": "3.0.11",
   "description": "dynamic rendering core of simple form",
   "author": "mezhanglei <496623925@qq.com>",
   "homepage": "https://github.com/mezhanglei/simpleform#readme",
@@ -43,7 +43,7 @@
     "react-router-dom": "^6.19.0"
   },
   "dependencies": {
-    "@simpleform/form": "^2.0.14",
+    "@simpleform/form": "^2.0.15",
     "classnames": "^2.3.2",
     "copy-anything": "^3.0.5",
     "react-fast-compare": "^3.2.2"

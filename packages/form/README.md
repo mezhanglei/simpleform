@@ -1,7 +1,7 @@
 # `@simpleform/form`
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-2.0.13-green)](https://www.npmjs.com/package/@simpleform/form)
+[![](https://img.shields.io/badge/version-2.0.15-green)](https://www.npmjs.com/package/@simpleform/form)
 
 > The underlying form component, Binding of form values to display and update events is accomplished through callback functions.
 
