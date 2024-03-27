@@ -35,7 +35,7 @@ export function Form(props: FormProps) {
 
   useEffect(() => {
     if (!form || !watch) return;
-    Object.entries(watch)?.map(([key, watcher]) => {
+    Object.entries(watch)?.forEach(([key, watcher]) => {
       // 函数形式
       if (typeof watcher === 'function') {
         form?.subscribeFormValue(key, watcher);

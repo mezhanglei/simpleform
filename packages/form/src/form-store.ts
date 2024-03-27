@@ -144,7 +144,7 @@ export class SimpleForm<T extends Object = any> {
   // 设置初始值
   public setInitialValues(path: string, initialValue: any) {
     const oldValue = deepGet(this.lastValues, path);
-    if(isEmpty(oldValue) && initialValue == undefined) {
+    if (isEmpty(oldValue) && initialValue == undefined) {
       return;
     }
     this.initialValues = deepSet(this.initialValues, path, initialValue);
@@ -236,11 +236,11 @@ export class SimpleForm<T extends Object = any> {
   }
 
   // 校验整个表单或校验表单中的某个控件
-  public async validate(): Promise<ValidateResult<T>>
-  public async validate(path: string, eventName?: TriggerType | boolean): Promise<string>
+  public async validate(): Promise<ValidateResult<T> | undefined>
+  public async validate(path: string, eventName?: TriggerType | boolean): Promise<ValidateResult<T> | undefined>
   public async validate(path?: string | string[], eventName?: TriggerType | boolean) {
-    const singleValidate = async (path: string) => {
-      // 清空错误信息
+
+    const validateError = async (path: string) => {
       this.setFieldError(path, undefined);
       const fieldProps = this.getFieldProps(path) || {};
       const value = this.getFieldValue(path);
@@ -263,7 +263,7 @@ export class SimpleForm<T extends Object = any> {
         const fieldProps = fieldPropsMap?.[key];
         const rules = fieldProps?.['rules'];
         if (rules instanceof Array) {
-          return singleValidate(key);
+          return validateError(key);
         }
       }));
       const currentError = result?.filter((error) => error !== undefined)?.[0];
@@ -272,7 +272,11 @@ export class SimpleForm<T extends Object = any> {
         values: this.getFieldValue()
       };
     } else if (typeof path === 'string') {
-      return singleValidate(path);
+      const currentError = await validateError(path);
+      return {
+        error: currentError,
+        values: this.getFieldValue()
+      };
     }
   }
 
@@ -283,7 +287,7 @@ export class SimpleForm<T extends Object = any> {
       path: path
     });
     return () => {
-      this.unsubscribeFormItem();
+      this.unsubscribeFormItem(path);
     };
   }
   // 卸载
@@ -361,7 +365,7 @@ export class SimpleForm<T extends Object = any> {
       path: path
     });
     return () => {
-      this.unsubscribeError();
+      this.unsubscribeError(path);
     };
   }
   // 卸载
