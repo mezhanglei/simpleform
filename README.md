@@ -10,7 +10,7 @@ English | [中文说明](./README_CN.md)
 
 - [@simpleform/form](packages/form)：It's easy to build the base package for forms and implement two-way binding of form data.
 - [@simpleform/render](packages/render)：Dynamic rendering form engine that dynamically renders forms based on `JSON` data.
-- [@simpleform/editor](packages/editor)：Form designer, based on `@simpleform/form`, `@simpleform/render`. Quickly embed form editing/design functionality in `react` projects.
+- [@simpleform/editor](packages/editor)：Form designer, based on `@simpleform/render`. Quickly embed form editing/design functionality in `react` projects.
 
 ## Development
 

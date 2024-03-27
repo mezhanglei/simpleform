@@ -11,8 +11,8 @@ English | [中文说明](./README_CN.md)
  - Deprecated ~`onPropertiesChange`~ : replaced by `onRenderChange`.
  - All methods of `useSimpleFormRender()` are changed.
 ## Introduction
-- Component Registration: The form control used in `@simpleform/render` must be a controlled component with `value` and `onChange` `props`.
-- Component Description: `widgetList` array list describing the current form structure.
+- Component Registration(`components`): Registration of form controls and non-form components is required before use, in the case of form controls you need to support the `value` and `onChange` `props` inside the control.
+- Component Description(`widgetList`): We use a list to describe the interface UI structure, each item in the list represents a component node. Support for node nesting
 - Component Rendering: `Form` component handles the values of the form, `FormChildren` component handles the rendering of the form, a `Form` component can support multiple `FormChildren` components for internal rendering.
 - Component linkage: All form properties can support string expressions to describe linkage conditions (except `widgetList` property).
 

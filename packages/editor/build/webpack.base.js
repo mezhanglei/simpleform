@@ -191,11 +191,6 @@ module.exports = {
   },
   // 插件
   plugins: [
-    isDist && new CopyPlugin({
-      patterns: [
-        { from: paths.resolveApp('dist'), to: paths.resolveApp('../../docs/demo'), force: true },
-      ],
-    }),
     // 设置项目的全局变量,String类型, 如果值是个字符串会被当成一个代码片段来使用, 如果不是,它会被转化为字符串(包括函数)
     new webpack.DefinePlugin({
       'process.env': {
@@ -232,5 +227,10 @@ module.exports = {
     }),
     !isDev && configs.isAnalyz &&
     new BundleAnalyzerPlugin(),
+    isDist && new CopyPlugin({
+      patterns: [
+        { from: paths.outputPath, to: paths.resolveApp('../../docs/demo'), force: true },
+      ],
+    }),
   ]
 };

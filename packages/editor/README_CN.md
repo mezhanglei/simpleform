@@ -13,7 +13,7 @@
 ## 简介
 - 设计器组成：设计器包含六大模块
   * 配置上下文`EditorProvider`：提供编辑器的上下文环境
-  * 配置面板`EditorPanel`：配置组件可选择到编辑区
+  * 配置面板`EditorPanel`：配置已经注册的组件显示列表
   * 操作区域 `EditorTools`：设计器的操作区域
   * 编辑区域`EditorView`：设计器的编辑区域
   * 配置属性组件`EditorSetting`：鼠标选中组件时展示对应的属性配置表单

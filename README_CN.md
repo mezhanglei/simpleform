@@ -10,7 +10,7 @@
 
 - [@simpleform/form](packages/form)：构建表单的基础包，实现表单数据的双向绑定很简单。
 - [@simpleform/render](packages/render)：动态渲染表单引擎，可根据`JSON`数据动态渲染表单。
-- [@simpleform/editor](packages/editor)：表单设计器，基于`@simpleform/form`、`@simpleform/render`开发。可快速在`react`项目中嵌入表单编辑/设计功能。
+- [@simpleform/editor](packages/editor)：表单设计器，基于`@simpleform/render`开发。可快速在`react`项目中嵌入表单编辑/设计功能。
 
 ## 本地运行环境
 

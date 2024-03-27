@@ -12,8 +12,8 @@
  - `useSimpleFormRender()`的方法全部变更使用方式.
 
 ## 介绍
-- 组件注册: 在`@simpleform/render`中使用的表单控件必须是具有`value`和`onChange`两个`props`的受控组件.
-- 组件描述：`widgetList`数组列表描述当前的表单结构.
+- 组件注册(`components`属性): 使用之前需要注册表单控件和非表单组件，如果是表单控件需要控件内部支持`value`和`onChange`两个`props`.
+- 组件描述(`widgetList`属性)：我们使用列表来描述界面UI结构, 列表中的每一项都表示一个组件节点.支持节点嵌套
 - 组件渲染：`Form`组件处理表单的值, `FormChildren`组件处理表单的渲染, 一个`Form`组件可以支持多个`FormChildren`组件在内部渲染.
 - 组件联动：表单属性均可以支持字符串表达式描述联动条件(`widgetList`属性除外).
 
@@ -443,7 +443,7 @@ export default OptionList;
 ## 其他
 
 ### widgetList结构说明
-`widgetList`列表中每一项均为一个渲染节点, 由`type`和`props`渲染而成, 分为表单控件节点和非控件节点
+`widgetList`列表中每一项均为一个渲染节点, 由`type`和`props`渲染而成, 分为表单控件节点和非表单节点
 - 表单控件节点:
 具有`name`属性的节点为表单控件节点，默认携带表单域组件(`Form.Item`)，举例：
 ```javascript
@@ -456,7 +456,7 @@ const widgetList = [{
   props: {}
 }]
 ```
-- 普通组件节点:
+- 非表单节点:
 无`name`属性的节点。举例：
 ```javascript
 const widgetList = [{
