@@ -2,6 +2,7 @@ import { ReactSortable, ReactSortableProps } from "react-sortablejs";
 import React, { CSSProperties } from 'react';
 import { defaultGetId, getConfigItem, insertWidgetItem, moveWidgetItem } from '../utils/utils';
 import { CommonWidgetProps, getParent, joinFormPath } from '../formrender';
+import './BaseDnd.less';
 
 export interface ControlDndProps extends Omit<CommonWidgetProps, 'onChange'>, Partial<ReactSortableProps<any>> {
   className?: string;
@@ -67,7 +68,12 @@ function BaseDnd(props: ControlDndProps & Record<string, any>, ref: any) {
       className='editor-dnd'
       {...rest}
     >
-      {children}
+      {
+        // 处理非node节点
+        React.Children.map(children, (child, i) => {
+          return React.isValidElement(child) ? child : <div key={i}>{child}</div>;
+        })
+      }
     </ReactSortable>
   );
 };
