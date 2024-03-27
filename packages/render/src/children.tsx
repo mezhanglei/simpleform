@@ -97,7 +97,7 @@ export default function FormChildren(props: FormChildrenProps) {
           const widgetList = item[key] as WidgetList;
           const curPath = joinFormPath(path, key);
           widgetList.forEach((child, index) => {
-            const childPath = joinFormPath(curPath, `[${index}]`);
+            const childPath = joinFormPath(curPath, index);
             deepHandleItem(child, childPath);
           });
         } else {

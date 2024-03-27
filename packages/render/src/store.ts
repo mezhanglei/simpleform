@@ -34,7 +34,7 @@ export class SimpleFormRender {
     this.components = Object.assign({}, this.components, data);
   };
 
-  // 解析components
+  // 返回目标声明组件
   public getFormComponent(target?: CustomUnionType) {
     const typeMap = this.components;
     return getFormComponent(target, typeMap);

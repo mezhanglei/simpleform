@@ -1,24 +1,8 @@
-// 是否为类组件声明
-export function isClassComponent(component: any) {
-  return (
-    typeof component === 'function' &&
-    (component.prototype && component.prototype.isReactComponent)
-  );
-}
+import * as ReactIs from "react-is";
+import { isEmpty } from "./type";
 
-// 是否为函数组件
-export function isFunctionComponent(component: any) {
-  return (
-    typeof component === 'function'
-  );
-}
-
-// 是否为函数组件或类组件
-export function isReactComponent(component: any) {
-  return (
-    isClassComponent(component) ||
-    isFunctionComponent(component) ||
-    isClassComponent(component?.render || component?.type) ||
-    isFunctionComponent(component?.render || component?.type)
-  );
-}
+// 是否为组件(不包括html标签字符串)
+export function isValidComponent(component?: any) {
+  if (isEmpty(component) || typeof component === 'string') return;
+  return ReactIs.isValidElementType(component);
+};
