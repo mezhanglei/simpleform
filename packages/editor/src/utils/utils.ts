@@ -38,7 +38,7 @@ export const getSettingInitial = (setting?: ConfigWidgetSetting) => {
   return initialValues;
 };
 
-// 获取控件的配置属性
+// 返回配置组件信息
 export const getConfigItem = (type: string | undefined, editorConfig?: FormEditorState['editorConfig']) => {
   if (!type || !editorConfig) return;
   const item = editorConfig[type];
@@ -80,9 +80,3 @@ export const delWidgetItem = (formrender?: SimpleFormRender | null, path?: strin
   formrender?.delItemByPath(path);
 };
 
-// 同步选中项到属性面板回显
-export const asyncSettingForm = (editor?: SimpleFormRender | null, settingForm?: SimpleForm | null, selected?: FormEditorState['selected']) => {
-  if (isNoSelected(selected?.path) || !settingForm) return;
-  const item = getWidgetItem(editor, selected?.path);
-  settingForm.setFieldsValue(item);
-};

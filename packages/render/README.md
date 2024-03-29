@@ -2,14 +2,10 @@
 
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-3.0.13-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-3.0.14-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > A lightweight dynamic forms engine that makes it easy to dynamically render forms.
 
-* Break Change: Version >= 3.x is recommended, providing a better semanticized `JSON` structure.
- - Deprecated ~`properties`~ : Replaced by `widgetList`.
- - Deprecated ~`onPropertiesChange`~ : replaced by `onRenderChange`.
- - All methods of `useSimpleFormRender()` are changed.
 ## Introduction
 - Component Registration(`components`): Registration of form controls and non-form components is required before use, in the case of form controls you need to support the `value` and `onChange` `props` inside the control.
 - Component Description(`widgetList`): We use a list to describe the interface UI structure, each item in the list represents a component node. Support for node nesting
@@ -105,19 +101,7 @@ export default function FormRender(props: CustomFormRenderProps) {
 import { Button } from 'antd';
 import React, { useState } from 'react';
 import FormRender, { useSimpleForm, useSimpleFormRender } from './form-render';
-export default function Demo5(props) {
-
-  const watch = {
-    'name2': (newValue, oldValue) => {
-      console.log(newValue, oldValue)
-    },
-    'name3[0]': (newValue, oldValue) => {
-      console.log(newValue, oldValue)
-    },
-    'name4': (newValue, oldValue) => {
-      console.log(newValue, oldValue)
-    }
-  }
+export default function Demo(props) {
 
   const widgetList = [
     {
@@ -233,7 +217,7 @@ export default function Demo5(props) {
         form={form}
         // formrender={formrender}
         widgetList={widgetList}
-        watch={watch} />
+      />
       <div style={{ marginLeft: '120px' }}>
         <Button onClick={onSubmit}>submit</Button>
       </div>
@@ -375,7 +359,7 @@ const OptionList = React.forwardRef<HTMLElement, any>((props, ref) => {
     onChange && onChange(newData);
   };
 
-  const addItem = () => {
+  const addItem = async () => {
     const { error } = await form.validate();
     if (error) {
       return;

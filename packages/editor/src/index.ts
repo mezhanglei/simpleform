@@ -6,8 +6,9 @@ import EditorSetting from './setting';
 import EditorTools from './tools';
 import EditorProvider from './provider';
 import FormRender from './formrender';
+import EditorConfig from './config';
 
-export { EditorPanel, EditorView, EditorSetting, EditorTools, EditorProvider, FormRender, BaseSelection, BaseDnd };
+export { EditorConfig, EditorPanel, EditorView, EditorSetting, EditorTools, EditorProvider, FormRender, BaseSelection, BaseDnd };
 export * from './panel';
 export * from './view';
 export * from './setting';

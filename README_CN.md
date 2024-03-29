@@ -4,7 +4,7 @@
 > 基于`React`, 轻量、简易、强大的表单开发解决方案。
 
 * [在线预览](https://mezhanglei.github.io/simpleform/demo/#/)
-<!-- * [文档](https://mezhanglei.github.io/simpleform/docs/#/) -->
+* [文档](https://mezhanglei.github.io/simpleform/docs/#/)
 
 ## 分类
 

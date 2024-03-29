@@ -71,35 +71,37 @@ function EditorTools(props: EditorToolsProps) {
         className={cls}
         style={style}
         {...restProps}>
-        <div className="left-toolbar">
-          <Tooltip
-            title="撤销"
-          >
-            <Button disabled={!canUndo} className="undo-btn" type='link' onClick={undo}>
-              <SvgIcon name="undo" />
-            </Button>
-          </Tooltip>
-          <Tooltip
-            title="重做"
-          >
-            <Button disabled={!canRedo} className="redo-btn" type='link' onClick={redo}>
-              <SvgIcon name="redo" />
-            </Button>
-          </Tooltip>
-          <Divider className="left-divid" type='vertical' />
-          <Radio.Group
-            options={PlatOptions}
-            onChange={(e) => context.dispatch((old) => ({ ...old, platType: e?.target?.value }))}
-            value={platType}
-            optionType="button"
-            buttonStyle="solid"
-          />
-        </div>
-        <Flex wrap="wrap" gap="small" align="center">
-          {renderTools ? renderTools(context) : null}
-          <Button type='link' onClick={showPreview}>预览</Button>
-          <Button type='link' onClick={clearEditor}>清空</Button>
-          <Button type='link' onClick={showExportJson}>生成JSON</Button>
+        <Flex wrap="wrap" gap="small" align="center" justify="space-between">
+          <div>
+            <Tooltip
+              title="撤销"
+            >
+              <Button disabled={!canUndo} className="undo-btn" type='link' onClick={undo}>
+                <SvgIcon name="undo" />
+              </Button>
+            </Tooltip>
+            <Tooltip
+              title="重做"
+            >
+              <Button disabled={!canRedo} className="redo-btn" type='link' onClick={redo}>
+                <SvgIcon name="redo" />
+              </Button>
+            </Tooltip>
+            <Divider className="left-divid" type='vertical' />
+            <Radio.Group
+              options={PlatOptions}
+              onChange={(e) => context.dispatch((old) => ({ ...old, platType: e?.target?.value }))}
+              value={platType}
+              optionType="button"
+              buttonStyle="solid"
+            />
+          </div>
+          <div>
+            {renderTools ? renderTools(context) : null}
+            <Button type='link' onClick={showPreview}>预览</Button>
+            <Button type='link' onClick={clearEditor}>清空</Button>
+            <Button type='link' onClick={showExportJson}>生成JSON</Button>
+          </div>
         </Flex>
       </header>
   );

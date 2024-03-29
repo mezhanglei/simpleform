@@ -1,7 +1,7 @@
 import React, { CSSProperties, useEffect, useMemo } from 'react';
 import classnames from 'classnames';
 import { CustomFormRenderProps, Form, FormChildren, joinFormPath, useSimpleForm } from '../formrender';
-import { asyncSettingForm, getWidgetItem, setWidgetItem } from '../utils/utils';
+import { getWidgetItem, setWidgetItem } from '../utils/utils';
 import './component.less';
 import CustomCollapse from '../components/common/Collapse';
 import { useEditorContext } from '../context';
@@ -40,7 +40,9 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
     // 切换时需要重置后再进行表单设置
     form && form.reset();
     setTimeout(() => {
-      asyncSettingForm(editor, form, selected);
+      if (!form) return;
+      const item = getWidgetItem(editor, selected?.path);
+      form.setFieldsValue(item);
     }, 50);
   }, [selectedPath]);
 

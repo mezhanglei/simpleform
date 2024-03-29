@@ -236,8 +236,8 @@ export class SimpleForm<T extends Object = any> {
   }
 
   // 校验整个表单或校验表单中的某个控件
-  public async validate(): Promise<ValidateResult<T> | undefined>
-  public async validate(path: string, eventName?: TriggerType | boolean): Promise<ValidateResult<T> | undefined>
+  public async validate(): Promise<ValidateResult<T>>
+  public async validate(path: string, eventName?: TriggerType | boolean): Promise<ValidateResult<T>>
   public async validate(path?: string | string[], eventName?: TriggerType | boolean) {
 
     const validateError = async (path: string) => {
@@ -256,7 +256,13 @@ export class SimpleForm<T extends Object = any> {
       }
     };
 
-    if (path instanceof Array || path === undefined) {
+    if (typeof path === 'string') {
+      const currentError = await validateError(path);
+      return {
+        error: currentError,
+        values: this.getFieldValue()
+      };
+    } else {
       const fieldPropsMap = this.getFieldProps() || {};
       const keys = path instanceof Array ? path : Object.keys(fieldPropsMap || {});
       const result = await Promise.all(keys?.map((key) => {
@@ -267,12 +273,6 @@ export class SimpleForm<T extends Object = any> {
         }
       }));
       const currentError = result?.filter((error) => error !== undefined)?.[0];
-      return {
-        error: currentError,
-        values: this.getFieldValue()
-      };
-    } else if (typeof path === 'string') {
-      const currentError = await validateError(path);
       return {
         error: currentError,
         values: this.getFieldValue()

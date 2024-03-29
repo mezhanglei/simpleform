@@ -1,0 +1,44 @@
+.custom-field-item {
+  width: 100%;
+  margin-bottom: 16px;
+
+  &--error {
+    margin-bottom: 3px;
+  }
+
+  &--readOnly {
+    margin-bottom: 0px;
+
+    &>.item-label__header {
+      color: #999;
+    }
+  }
+
+  &--horizontal {
+    display: inline-flex;
+    align-items: flex-start;
+
+    &>.item-label__header {
+      text-align: right;
+      margin-top: 7px;
+      margin-right: 8px;
+    }
+  }
+
+  &--horizontal&--inline {
+    width: auto;
+  }
+
+  &--vertical {
+    display: inline-block;
+  }
+
+  &--vertical&--inline {
+    vertical-align: top;
+    width: auto;
+  }
+
+  &--compact {
+    margin-bottom: 0;
+  }
+}

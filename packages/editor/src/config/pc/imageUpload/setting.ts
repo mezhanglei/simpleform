@@ -10,6 +10,11 @@ const baseSetting = [
     type: 'Input',
   },
   {
+    label: '接口响应数据',
+    name: 'props.uploadCallback',
+    type: 'Input.TextArea',
+  },
+  {
     label: '参数名',
     name: 'props.formdataKey',
     type: 'Input',

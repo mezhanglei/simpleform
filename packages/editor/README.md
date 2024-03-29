@@ -2,12 +2,12 @@
 
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-3.1.8-green)](https://www.npmjs.com/package/@simpleform/editor)
+[![](https://img.shields.io/badge/version-3.1.9-green)](https://www.npmjs.com/package/@simpleform/editor)
 
 > Based on `react` implementation of the form designer , support for custom components , template import and export , visual design and other form design features , the secondary development is very simple .
 
 * [Preview](https://mezhanglei.github.io/simpleform/demo/#/)
-<!-- * [Guide](https://mezhanglei.github.io/simpleform/docs/#/) -->
+* [Guide](https://mezhanglei.github.io/simpleform/docs/#/)
 * [UI widgets](https://ant.design/index-cn/) `antd@5.x`, the designer registers the base form control by default.
 
 ## Introduction

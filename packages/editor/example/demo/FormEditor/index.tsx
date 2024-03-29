@@ -1,5 +1,4 @@
 import { Col, Row } from 'antd';
-import classnames from 'classnames';
 import React, { CSSProperties } from 'react';
 import { EditorPanel, EditorProvider, EditorProviderProps, EditorSetting, EditorTools, EditorView } from '../../../src';
 import FormRender from '../FormRender';
@@ -17,10 +16,10 @@ export type EasyFormEditorProps = EditorProviderProps & {
   style?: CSSProperties;
 };
 
-const FormEditor = ({ className, style, ...props }: EasyFormEditorProps) => {
+const FormEditor = () => {
 
   return (
-    <Row className={classnames('simple-form-container', className)}>
+    <Row className='simple-form-container'>
       <EditorProvider
         editorConfig={EditorConfig}
         FormRender={FormRender}
