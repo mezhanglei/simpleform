@@ -69,7 +69,7 @@ const CustomEditorPanel = (context) => {
                 list.map((key) => {
                   const data = editorConfig?.[key] || {};
                   const panel = data?.panel || {};
-                  return <Tag color="processing" key={key} data-type={key} data-group='panel' onClick={() => onChange(key)}>{panel.label}</Tag>
+                  return <Tag style={{ marginBottom: '10px' }} color="processing" key={key} data-type={key} data-group='panel' onClick={() => onChange(key)}>{panel.label}</Tag>
                 })
               }
             </BaseDnd>

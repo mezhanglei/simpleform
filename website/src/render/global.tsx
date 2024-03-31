@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import FormRender from './FormRender';
 import { Checkbox, Radio } from 'antd';
-import { useState } from 'react';
 
 export default function Demo() {
 

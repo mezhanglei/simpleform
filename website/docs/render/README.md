@@ -14,7 +14,7 @@ nav:
 ## 特性
 - 组件注册(`components`属性): 使用之前需要注册表单控件和非表单组件，如果是表单控件需要控件内部支持`value`和`onChange`两个`props`.
 - 组件描述(`widgetList`属性)：我们使用列表来描述界面UI结构, 列表中的每一项都表示一个组件节点.支持节点嵌套`widgetList`属性字段.
-- 组件渲染：`Form`组件处理表单的值, `FormChildren`组件处理表单的渲染, 一个`Form`组件可以支持多个`FormChildren`组件在内部渲染. `Form`组件为[@simpleform/form](./form).
+- 组件模块：默认导出`FormRender`, `FormRender`组件由[Form](./form)和`FormChildren`组成, 支持多模块渲染，[Form](./form)组件处理表单的值, `FormChildren`组件处理表单的渲染, 一个`Form`组件可以支持多个`FormChildren`组件在内部渲染.
 - 组件联动：表单属性均可以支持字符串表达式描述联动条件(`widgetList`属性除外).
 
 ## 安装
@@ -35,7 +35,7 @@ yarn add @simpleform/render
 import '@simpleform/render/lib/css/main.css';
 ```
 ## 基本使用
-概述：1.注册基本组件对象 → 2.赋值给`FormRender`或`FormChildren`中的`components`
+概述：1.注册组件对象 → 2.赋值给`FormRender`或`FormChildren`中的`components`即可完成前置工作
 <code src="../../src/render/base.tsx"></code>
 
 ### 多模块渲染
@@ -82,9 +82,13 @@ export type GenerateWidgetItem<T extends Record<string, any> = {}> = FormItemPro
   widgetList?: WidgetList; // 嵌套的子节点(会覆盖props.children)
 }
 ```
+:::warning
+`readOnly`和`readOnlyRender`只在表单控件节点才会生效
+:::
 
 ### 表单注册组件
-表单中的任意组件都会被注入四个上下文参数: 
+表单中的任意组件都会被注入五个上下文参数: 
+- `index`：当前组件所在的列表的索引数字
 - `path`：当前组件所在的节点路径
 - `widgetItem`：当前组件节点的所有信息
 - `formrender`: `SimpleFormRender`的实例
@@ -94,13 +98,14 @@ const CustomInput: React.FC<GenerateParams & InputProps> = (props) => {
   const {
     value,
     onChange,
+    // index,
     // path,
     // widgetItem,
     // formrender,
     // form,
   } = props;
 
-  // console.log(path, widgetItem, formrender, form)
+  // console.log(index, path, widgetItem, formrender, form)
 
   return (
     <Input value={value} onChange={onChange} />
@@ -146,8 +151,8 @@ const widgetList = [{
 - `useSimpleFormRender`: `(widgetList: WidgetItem[]) => SimpleFormRender` 等于`new SimpleFormRender()`.
 - `useSimpleForm`: 继承`@simpleform/form`组件的`hooks`.
 
-### FormChildren
-`FormChildren`组件的`props`
+### Props
+`FormRender`或`FormChildren`组件的`props`
 - `widgetList`: `WidgetItem[]` 渲染表单的DSL形式的json数据
 - `components`：注册表单中的所有组件;
 - `plugins`：表单中需要引入的外来库;

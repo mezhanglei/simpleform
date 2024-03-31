@@ -50,11 +50,31 @@ import '@simpleform/form/lib/css/main.css'
 |  `onSubmit`    |  标签提交事件    |        `(e) => void`                          | -        |
 |   `onReset`   |  重置默认值事件, 只有`htmlType=reset`的`button`标签才可以触发    |    `() => void`                              | -        |
 |  `onFieldsChange`    |  表单控件`onChange` 变化时的事件函数，只会被控件主动`onChange`触发，不会被`form.setFieldValue`和`form.setFieldsValue`触发, 避免循环调用    |      `(item: {name: string, value: unknown}, values: unknown)=> void`       | -        |
-|  `onValuesChange`    |   监听表单值的变化, 只要表单值有变化无论初始值还是其他变更都会被监听到   |    `(item: {name: string, value: unknown}, values: unknown)=> void` | -        |
+|  `onValuesChange`    |   监听表单值的变化, 只要表单值有变化无论是初始值赋值场景还是其他场景下值的变更都会被监听到   |    `(item: {name: string, value: unknown}, values: unknown)=> void` | -        |
 |  `watch`    |   监听表单中某个控件的`name`字段对应的表单值   |   -  | -        |
 
-### Form.Item
+### component
+`Form.Item`的`component`为表单域的显示组件，`props`如下：
 
+| `props`字段     | 说明           | 类型                          | 默认值 |
+| -------------- | -------- | ----------------------------- | ------ |
+| `label` | 表单域的`label` | `string` | - |
+| `labelStyle`    |  `label`的样式     |  `CSSProperties`   | -      |
+| `labelWidth`    |    `label`的宽度    |  `CSSProperties['width']`   | -      |
+| `labelAlign`    |   `label`标签的`textAlign`属性     |  `CSSProperties['textAlign']`   | -      |
+| `inline`  |   是否设置行内布局     |   `boolean`  | -      |
+| `layout`   |  布局类型, 水平对齐或者垂直对齐   |  `'horizontal'/'vertical'`   | `horizontal`      |
+| `colon`    |   `label`是否添加冒号    |  `boolean`   | -      |
+| `required` |  是否显示必填标记，不包含表单校验，仅用于显示   |  `number`   | -      |
+| `gutter` |  `label`标签和表单组件间的距离   |  `number`   | -      |
+| `error` |  展示的报错信息   |  `string`   | -      |
+| `suffix` |  后缀节点   |  `React.ReactNode`   | -      |
+| `footer` |  底部节点   |  `React.ReactNode`   | -      |
+| `tooltip` |  展示标识信息   |  `string`   | -      |
+| `compact` |  是否紧凑，会去掉表单域的`margin`   |  `boolean`   | -      |
+
+### Form.Item
+继承上面`Form.Item`的`component`显示组件的`props`，其他的`props`如下
 | `props`属性字段      | 说明            | 类型    | 默认值 |
 | -------------- | --------------- | ------- | ------ |
 |`className`     | 类名     | `string` |  -  |
@@ -96,22 +116,3 @@ import '@simpleform/form/lib/css/main.css'
 |  `getFieldError`   |  返回目标的错误信息或所有的错误信息   |  `(path?: string) => string`   |
 
 
-### component
-`Form.Item`的`component`默认组件的`props`
-
-| `props`字段     | 说明           | 类型                          | 默认值 |
-| -------------- | -------- | ----------------------------- | ------ |
-| `label` | 表单域的`label` | `string` | - |
-| `labelStyle`    |  `label`的样式     |  `CSSProperties`   | -      |
-| `labelWidth`    |    `label`的宽度    |  `CSSProperties['width']`   | -      |
-| `labelAlign`    |   `label`标签的`textAlign`属性     |  `CSSProperties['textAlign']`   | -      |
-| `inline`  |   是否设置行内布局     |   `boolean`  | -      |
-| `layout`   |  布局类型, 水平对齐或者垂直对齐   |  `'horizontal'/'vertical'`   | `horizontal`      |
-| `colon`    |   `label`是否添加冒号    |  `boolean`   | -      |
-| `required` |  是否显示必填标记，不包含表单校验，仅用于显示   |  `number`   | -      |
-| `gutter` |  `label`标签和表单组件间的距离   |  `number`   | -      |
-| `error` |  展示的报错信息   |  `string`   | -      |
-| `suffix` |  后缀节点   |  `React.ReactNode`   | -      |
-| `footer` |  底部节点   |  `React.ReactNode`   | -      |
-| `tooltip` |  展示标识信息   |  `string`   | -      |
-| `compact` |  是否紧凑，会去掉表单域的`margin`   |  `boolean`   | -      |

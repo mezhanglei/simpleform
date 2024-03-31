@@ -1,4 +1,3 @@
-import classnames from 'classnames';
 import React, { useEffect, useState } from 'react';
 import { Button, Flex, Tag, Modal, ModalProps } from 'antd';
 import './index.less';
@@ -16,14 +15,11 @@ export interface ImportModalProps extends Partial<ModalProps> {
   context?: CustomOptions['context'];
 }
 
-const ImportModal = React.forwardRef<HTMLDivElement, ImportModalProps>((props, ref) => {
+const ImportModal: React.FC<ImportModalProps> = (props) => {
 
   const {
-    children,
-    className,
     open,
     context,
-    onClose,
     data = templates,
     onSelect,
     ...rest
@@ -40,10 +36,9 @@ const ImportModal = React.forwardRef<HTMLDivElement, ImportModalProps>((props, r
   };
 
   const prefixCls = 'import-modal';
-  const cls = classnames(prefixCls, className);
 
   const load = (item?: TemplateItem) => {
-    context.dispatch((old) => ({ ...old, widgetList: item?.data }));
+    context?.dispatch((old) => ({ ...old, widgetList: item?.data }));
     onSelect && onSelect(item);
     setModalOpen(false);
   };
@@ -56,9 +51,9 @@ const ImportModal = React.forwardRef<HTMLDivElement, ImportModalProps>((props, r
     <>
       <Button type='link' onClick={showModal}>导入模板</Button>
       <Modal
-        ref={ref}
         open={modalOpen}
-        onClose={closeModal}
+        onCancel={closeModal}
+        footer={null}
         {...rest}>
         <div className={`${prefixCls}-title`}>导入模板</div>
         <Flex gap="4px 0" wrap="wrap" className={`${prefixCls}-body`}>
@@ -72,6 +67,6 @@ const ImportModal = React.forwardRef<HTMLDivElement, ImportModalProps>((props, r
     </>
 
   );
-});
+};
 
 export default ImportModal;

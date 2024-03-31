@@ -17,7 +17,7 @@ export interface ImportModalProps extends Partial<ModalWrapperProps> {
   context?: CustomOptions['context'];
 }
 
-const ImportModal = React.forwardRef<HTMLDivElement, ImportModalProps>((props, ref) => {
+const ImportModal: React.FC<ImportModalProps> = (props) => {
 
   const {
     children,
@@ -57,7 +57,6 @@ const ImportModal = React.forwardRef<HTMLDivElement, ImportModalProps>((props, r
     <>
       <Button type='link' onClick={showModal}>导入模板</Button>
       <ModalWrapper
-        ref={ref}
         open={modalOpen}
         onClose={closeModal}
         classNames={{ modal: cls }}
@@ -74,6 +73,6 @@ const ImportModal = React.forwardRef<HTMLDivElement, ImportModalProps>((props, r
     </>
 
   );
-});
+};
 
 export default ImportModal;
