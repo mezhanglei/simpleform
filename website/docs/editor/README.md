@@ -75,7 +75,7 @@ import { Checkbox } from 'antd';
 import { bindRequest } from '@simpleform/editor';
 
 const components = {
-  'Checkbox.Group': bindRequest(Checkbox.Group),
+  'Checkbox.Group': bindRequest(Checkbox.Group, 'options'),
 }
 
 <FormRender components={components} />
