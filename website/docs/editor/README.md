@@ -43,7 +43,7 @@ yarn add @simpleform/editor
 ```javascript
 import '@simpleform/editor/lib/css/main.css';
 ```
-## 基本使用
+### 基本使用
 概述：1.配置渲染器`FormRender`的`components`用于提供组件 → 2.然后进行编辑器`FormEditor`的`editorConfig`配置 → 3.最后在编辑器的`EditPanel`展示列表中显示即可使用, 具体代码请在项目内的`packages/editor/example/demo`路径下查看
 <code src="../../src/editor/FormEditor/index.tsx"></code>
 

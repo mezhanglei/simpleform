@@ -34,19 +34,19 @@ yarn add @simpleform/render
 ```javascript
 import '@simpleform/render/lib/css/main.css';
 ```
-## 基本使用
+### 基本使用
 概述：1.注册组件对象 → 2.赋值给`FormRender`或`FormChildren`中的`components`即可完成前置工作
 <code src="../../src/render/base.tsx"></code>
 
-### 多模块渲染
+## 多模块渲染
 表单引擎还支持多个`FormChildren`组件渲染，然后由`Form`组件统一处理表单值.
 <code src="../../src/render/multiple.tsx"></code>
 
-### 数组列表渲染
+## 数组列表渲染
 复杂的列表渲染增删改功能demo
 <code src="../../src/render/list.tsx"></code>
 
-### 渲染结构说明
+## 渲染结构说明
 `FormRender`或`FormChildren`使用`widgetList`列表渲染，列表中每一项均为一个渲染节点, 分为表单控件节点和非表单节点
 - 表单控件节点:
 具有`name`属性的节点为表单控件节点，默认携带表单域组件(`Form.Item`)，控件则由`type`和`props`生成, 使用规则[@simpleform/form](./form/usage#表单字段)，举例：
@@ -86,7 +86,7 @@ export type GenerateWidgetItem<T extends Record<string, any> = {}> = FormItemPro
 `readOnly`和`readOnlyRender`只在表单控件节点才会生效
 :::
 
-### 表单注册组件
+## 表单注册组件
 表单中的任意组件都会被注入五个上下文参数: 
 - `index`：当前组件所在的列表的索引数字
 - `path`：当前组件所在的节点路径
@@ -113,11 +113,11 @@ const CustomInput: React.FC<GenerateParams & InputProps> = (props) => {
 }
 ```
 
-### 全局参数注入
+## 全局参数注入
 通过`options`可设置全表单内部[Form.Item](./form#api)和组件自身的`props`，也可以注入新的其他字段到上下文参数`widgetItem`中
 <code src="../../src/render/global.tsx"></code>
 
-### 表单联动
+## 表单联动
 ### 普通情况下实现联动
 <code src="../../src/render/linkage.tsx"></code>
 

@@ -28,7 +28,7 @@ yarn add @simpleform/form
 ```javascript
 import '@simpleform/form/lib/css/main.css'
 ```
-## 基本使用
+### 基本使用
 <code src="../../src/form/base.tsx"></code>
 
 ## API
@@ -114,5 +114,3 @@ import '@simpleform/form/lib/css/main.css'
 | `reset`    |   重置表单, 可以传值重置为目标值     |  `(values?: unknown) => void`   |
 | `validate`  |   校验表单，并返回错误信息和表单值。    |   `(path?: string[]/string) => {error: true/string; values: unknown}`  |
 |  `getFieldError`   |  返回目标的错误信息或所有的错误信息   |  `(path?: string) => string`   |
-
-
