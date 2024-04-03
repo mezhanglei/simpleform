@@ -49,7 +49,7 @@ import '@simpleform/render/lib/css/main.css';
 ## 渲染结构说明
 `FormRender`或`FormChildren`使用`widgetList`列表渲染，列表中每一项均为一个渲染节点, 分为表单控件节点和非表单节点
 - 表单控件节点:
-具有`name`属性的节点为表单控件节点，默认携带表单域组件(`Form.Item`)，控件则由`type`和`props`生成, 使用规则[@simpleform/form](./form/usage#表单字段)，举例：
+具有`name`属性的节点为表单控件节点，控件由`type`和`props`生成, 节点的其他字段则为表单域组件[Form.Item](./form#formitem)的属性，举例：
 ```javascript
 const widgetList = [{
   label: "part2input",
@@ -61,7 +61,7 @@ const widgetList = [{
 }]
 ```
 - 非表单节点:
-无`name`属性的节点。举例：
+无`name`属性的节点, 除了`widgetList`属性外，只有`type`和`props`生成目标节点, 举例：
 ```javascript
 const widgetList = [{
   type: 'CustomCard',
@@ -69,6 +69,7 @@ const widgetList = [{
 }]
 ```
 - 节点类型
+继承`@simpleform/form`组件的[FormItemProps](./form#formitem)
 ```javascript
 export type GenerateWidgetItem<T extends Record<string, any> = {}> = FormItemProps & T & {
   inside?: CustomUnionType; // 节点的内层
@@ -114,14 +115,14 @@ const CustomInput: React.FC<GenerateParams & InputProps> = (props) => {
 ```
 
 ## 全局参数注入
-通过`options`可设置全表单内部[Form.Item](./form#api)和组件自身的`props`，也可以注入新的其他字段到上下文参数`widgetItem`中
+通过`options`可设置每个节点的信息字段，同时节点中的组件上下文参数`widgetItem`可以接收到每个节点的完整信息。
 <code src="../../src/render/global.tsx"></code>
 
 ## 表单联动
-### 普通情况下实现联动
+### 通过状态实现联动
 <code src="../../src/render/linkage.tsx"></code>
 
-### 通过javascript表达式实现联动
+### 通过字符串表达式实现联动
 此方式实现联动可以进行完整的JSON转换而不丢失信息，这就意味着表单信息可以存储在服务端,然后传到客户端渲染.
 <code src="../../src/render/expression.tsx"></code>
 
