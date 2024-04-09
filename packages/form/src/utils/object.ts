@@ -10,7 +10,7 @@ export function deepClone<T = any>(value: T) {
 export function pathToArr(path?: string | Array<string | number>) {
   if (path instanceof Array) return path;
   const regex = /([^\.\[\]]+)|(\[\d+\])/g;
-  const parts = typeof path === 'string' && path ? path.match(regex) : [];
+  const parts = typeof path === 'string' ? path.match(regex) : [];
   return parts || [];
 }
 

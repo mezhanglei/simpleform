@@ -13,7 +13,7 @@ export const matchExpression = (value?: any) => {
   }
 };
 
-// 获取路径的末尾节点字符串(不带中括号)
+// 获取路径的末尾节点
 export const getPathEnd = (path?: string) => {
   const pathArr = pathToArr(path);
   const end = pathArr?.pop();

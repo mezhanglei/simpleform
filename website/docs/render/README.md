@@ -12,7 +12,7 @@ nav:
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
 
 ## 特性
-- 组件注册(`components`属性): 使用之前需要注册表单控件和非表单组件，如果是表单控件需要控件内部支持`value`和`onChange`两个`props`.
+- 组件注册(`components`属性): 使用之前需要注册表单控件和非表单组件，如果是表单控件需要控件内部支持`value`和`onChange`两个`props`字段.
 - 组件描述(`widgetList`属性)：我们使用列表来描述界面UI结构, 列表中的每一项都表示一个组件节点.支持节点嵌套`widgetList`属性字段.
 - 组件模块：默认导出`FormRender`, `FormRender`组件由[Form](./form)和`FormChildren`组成, 支持多模块渲染，[Form](./form)组件处理表单的值, `FormChildren`组件处理表单的渲染, 一个`Form`组件可以支持多个`FormChildren`组件在内部渲染.
 - 组件联动：表单属性均可以支持字符串表达式描述联动条件(`widgetList`属性除外).
@@ -155,15 +155,15 @@ const widgetList = [{
 ### Props
 `FormRender`或`FormChildren`组件的`props`
 - `widgetList`: `WidgetItem[]` 渲染表单的DSL形式的json数据
-- `components`：注册表单中的所有组件;
-- `plugins`：表单中需要引入的外来库;
-- `options`： `GenerateFormNodeProps | ((field: GenerateFormNodeProps) => any)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
-- `renderList`：提供自定义渲染列表的函数.
-- `renderItem`：提供自定义渲染节点的函数.
+- `components`：`Record<string, any>`注册表单中的所有组件;
+- `plugins`：`Record<string, any>`表单中需要引入的外来库;
+- `options`： `GenerateWidgetItem | ((field: GenerateWidgetItem) => any)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
+- `renderList`：`(params: GenerateParams<any> & { children?: any }) => any`提供自定义渲染列表的函数.
+- `renderItem`：`(params: GenerateParams<any> & { children?: any }) => any`提供自定义渲染节点的函数.
 - `onRenderChange`: `(newValue: WidgetList) => void;` `widgetList`更改时回调函数
-- `formrender`: 负责渲染的表单类。通过`useSimpleFormRender()`创建，选填.
-- `form`: 负责表单的值的类。通过`useSimpleForm()`创建，选填.
-- `uneval`: 不执行表单中的字符串表达式.
+- `formrender`: `FormRender`通过`useSimpleFormRender()`创建的实例，负责表单界面渲染，选填.
+- `form`: `Form`。通过`useSimpleForm()`创建，负责表单值的管理，选填.
+- `uneval`: `boolean`不执行表单中的字符串表达式.
 
 ### SimpleFormRender Method
 - `updateItemByPath`: `(data?: any, path?: string) => void` 根据`path`获取对应的节点

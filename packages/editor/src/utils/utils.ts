@@ -1,6 +1,6 @@
 import { deepMergeObject } from './object';
 import { nanoid } from 'nanoid';
-import { SimpleForm, SimpleFormRender, getInitialValues, getPathEnd, getParent, CustomWidgetItem } from '../formrender';
+import { SimpleFormRender, getInitialValues, getPathEnd, CustomWidgetItem } from '../formrender';
 import { ConfigWidgetSetting, FormEditorState } from '../context';
 
 export const defaultGetId = (key?: string) => {
@@ -8,23 +8,19 @@ export const defaultGetId = (key?: string) => {
 };
 
 // 未被选中
-export const isNoSelected = (path?: string) => {
+export const isNoSelected = (path?: string | number) => {
   if (!path || path === '#') return true;
 };
 
-// 根据目标路径推测其在父列表中的序号
+// 提取目标所在列表的序号
 export const getListIndex = (editor?: SimpleFormRender | null, path?: string) => {
   if (!editor) return -1;
   const widgetList = editor.getWidgetList();
   const len = widgetList.length || 0;
-  if (isNoSelected(path)) return len - 1;
-  const containerPath = getParent(path);
-  const container = containerPath ? getWidgetItem(editor, containerPath) : widgetList;
   const endName = getPathEnd(path);
+  if (isNoSelected(path) || endName === undefined || endName === '') return len - 1;
   const endCode = typeof endName == 'string' ? endName?.replace(/\]/, '').replace(/\[/, '') : endName;
-  const keys = Object.keys(container);
-  const index = keys.findIndex((key) => key == endCode);
-  return index;
+  return typeof endCode === 'string' ? +endCode : endCode;
 };
 
 // 从配置中获取初始值

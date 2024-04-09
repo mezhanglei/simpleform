@@ -31,12 +31,10 @@ export interface ItemCoreProps {
 export function getRulesTriggers(rules?: ItemCoreProps['rules']) {
   const result = [];
   if (rules instanceof Array) {
-    if (rules instanceof Array) {
-      for (let i = 0; i < rules?.length; i++) {
-        const rule = rules?.[i];
-        if (rule?.validateTrigger) {
-          result.push(rule?.validateTrigger);
-        }
+    for (let i = 0; i < rules?.length; i++) {
+      const rule = rules?.[i];
+      if (rule?.validateTrigger) {
+        result.push(rule?.validateTrigger);
       }
     }
   }

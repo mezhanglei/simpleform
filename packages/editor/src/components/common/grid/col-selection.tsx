@@ -1,23 +1,19 @@
 import React from 'react';
 import SvgIcon from '../SvgIcon';
-import { getListIndex, insertWidgetItem } from '../../../utils/utils';
+import { insertWidgetItem } from '../../../utils/utils';
 import BaseSelection from '../../../view/BaseSelection';
 import classnames from 'classnames';
 import './col-selection.less';
 import { CustomColProps } from './col';
 import { getParent } from '../../../formrender';
 
-/**
- * 给表单中的控件外围添加选中框
- * @param props 
- * @param ref 
- * @returns 
- */
+
 function ColSelection(props: CustomColProps, ref: any) {
   const {
     children,
     style,
     className,
+    index,
     path,
     widgetItem,
     formrender: editor,
@@ -30,7 +26,7 @@ function ColSelection(props: CustomColProps, ref: any) {
   const { editorConfig } = context?.state || {};
 
   const addCol = () => {
-    const colIndex = getListIndex(editor, path);
+    const colIndex = index;
     const nextIndex = colIndex + 1;
     const newItem = {
       ...editorConfig?.['GridCol'],

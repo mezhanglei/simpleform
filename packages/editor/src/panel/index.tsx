@@ -37,22 +37,6 @@ const defaultPanelData = {
   ]
 };
 
-const PanelTag = React.forwardRef((props: PanelTagProps, ref: any) => {
-  const {
-    style,
-    className,
-    children,
-    onChange,
-    ...restProps
-  } = props;
-  const prefixCls = 'component-tag';
-  const cls = classnames(prefixCls, className);
-
-  return (
-    <Tag onClick={onChange} ref={ref} className={cls} style={style} {...restProps}>{children}</Tag>
-  );
-});
-
 export interface EditorPanelProps {
   className?: string
   style?: CSSProperties
@@ -108,7 +92,7 @@ function EditorPanel(props: EditorPanelProps) {
                     list.map((key) => {
                       const data = editorConfig?.[key] || {};
                       const panel = data?.panel || {};
-                      return <PanelTag key={key} data-type={key} data-group='panel' onChange={() => onChange?.(key)}>{panel.label}</PanelTag>;
+                      return <Tag className="component-tag" key={key} data-type={key} data-group='panel' onClick={(e) => onChange?.(key)}>{panel.label}</Tag>;
                     })
                   }
                 </ReactSortable>

@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/editor
-[![](https://img.shields.io/badge/version-3.1.9-green)](https://www.npmjs.com/package/@simpleform/editor)
+[![](https://img.shields.io/badge/version-3.1.10-green)](https://www.npmjs.com/package/@simpleform/editor)
 
 > 基于`react`实现的表单设计器，支持自定义组件，模板导入导出，可视化设计等表单设计功能，二次开发非常简单。
 
@@ -24,7 +24,7 @@ nav:
   * 渲染器`FormRender`：设计器的表单渲染核心组件，使用前需要配置好注册组件及相关的属性
 - 自定义功能：设计器允许两种自定义类型
   * 自定义组件：通过自定义一个组件，在设计器和渲染器中注册，然后就可以在组件面板中配置该控件使用
-  * 导入模板：需要通过`renderTools`函数从设计器组件外面添加导入模板功能入口，这样可以自定义`JSON`模板列表的渲染界面.
+  * 导入模板：需要通过`renderTools`函数从设计器组件外面添加导入模板功能入口.
 
 ## 安装
 
@@ -50,7 +50,7 @@ import '@simpleform/editor/lib/css/main.css';
 ## FormRender配置项
 
 ### 请求配置
-编辑器内置了`axios`请求，使用编辑器前需要根据你当前的项目进行个性化配置，举例：
+编辑器内置了`axios`，使用编辑器前需要根据你当前的项目进行个性化配置，参考示例：
 ```javascript
 import { createRequest } from '@simpleform/editor';
 ...
@@ -68,7 +68,7 @@ const axiosConfig = {
 ```
 
 ### 参数化请求
-在编辑器中比如`Select`，可以通过`props`中的参数来实现完整的请求，我们可以通过`bindRequest`高阶函数使组件具备接收参数完成请求的能力，参考示例：
+在编辑器中比如`Select`，可以通过接收`props`中的参数来实现完整的请求，我们可以通过`bindRequest`高阶函数使组件具备接收参数完成请求的能力，参考示例：
 ```javascript
 
 import { Checkbox } from 'antd';
@@ -85,7 +85,7 @@ const components = {
 ## FormEditor配置项
 
 ### 上传组件
-默认内置了上传组件，但是需要通过`uploadCallback`这个`props`字段来控制接口响应的数据.有两种方式解决:
+默认内置了上传组件，但是需要通过`uploadCallback`这个`props`字段来自定义接口响应的数据.有两种方式解决:
 - 界面上的上传组件有`uploadCallback`（接口响应数据）配置选项，修改即可.
 - 在配置`editorConfig`时重新配置上传组件的`props`
 ```javascript

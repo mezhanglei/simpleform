@@ -1,4 +1,4 @@
-import { getListIndex, getWidgetItem, insertWidgetItem } from '../utils/utils';
+import { getWidgetItem, insertWidgetItem } from '../utils/utils';
 import React, { CSSProperties } from 'react';
 import BaseSelection, { BaseSelectionProps } from './BaseSelection';
 import SvgIcon from '../components/common/SvgIcon';
@@ -9,17 +9,13 @@ export interface ControlSelectionProps extends BaseSelectionProps {
   style?: CSSProperties;
   className?: string;
 }
-/**
- * 给表单中的控件外围添加选中框
- * @param props 
- * @param ref 
- * @returns 
- */
+
 function ControlSelection(props: ControlSelectionProps, ref: any) {
   const {
     children,
     style,
     className,
+    index,
     path,
     widgetItem,
     formrender: editor,
@@ -30,7 +26,7 @@ function ControlSelection(props: ControlSelectionProps, ref: any) {
   const { historyRecord } = context?.state || {};
 
   const copyItem = () => {
-    const currentIndex = getListIndex(editor, path);
+    const currentIndex = index;
     const nextIndex = currentIndex + 1;
     const newItem = getWidgetItem(editor, path);
     insertWidgetItem(editor, newItem, nextIndex, getParent(path));

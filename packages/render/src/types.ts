@@ -58,6 +58,7 @@ export type FormRenderProps<T extends Record<string, any> = {}> = Omit<FormProps
 
 // 组件公共的参数
 export interface GenerateParams<T extends Record<string, any> = {}> {
+  index?: number;
   path?: string;
   widgetItem?: GenerateWidgetItem<T>;
   formrender?: SimpleFormRender;
