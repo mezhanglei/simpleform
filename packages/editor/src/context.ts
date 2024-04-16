@@ -21,6 +21,7 @@ export interface FormEditorState {
   editorConfig?: Record<string, CustomWidgetItem>;
   platType?: PlatType;
   historyRecord?: SimpleUndo;
+  onEvent?: (type: string, context?: FormEditorContextProps) => void;
 }
 
 export interface FormEditorContextProps {

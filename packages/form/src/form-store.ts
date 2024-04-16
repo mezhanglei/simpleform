@@ -144,17 +144,17 @@ export class SimpleForm<T extends Object = any> {
   // 设置初始值
   public setInitialValues(path: string, initialValue: any) {
     const oldValue = deepGet(this.lastValues, path);
-    if (isEmpty(oldValue) && initialValue == undefined) {
-      return;
-    }
     this.initialValues = deepSet(this.initialValues, path, initialValue);
     // 旧表单值存储
     this.lastValues = deepClone(this.values);
     // 设置值
     this.values = deepSet(this.values, path, initialValue);
     this.notifyFormItem(path);
+    if (isEmpty(oldValue) && initialValue == undefined) {
+      return;
+    }
     this.notifyFormValue(path);
-    this.notifyFormValues(path);
+    this.notifyFormValues();
   }
 
   // 获取初始值
@@ -177,19 +177,16 @@ export class SimpleForm<T extends Object = any> {
         // 校验规则
         this.validate(path, eventName);
       }
+      this.notifyFormItem(path);
+      this.notifyFormValue(path);
+      this.notifyFormValues();
     };
 
     if (typeof path === 'string') {
       setFormItemValue(path, value, eventName);
-      this.notifyFormItem(path);
-      this.notifyFormValue(path);
-      this.notifyFormValues(path);
     } else if (isObject(path)) {
       // @ts-ignore
       Promise.all(Object.keys(path).map((n) => setFormItemValue(n, path?.[n])));
-      this.notifyFormItem();
-      this.notifyFormValue();
-      this.notifyFormValues();
     }
   }
 
@@ -354,7 +351,7 @@ export class SimpleForm<T extends Object = any> {
     this.formValuesListeners = [];
   }
   // 同步
-  private notifyFormValues(path?: string) {
+  private notifyFormValues() {
     this.formValuesListeners.forEach((onChange) => onChange(this.getFieldValue(), this.getLastValue()));
   }
 

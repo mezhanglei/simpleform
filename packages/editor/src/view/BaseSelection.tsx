@@ -39,7 +39,7 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
   const overCls = `${prefixCls}-over`;
   const [isOver, setIsOver] = useState<boolean>(false);
   const context = widgetItem?.context;
-  const { selected, historyRecord } = context?.state || {};
+  const { selected, historyRecord, onEvent } = context?.state || {};
   const isSelected = path ? path === selected?.path : false;
 
   const nextSelected = {
@@ -48,6 +48,7 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
 
   const chooseItem = (e: any) => {
     e.stopPropagation();
+    onEvent && onEvent('select', context);
     if (onSelect) {
       onSelect(nextSelected);
       return;

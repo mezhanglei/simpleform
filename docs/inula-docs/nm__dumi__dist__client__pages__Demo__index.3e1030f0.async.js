@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunksimpleform=self.webpackChunksimpleform||[]).push([[9],{12535:function(l,n,e){e.r(n),e.d(n,{default:function(){return t}});var m=e(73847),a=e(74254),r=function(){var u=(0,m.UO)(),s=u.id,d=(0,m.WF)(),f=d.demos,i=f[s]||{},o=i.component;return o&&(0,a.createElement)(o)},t=r}}]);

@@ -7,9 +7,9 @@ nav:
 ---
 
 # @simpleform/editor
-[![](https://img.shields.io/badge/version-3.1.10-green)](https://www.npmjs.com/package/@simpleform/editor)
+[![](https://img.shields.io/badge/version-3.1.11-green)](https://www.npmjs.com/package/@simpleform/editor)
 
-> 基于`react`实现的表单设计器，支持自定义组件，模板导入导出，可视化设计等表单设计功能，二次开发非常简单。
+> 基于`@simpleform/render`实现的表单设计器，支持自定义组件，模板导入导出，可视化设计等表单设计功能，二次开发非常简单。
 
 * [在线预览](https://mezhanglei.github.io/simpleform/demo/#/)
 * [默认组件库](https://ant.design/index-cn/) `antd@5.x`，设计器默认注册了基础的表单控件.
