@@ -24,7 +24,7 @@ nav:
   * 渲染器`FormRender`：设计器的表单渲染核心组件，使用前需要配置好注册组件及相关的属性
 - 自定义功能：设计器允许两种自定义类型
   * 自定义组件：通过自定义一个组件，在设计器和渲染器中注册，然后就可以在组件面板中配置该控件使用
-  * 导入模板：需要通过`renderTools`函数从设计器组件外面添加导入模板功能入口.
+  * 导入模板：可渲染成界面的`JSON`列表，列表中的每一项均为注册组件，需要通过`renderTools`函数从设计器组件外面添加导入模板功能入口.
 
 ## 安装
 
@@ -67,8 +67,8 @@ const axiosConfig = {
 <FormRender plugins={{ request: createRequest(axiosConfig) }} />
 ```
 
-### 参数化请求
-在编辑器中比如`Select`，可以通过接收`props`中的参数来实现完整的请求，我们可以通过`bindRequest`高阶函数使组件具备接收参数完成请求的能力，参考示例：
+### 请求数据源
+在编辑器中比如`Select`，我们可以通过`bindRequest`高阶函数使组件具备接收`props`参数完成请求返回数据源的能力，参考示例：
 ```javascript
 
 import { Checkbox } from 'antd';
@@ -137,7 +137,7 @@ const EditorConfig = {
 ```
 
 ### EditPanel组件配置
-`EditPanel`组件通过`panelData`来配置显示列表. 参考示例：
+默认的`EditPanel`组件通过`panelData`来配置显示列表. 参考示例：
 ```javascript
 // config data for EditPanel
 const panelData = {
