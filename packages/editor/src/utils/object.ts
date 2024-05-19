@@ -1,8 +1,7 @@
-import { deepGet } from "../formrender";
 import { copy } from "copy-anything";
-import { isEmpty, isObject } from "./type";
+import { isObject } from "./type";
 
-export function deepClone<T = any>(value: T) {
+export function deepClone<T>(value: T) {
   return copy(value);
 }
 
@@ -10,10 +9,10 @@ export function deepClone<T = any>(value: T) {
  * 递归去除参数的前后空格
  * @param {*} data 参数
  */
-export const trimParams = (data: any) => {
+export const trimParams = <V>(data?: V) => {
   if (typeof data === 'string') return data.trim();
-  if (isObject(data)) {
-    for (let key in data) {
+  if (data && isObject(data)) {
+    for (let key of Object.keys(data)) {
       data[key] = trimParams(data[key]);
     }
   }
@@ -26,10 +25,11 @@ export const trimParams = (data: any) => {
  * @param {Object} obj 传入的对象数据
  * @param {FormData} formData 是否传入已有的formData数据
  */
-export function objectToFormData(obj: any, formData?: FormData) {
+export function objectToFormData(obj?: object, formData?: FormData) {
   const fd = (formData instanceof FormData) ? formData : new FormData();
+  if (typeof obj !== 'object') return fd;
   let formKey;
-  for (let property in obj) {
+  for (let property of Object.keys(obj)) {
     if (obj.hasOwnProperty(property)) {
       formKey = property;
       // 如果传入数据的值为对象且不是二进制文件
@@ -44,43 +44,17 @@ export function objectToFormData(obj: any, formData?: FormData) {
 }
 
 // 深度合并两个对象
-export const deepMergeObject = function (obj1: any, obj2: any) {
+export const deepMergeObject = <V>(obj1: V, obj2: unknown): V => {
   const obj1Type = Object.prototype.toString.call(obj1);
   const obj2Type = Object.prototype.toString.call(obj2);
-  if (isEmpty(obj1)) return obj2;
-  if (obj1Type !== obj2Type) return obj1;
+  if (obj1Type !== obj2Type || typeof obj2 !== 'object') return obj1;
   const cloneObj = deepClone(obj1);
-  for (let key in obj2) {
+  for (let key of Object.keys(obj2 || {})) {
     if (isObject(cloneObj[key])) {
-      cloneObj[key] = deepMergeObject(cloneObj[key], obj2[key]);
+      cloneObj[key] = deepMergeObject(cloneObj[key], obj2?.[key]);
     } else {
-      cloneObj[key] = obj2[key];
+      cloneObj[key] = obj2?.[key];
     }
   }
   return cloneObj;
-};
-
-// 提取对象中的部分属性
-export const pickObject = <T = any>(obj: T | undefined, keys: string[] | ((key?: string, value?: any) => boolean)) => {
-  if (obj === undefined || obj === null) return obj;
-  if (keys instanceof Array) {
-    return keys.reduce((iter, key) => {
-      const item = deepGet(obj as any, key);
-      if (item !== undefined) {
-        // @ts-ignore
-        iter[key] = item;
-      }
-      return iter;
-    }, {}) as T;
-  } else if (typeof keys === 'function') {
-    return Object.keys(obj || {}).reduce((iter, key) => {
-      // @ts-ignore
-      const item = obj[key];
-      if (keys(key, item)) {
-        // @ts-ignore
-        iter[key] = item;
-      }
-      return iter;
-    }, {}) as T;
-  }
 };

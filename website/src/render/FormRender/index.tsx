@@ -44,7 +44,7 @@ export const widgets = {
   "TimePicker.RangePicker": TimePicker.RangePicker
 };
 
-export type CustomFormChildrenProps = FormChildrenProps<any>;
+export type CustomFormChildrenProps = FormChildrenProps;
 export function FormChildren(props: CustomFormChildrenProps) {
   const { components, plugins, ...rest } = props;
   return (
@@ -56,7 +56,7 @@ export function FormChildren(props: CustomFormChildrenProps) {
     />
   );
 }
-export type CustomFormRenderProps = FormRenderProps<any>;
+export type CustomFormRenderProps = FormRenderProps;
 export default function FormRender(props: CustomFormRenderProps) {
   const { components, plugins, ...rest } = props;
   return (

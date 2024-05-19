@@ -8,25 +8,22 @@ import { CustomColProps } from './col';
 import { getParent } from '../../../formrender';
 
 
-function ColSelection(props: CustomColProps, ref: any) {
+const ColSelection = React.forwardRef<HTMLDivElement, CustomColProps>((props, ref) => {
   const {
     children,
-    style,
     className,
-    index,
-    path,
-    widgetItem,
-    formrender: editor,
-    form: editorForm,
-    ...restProps
+    _options
   } = props;
 
-  const context = widgetItem?.context;
+  const index = _options?.index;
+  const context = _options?.context;
+  const editor = _options?.formrender;
+  const path = _options?.path;
 
   const { editorConfig } = context?.state || {};
 
   const addCol = () => {
-    const colIndex = index;
+    const colIndex = index || 0;
     const nextIndex = colIndex + 1;
     const newItem = {
       ...editorConfig?.['GridCol'],
@@ -43,12 +40,12 @@ function ColSelection(props: CustomColProps, ref: any) {
     <BaseSelection
       ref={ref}
       {...props}
-      configLabel={widgetItem?.panel?.label}
+      configLabel={_options?.panel?.label}
       className={cls}
       tools={[<SvgIcon key="add" name="add" onClick={addCol} />]}>
       {children}
     </BaseSelection>
   );
-};
+});
 
-export default React.forwardRef(ColSelection);
+export default ColSelection;

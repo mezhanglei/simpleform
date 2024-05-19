@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/form
-[![](https://img.shields.io/badge/version-2.0.18-green)](https://www.npmjs.com/package/@simpleform/form)
+[![](https://img.shields.io/badge/version-2.1.1-green)](https://www.npmjs.com/package/@simpleform/form)
 
 > 表单底层组件，通过回调函数方式实现表单值的显示和更新事件的绑定.
 
@@ -113,4 +113,4 @@ import '@simpleform/form/lib/css/main.css'
 | `setFieldsValue`    |  设置整个表单的值(覆盖)    |  `(values: unknown) => void`   |
 | `reset`    |   重置表单, 可以传值重置为目标值     |  `(values?: unknown) => void`   |
 | `validate`  |   校验表单，并返回错误信息和表单值。    |   `(path?: string[]/string) => {error: true/string; values: unknown}`  |
-|  `getFieldError`   |  返回目标的错误信息或所有的错误信息   |  `(path?: string) => string`   |
+|  `getFieldError`   |  返回目标的错误信息或所有的错误信息   |  `(path?: string) => string | boolean`   |

@@ -4,7 +4,7 @@ import { FormEditorContext, FormEditorState, useEditorState } from './context';
 import EditorConfig from './config';
 
 export interface EditorProviderProps extends FormEditorState {
-  children?: any;
+  children?: React.ReactNode;
 }
 function EditorProvider(props: EditorProviderProps) {
   const curEditor = useSimpleFormRender();

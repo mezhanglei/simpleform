@@ -8,11 +8,11 @@ export const PlatOptions = [
 ];
 
 export type PlatType = typeof PlatOptions[number]["value"]
-export interface PlatContainerProps extends React.HtmlHTMLAttributes<any> {
+export interface PlatContainerProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
   plat: PlatType;
 }
 
-function PlatContainer(props: PlatContainerProps, ref: any) {
+const PlatContainer = React.forwardRef<HTMLDivElement, PlatContainerProps>((props, ref) => {
   const {
     plat,
     className,
@@ -39,6 +39,6 @@ function PlatContainer(props: PlatContainerProps, ref: any) {
       {plat === 'phone' ? renderPhone : children}
     </div>
   );
-};
+});
 
-export default React.forwardRef(PlatContainer);
+export default PlatContainer;

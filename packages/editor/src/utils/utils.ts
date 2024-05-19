@@ -1,6 +1,6 @@
 import { deepMergeObject } from './object';
 import { nanoid } from 'nanoid';
-import { SimpleFormRender, getInitialValues, getPathEnd, CustomWidgetItem } from '../formrender';
+import { SimpleFormRender, getInitialValues, getPathEnd, CustomGenerateWidgetItem } from '../formrender';
 import { ConfigWidgetSetting, FormEditorState } from '../context';
 
 export const defaultGetId = (key?: string) => {
@@ -29,25 +29,24 @@ export const getSettingInitial = (setting?: ConfigWidgetSetting) => {
   const expandSetting = Object.values(setting || {}).reduce((pre, cur) => {
     const result = [...pre, ...cur];
     return result;
-  }, []) as any;
-  const initialValues = getInitialValues(expandSetting);
+  }, []);
+  const initialValues = getInitialValues<CustomGenerateWidgetItem>(expandSetting);
   return initialValues;
 };
 
 // 返回配置组件信息
 export const getConfigItem = (type: string | undefined, editorConfig?: FormEditorState['editorConfig']) => {
   if (!type || !editorConfig) return;
-  const item = editorConfig[type];
-  const { setting, ...rest } = item;
-  const initialValues = getSettingInitial(setting);
-  const widgetItem = deepMergeObject(initialValues, rest);
-  return widgetItem;
+  const configItem = editorConfig[type] as CustomGenerateWidgetItem;
+  const { setting, ...rest } = configItem;
+  const initialValues = getSettingInitial(typeof setting === 'object' ? setting : {});
+  return deepMergeObject(initialValues, rest);
 };
 
 // 根据路径获取节点的值和属性
-export const getWidgetItem = (formrender?: SimpleFormRender | null, path?: string) => {
+export const getWidgetItem = <V = CustomGenerateWidgetItem>(formrender?: SimpleFormRender | null, path?: string) => {
   if (!formrender) return;
-  const item = formrender.getItemByPath(path);
+  const item = formrender.getItemByPath<V>(path);
   return item;
 };
 
@@ -58,14 +57,14 @@ export const moveWidgetItem = (formrender?: SimpleFormRender | null, from?: { in
 };
 
 // 插入新节点
-export const insertWidgetItem = (formrender?: SimpleFormRender | null, data?: CustomWidgetItem, index?: number, parent?: string) => {
+export const insertWidgetItem = (formrender?: SimpleFormRender | null, data?: unknown, index?: number, parent?: string) => {
   if (!formrender || !data) return;
   const newData = data;
   formrender?.insertItemByIndex(newData, index, parent);
 };
 
 // 设置节点的属性
-export const setWidgetItem = (formrender?: SimpleFormRender | null, data?: any, path?: string) => {
+export const setWidgetItem = (formrender?: SimpleFormRender | null, data?: unknown, path?: string) => {
   if (!formrender) return;
   formrender?.setItemByPath(data, path);
 };

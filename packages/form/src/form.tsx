@@ -1,31 +1,27 @@
-import React, { CSSProperties, useEffect } from 'react';
-import { FormItem } from './form-item';
-import { SimpleForm } from './form-store';
-import { SimpleFormContext, FormInitialValuesContext } from './form-context';
-import { ItemCoreProps } from './item-core';
+import React, { useEffect } from 'react';
+import { FormItem, FormItemOptions } from './form-item';
+import { SimpleFormContext, FormInitialValuesContext } from './context';
 import { ItemProps } from './components/Item';
 import { isObject } from './utils/type';
+import { SimpleForm } from './store';
 
 interface CreateFormProps extends React.HTMLAttributes<HTMLElement> {
   tagName?: keyof React.ReactHTML;
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
   onReset?: (e: React.FormEvent<HTMLFormElement>) => void;
 }
-const CreateForm = React.forwardRef<any, CreateFormProps>((props, ref) => {
+const CreateForm = React.forwardRef<unknown, CreateFormProps>((props, ref) => {
   const { tagName = "form", ...rest } = props;
   return React.createElement(tagName, { ...rest, ref });
 });
 
-export type WatchHandler = (newValue: any, oldValue: any) => void;
-export type FormProps<S = SimpleForm, T = ItemProps> = T & ItemCoreProps & {
-  className?: string;
-  form?: S;
+export type WatchHandler = <T>(newValue: T, oldValue: T) => void;
+export type FormProps<V = any, P = ItemProps> = {
   watch?: { [key: string]: { immediate?: boolean, handler: WatchHandler } | WatchHandler };
-  style?: CSSProperties;
-  children?: any;
-  initialValues?: any;
-  component?: any;
-} & CreateFormProps;
+  children?: unknown;
+  initialValues?: unknown;
+  form?: SimpleForm<V>;
+} & FormItemOptions<P> & CreateFormProps;
 
 export function Form(props: FormProps) {
   const { className = '', style, children, initialValues, tagName, onSubmit, onReset, watch, ...rest } = props;

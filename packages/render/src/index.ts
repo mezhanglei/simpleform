@@ -2,7 +2,7 @@ import FormRender from './form';
 import FormChildren from './children';
 export default FormRender;
 export { FormChildren };
-export * from './types';
+export * from './typings';
 export * from './components';
 export * from './store';
 export * from "./hooks";

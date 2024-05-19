@@ -7,13 +7,6 @@ import { FormEditorContextProps, useEditorContext } from '../context';
 import { getParent } from '../formrender';
 import { Tag } from 'antd';
 
-export interface PanelTagProps {
-  className?: string
-  style?: CSSProperties
-  children: any
-  onChange: () => void
-}
-
 const defaultPanelData = {
   '布局组件': ['Grid', 'Divider', 'Alert'],
   '控件组合': ['FormTable'],
@@ -40,7 +33,7 @@ const defaultPanelData = {
 export interface EditorPanelProps {
   className?: string
   style?: CSSProperties
-  panelData?: { [title: string]: Array<string> }; // 组件面板配置
+  panelData?: Record<string, string[]>; // 组件面板配置
   children?: (context: FormEditorContextProps) => React.ReactElement;
 }
 
@@ -76,7 +69,7 @@ function EditorPanel(props: EditorPanelProps) {
               <div key={title} className='panel-list'>
                 <div className={`panel-list-title`}>{title}</div>
                 <ReactSortable
-                  list={list}
+                  list={list as any[]}
                   setList={() => { }}
                   forceFallback={true}
                   sort={false}
@@ -91,7 +84,7 @@ function EditorPanel(props: EditorPanelProps) {
                   {
                     list.map((key) => {
                       const data = editorConfig?.[key] || {};
-                      const panel = data?.panel || {};
+                      const panel = typeof data?.panel === 'object' ? data?.panel : {};
                       return <Tag className="component-tag" key={key} data-type={key} data-group='panel' onClick={(e) => onChange?.(key)}>{panel.label}</Tag>;
                     })
                   }

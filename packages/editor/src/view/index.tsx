@@ -27,7 +27,7 @@ function EditorView(props: EditorViewProps) {
     ...restProps
   } = props;
 
-  const onRenderChange: CustomFormRenderProps['onRenderChange'] = (newData) => {
+  const onRenderChange = (newData) => {
     console.log(newData, '表单');
     context?.dispatch((old) => ({
       ...old,
@@ -70,12 +70,12 @@ function EditorView(props: EditorViewProps) {
 };
 
 // 编辑区默认的选中框渲染
-const renderItem: CustomFormRenderProps['renderItem'] = (props) => {
-  const { children } = props;
-  const isItem = props?.widgetItem?.widgetList ? false : true;
+const renderItem = (children, params) => {
+  const _options = params?._options || {};
+  const isItem = _options?.widgetList ? false : true;
   // 单个组件批量添加选区
   if (isItem) {
-    return <ComponentSelection data-path={props.path} {...props} />;
+    return <ComponentSelection data-path={_options.path} {...params} children={children} />;
   }
   return children;
 };

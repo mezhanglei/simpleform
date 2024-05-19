@@ -8,7 +8,7 @@ import { BaseSelectionProps } from '../../../view/BaseSelection';
 
 export type CustomRowProps = RowProps & BaseSelectionProps;
 
-const GridRow = React.forwardRef<any, CustomRowProps>((props, ref) => {
+const GridRow = React.forwardRef<HTMLDivElement, CustomRowProps>((props, ref) => {
   const {
     children,
     className,
@@ -16,8 +16,8 @@ const GridRow = React.forwardRef<any, CustomRowProps>((props, ref) => {
     ...rest
   } = props;
 
-  const { widgetItem } = rest || {};
-  const isEditor = widgetItem?.isEditor;
+  const { _options } = rest || {};
+  const isEditor = _options?.isEditor;
   const cls = classnames(className, {
     'edit-row': isEditor
   });

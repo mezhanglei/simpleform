@@ -1,18 +1,18 @@
 import { deepClone } from "./utils/object";
-import { CustomUnionType, GenerateParams, WidgetItem, WidgetList } from "./types";
+import { CustomUnionType, FormRenderProps, WidgetList } from "./typings";
 import { getItemByPath, setItemByPath, moveSameLevel, moveDiffLevel, getKeyValueByIndex, insertItemByIndex } from "./utils/utils";
 import { createFormElement, getFormComponent } from "./utils/transform";
 import { joinFormPath } from "@simpleform/form";
 
-export type FormRenderListener = (newValue?: any, oldValue?: any) => void;
+export type FormRenderListener<V> = (newValue?: V, oldValue?: V) => void;
 
 // 管理formrender过程中的数据
 export class SimpleFormRender {
-  public plugins: any;
-  public components: any;
+  public plugins: FormRenderProps['plugins'];
+  public components: FormRenderProps['components'];
   private widgetList: WidgetList;
   private lastWidgetList: WidgetList | undefined;
-  private widgetListListeners: FormRenderListener[] = [];
+  private widgetListListeners: FormRenderListener<WidgetList>[] = [];
   constructor() {
     this.widgetList = [];
     this.lastWidgetList = undefined;
@@ -26,11 +26,11 @@ export class SimpleFormRender {
   }
 
   // 增加plugin
-  public addPlugin(data: any) {
+  public addPlugin(data: FormRenderProps['plugins']) {
     this.plugins = Object.assign({}, this.plugins, data);
   };
   // 注册组件
-  public registry(data: any) {
+  public registry(data: FormRenderProps['components']) {
     this.components = Object.assign({}, this.components, data);
   };
 
@@ -41,7 +41,7 @@ export class SimpleFormRender {
   }
 
   // 创建components的实例
-  public createFormElement(target?: CustomUnionType, commonProps?: GenerateParams) {
+  public createFormElement(target?: CustomUnionType, commonProps?: unknown) {
     const typeMap = this.components;
     return createFormElement(target, typeMap, commonProps);
   }
@@ -52,26 +52,26 @@ export class SimpleFormRender {
   }
 
   // 设置widgetList
-  setWidgetList(data?: WidgetList) {
+  setWidgetList(data?: SimpleFormRender['widgetList']) {
     this.lastWidgetList = this.widgetList;
     this.widgetList = data || [];
     this.notifyWidgetList();
   }
 
   // 设置指定路径的值
-  setItemByPath = (data?: any, path?: string) => {
+  setItemByPath = (data?: unknown, path?: string) => {
     const cloneData = this.getWidgetList();
     if (cloneData) {
-      let newData = setItemByPath(cloneData, data, path);
+      const newData = setItemByPath(cloneData, data, path);
       this.setWidgetList(newData);
     }
   };
 
   // 设置指定路径的值
-  setItemByIndex = (data?: any, index?: number, parent?: string) => {
+  setItemByIndex = <V>(data?: unknown, index?: number, parent?: string) => {
     const cloneData = this.getWidgetList();
     if (cloneData) {
-      const keyValue = getKeyValueByIndex(cloneData, index, parent);
+      const keyValue = getKeyValueByIndex<V>(cloneData, index, parent);
       const path = joinFormPath(parent, keyValue && keyValue[0]);
       const newData = setItemByPath(cloneData, data, path);
       this.setWidgetList(newData);
@@ -79,10 +79,10 @@ export class SimpleFormRender {
   };
 
   // 插入值，默认末尾
-  insertItemByIndex = (data?: WidgetItem | Array<WidgetItem>, index?: number, parent?: string) => {
+  insertItemByIndex = <V>(data?: V | Array<V>, index?: number, parent?: string) => {
     const cloneData = this.getWidgetList();
     if (cloneData) {
-      const newData = insertItemByIndex(cloneData, data, index, parent);
+      const newData = insertItemByIndex<V>(cloneData, data, index, parent);
       this.setWidgetList(newData);
     }
   };
@@ -97,18 +97,18 @@ export class SimpleFormRender {
   };
 
   // 获取指定路径的项
-  getItemByPath = (path?: string) => {
+  getItemByPath = <V>(path?: string) => {
     const cloneData = this.getWidgetList();
     if (cloneData) {
-      return getItemByPath(cloneData, path);
+      return getItemByPath<V>(cloneData, path);
     }
   };
 
   // 获取指定index的项
-  getItemByIndex = (index: number, parent?: string) => {
+  getItemByIndex = <V>(index: number, parent?: string) => {
     const cloneData = this.getWidgetList();
     if (cloneData) {
-      const keyValue = getKeyValueByIndex(cloneData, index, parent);
+      const keyValue = getKeyValueByIndex<V>(cloneData, index, parent);
       return keyValue && keyValue[1];
     }
   };
@@ -117,18 +117,18 @@ export class SimpleFormRender {
   moveItemByPath = (from: { parent?: string, index: number }, to: { parent?: string, index?: number }) => {
     const cloneData = this.getWidgetList();
     if (cloneData) {
-      let newData: any;
+      let newData: SimpleFormRender['widgetList'] | undefined;
       if (from?.parent === to?.parent) {
         newData = moveSameLevel(cloneData, from, to);
       } else {
         newData = moveDiffLevel(cloneData, from, to);
       }
-      this.setWidgetList(newData);
+      this.setWidgetList(newData || []);
     }
   };
 
   // 订阅表单渲染数据的变动
-  public subscribeWidgetList(listener: FormRenderListener) {
+  public subscribeWidgetList(listener: SimpleFormRender['widgetListListeners'][number]) {
     this.widgetListListeners.push(listener);
     return () => {
       this.widgetListListeners = [];

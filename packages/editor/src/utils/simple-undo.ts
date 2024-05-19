@@ -208,7 +208,7 @@ export default class SimpleUndo {
     this.onUpdate();
   }
 
-  initialize(initialItem: any) {
+  initialize(initialItem) {
     this.stack[0] = initialItem;
     this.initialItem = initialItem;
   }

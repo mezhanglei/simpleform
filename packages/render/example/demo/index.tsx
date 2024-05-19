@@ -4,7 +4,7 @@ import FormRender, { useSimpleForm } from '../../src/index';
 import { Button, Checkbox, Input, Radio, Select } from 'antd';
 
 // 原子组件
-export const defaultComponents: { [key: string]: any } = {
+export const defaultComponents = {
   "Input": Input,
   "Radio.Group": Radio.Group,
   "Radio": Radio,

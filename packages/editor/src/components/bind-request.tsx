@@ -1,4 +1,6 @@
+import { AxiosInstance } from 'axios';
 import React, { useEffect, useState } from 'react';
+import { CommonFormProps, ReactComponent } from '../formrender';
 import { objectToFormData } from '../utils/object';
 
 /**
@@ -8,14 +10,15 @@ import { objectToFormData } from '../utils/object';
  * @returns 
  */
 
-export default function bindRequest(Component: any, codeStr: string = "options") {
-  return React.forwardRef<any, any>(({ optionType, ...props }, ref) => {
+export default function bindRequest(Component: ReactComponent<any>, codeStr: string = "options") {
+  return React.forwardRef<unknown, CommonFormProps>((props, ref) => {
     // 目标参数
     const target = props?.[codeStr];
-    const formrender = props.formrender;
-    const request = formrender.plugins && formrender.plugins.request;
+    const _options = props._options;
+    const formrender = _options?.formrender;
+    const request = formrender?.plugins && formrender.plugins.request as AxiosInstance;
 
-    const [response, setResponse] = useState<any>([]);
+    const [response, setResponse] = useState<unknown[]>([]);
     const [isRequest, setIsRequest] = useState<boolean>();
 
     useEffect(() => {

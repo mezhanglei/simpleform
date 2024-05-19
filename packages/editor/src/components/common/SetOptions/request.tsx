@@ -2,18 +2,18 @@ import classNames from "classnames";
 import React, { CSSProperties, useEffect } from "react";
 import CodeTextArea from "../CodeTextarea";
 import { EditorCodeMirrorModal } from "../CodeMirror";
-import DefaultFormRender, { useSimpleForm, FormRenderProps, CommonWidgetProps } from "../../../formrender";
+import DefaultFormRender, { useSimpleForm, CommonFormProps } from "../../../formrender";
 
 export interface RequestResponseConfig {
   url?: string; // 请求的路径
   method?: string; // 请求方式
   paramsType?: string; // 参数类型
-  params?: any; // 参数
-  headers?: any; // headers携带的信息
-  returnFn?: string | ((val: any) => any); // 解析函数字符串
+  params?: unknown; // 参数
+  headers?: unknown; // headers携带的信息
+  returnFn?: string | (<V, R>(val: V) => R); // 解析函数字符串
 }
 
-export interface RequestSettingProps extends CommonWidgetProps<RequestResponseConfig> {
+export interface RequestSettingProps extends CommonFormProps<RequestResponseConfig> {
   className?: string;
   style?: CSSProperties;
 }
@@ -38,17 +38,17 @@ const RequestSetting = React.forwardRef<HTMLElement, RequestSettingProps>((props
     value,
     onChange,
     className,
-    widgetItem,
+    _options,
     ...rest
   } = props;
 
-  const context = widgetItem?.context;
+  const context = _options?.context;
   const FormRender = context?.state?.FormRender || DefaultFormRender;
-  const requestForm = useSimpleForm();
+  const form = useSimpleForm<RequestResponseConfig>();
 
   useEffect(() => {
-    if (requestForm) {
-      requestForm.setFieldsValue(value);
+    if (form) {
+      form.setFieldsValue(value);
     }
   }, [value]);
 
@@ -111,9 +111,9 @@ const RequestSetting = React.forwardRef<HTMLElement, RequestSettingProps>((props
     },
   ];
 
-  const onFieldsChange: FormRenderProps['onFieldsChange'] = ({ name }) => {
-    if (!name) return;
-    const newConfig = requestForm.getFieldValue();
+  const onFieldsChange = (_) => {
+    if (!_?.name) return;
+    const newConfig = form.getFieldValue();
     onChange && onChange(newConfig);
   };
 
@@ -121,7 +121,7 @@ const RequestSetting = React.forwardRef<HTMLElement, RequestSettingProps>((props
     <div className={classNames(classes.cls, className)} {...rest}>
       <FormRender
         tagName="div"
-        form={requestForm}
+        form={form}
         widgetList={widgetList}
         onFieldsChange={onFieldsChange}
       />

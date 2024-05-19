@@ -7,9 +7,9 @@ import { joinFormPath, CustomCol } from '../../../formrender';
 import BaseDnd from '../../../view/BaseDnd';
 import { BaseSelectionProps } from '../../../view/BaseSelection';
 
-export type CustomColProps = ColProps & BaseSelectionProps;
+export type CustomColProps = Omit<ColProps, 'draggable' | 'onSelect'> & BaseSelectionProps;
 // col组件
-const GridCol = React.forwardRef<any, CustomColProps>((props, ref) => {
+const GridCol = React.forwardRef<HTMLDivElement, CustomColProps>((props, ref) => {
   const {
     className,
     children,
@@ -17,8 +17,9 @@ const GridCol = React.forwardRef<any, CustomColProps>((props, ref) => {
     ...rest
   } = props;
 
-  const { widgetItem } = rest || {};
-  const isEditor = widgetItem?.isEditor;
+  const { _options } = rest || {};
+  const isEditor = _options?.isEditor;
+  const path = _options?.path;
   const cls = classnames(className, {
     'edit-col': isEditor
   });
@@ -29,8 +30,8 @@ const GridCol = React.forwardRef<any, CustomColProps>((props, ref) => {
         <ColSelection {...rest} >
           <BaseDnd
             {...rest}
-            dndPath={joinFormPath(rest?.path, 'widgetList')}
-            dndList={widgetItem?.widgetList || []}>
+            dndPath={joinFormPath(path, 'widgetList')}
+            dndList={_options?.widgetList || []}>
             {children}
           </BaseDnd>
         </ColSelection>

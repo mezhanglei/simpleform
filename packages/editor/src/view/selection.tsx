@@ -1,32 +1,23 @@
 import { getWidgetItem, insertWidgetItem } from '../utils/utils';
-import React, { CSSProperties } from 'react';
+import React from 'react';
 import BaseSelection, { BaseSelectionProps } from './BaseSelection';
 import SvgIcon from '../components/common/SvgIcon';
 import { getParent } from '../formrender';
 
-export interface ControlSelectionProps extends BaseSelectionProps {
-  children?: any;
-  style?: CSSProperties;
-  className?: string;
-}
-
-function ControlSelection(props: ControlSelectionProps, ref: any) {
+const ControlSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((props, ref) => {
   const {
     children,
-    style,
-    className,
-    index,
-    path,
-    widgetItem,
-    formrender: editor,
-    form: editorForm,
+    _options,
   } = props;
 
-  const context = widgetItem?.context;
+  const path = _options?.path;
+  const index = _options?.index;
+  const editor = _options?.formrender;
+  const context = _options?.context;
   const { historyRecord } = context?.state || {};
 
   const copyItem = () => {
-    const currentIndex = index;
+    const currentIndex = index || -1;
     const nextIndex = currentIndex + 1;
     const newItem = getWidgetItem(editor, path);
     insertWidgetItem(editor, newItem, nextIndex, getParent(path));
@@ -37,12 +28,12 @@ function ControlSelection(props: ControlSelectionProps, ref: any) {
     <BaseSelection
       ref={ref}
       {...props}
-      configLabel={widgetItem?.panel?.label}
+      configLabel={_options?.panel?.label}
       tools={[<SvgIcon key="fuzhi" name="fuzhi" onClick={copyItem} />]}
     >
       {children}
     </BaseSelection>
   );
-};
+});
 
-export default React.forwardRef(ControlSelection);
+export default ControlSelection;

@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from 'react';
-import { CustomWidgetItem, FormDesignData, SimpleFormRender, SimpleForm } from './formrender';
+import { CustomWidgetItem, FormDesignData, SimpleFormRender, SimpleForm, ReactComponent } from './formrender';
 import { PlatType } from './tools/platContainer';
 import { useMethod } from './utils/hooks';
 import SimpleUndo from './utils/simple-undo';
@@ -14,7 +14,7 @@ export interface FormEditorState {
   editorForm?: SimpleForm;
   editor?: SimpleFormRender;
   settingForm?: SimpleForm | null;
-  FormRender?: React.ComponentType<any> | React.ForwardRefExoticComponent<any>;
+  FormRender?: ReactComponent<any>;
   selected?: { path?: string; setting?: ConfigWidgetSetting };
   beforeSelected?: { path?: string; setting?: ConfigWidgetSetting };
   widgetList?: FormDesignData;
@@ -26,9 +26,8 @@ export interface FormEditorState {
 
 export interface FormEditorContextProps {
   state: FormEditorState;
-  dispatch: (state: React.SetStateAction<Partial<FormEditorContextProps['state']>>) => void
+  dispatch: (action: React.SetStateAction<unknown>) => void
 }
-
 
 // 初始化reducer
 export function useEditorState(initialState: FormEditorState) {

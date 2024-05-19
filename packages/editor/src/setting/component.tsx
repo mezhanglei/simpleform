@@ -13,7 +13,7 @@ export interface SelectedSettingProps {
 const prefixCls = 'item-setting';
 
 // 选中节点的属性设置
-function SelectedSetting(props: SelectedSettingProps, ref: any) {
+const SelectedSetting = React.forwardRef<HTMLDivElement, SelectedSettingProps>((props, ref) => {
   const {
     style,
     className,
@@ -52,7 +52,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
     // 同步编辑区域初始值展示
     if (name === 'initialValue') {
       const item = getWidgetItem(editor, selectedPath);
-      editorForm?.setFieldValue(item.name, value);
+      editorForm?.setFieldValue(item?.name || '', value);
     }
   };
 
@@ -76,7 +76,7 @@ function SelectedSetting(props: SelectedSettingProps, ref: any) {
       </Form>
     </div>
   );
-};
+});
 
 SelectedSetting.displayName = 'component-setting';
-export default React.forwardRef(SelectedSetting);
+export default SelectedSetting;

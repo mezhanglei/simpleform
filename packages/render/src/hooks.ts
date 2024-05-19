@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { SimpleFormRender } from './store';
-import { WidgetList } from './types';
+import { WidgetList } from './typings';
 
 export function useSimpleFormRender() {
   return useMemo(() => new SimpleFormRender(), []);
@@ -28,5 +28,5 @@ export function useWidgetList(formrender: SimpleFormRender) {
     };
   }, []);
 
-  return [widgetList, setWidgetList];
+  return [widgetList, setWidgetList] as const;
 }

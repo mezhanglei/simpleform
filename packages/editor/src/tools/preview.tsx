@@ -30,7 +30,7 @@ export const PreviewModal = React.forwardRef<HTMLDivElement, PreviewModalProps>(
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>();
   const [platType, setPlatType] = useState<PlatContainerProps['plat']>('pc');
-  const form = useSimpleForm();
+  const form = useSimpleForm<FormDesignData>();
   const FormRender = context?.state?.FormRender || DefaultFormRender;
 
   useEffect(() => {

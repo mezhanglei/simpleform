@@ -4,10 +4,10 @@ import SvgIcon from "../SvgIcon";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import LinkageSettingModal, { SettingModalProps } from "./modal";
 import './checkbox.less';
-import { CommonWidgetProps } from "../../../formrender";
+import { CommonFormProps } from "../../../formrender";
 
 // checkbox点击联动弹窗
-const OperateCheckbox = (props: SettingModalProps & CheckboxProps & CommonWidgetProps<boolean | string>) => {
+const OperateCheckbox = (props: SettingModalProps & CheckboxProps & CommonFormProps<boolean | string>) => {
 
   const {
     value,
@@ -65,17 +65,23 @@ const OperateCheckbox = (props: SettingModalProps & CheckboxProps & CommonWidget
   };
 
   return (
-    <LinkageSettingModal {...rest} title="添加联动" widgetConfig={widgetConfig} onChange={handOk} value={codeStr} displayElement={
-      (showModal) => (
-        <div className="operate-setting-checkbox">
-          <Checkbox checked={checked} onChange={checkboxChange} {...rest}>
-            {children}
-          </Checkbox>
-          <SvgIcon onClick={showModal} name="edit" title="编辑" />
-          {codeStr && <SvgIcon onClick={clearCodeStr} title="清除" name="qingchu" />}
-        </div>
-      )
-    } />
+    <LinkageSettingModal
+      {...rest}
+      title="添加联动"
+      widgetConfig={widgetConfig}
+      onChange={handOk}
+      value={codeStr}
+      displayElement={
+        (showModal) => (
+          <div className="operate-setting-checkbox">
+            <Checkbox checked={checked} onChange={checkboxChange} {...rest}>
+              {children}
+            </Checkbox>
+            <SvgIcon onClick={showModal} name="edit" title="编辑" />
+            {codeStr && <SvgIcon onClick={clearCodeStr} title="清除" name="qingchu" />}
+          </div>
+        )
+      } />
   );
 };
 

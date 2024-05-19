@@ -2,10 +2,11 @@ import { Input } from 'antd';
 import { TextAreaProps } from 'antd/lib/input';
 import { TextAreaRef } from 'antd/lib/input/TextArea';
 import React, { useEffect, useState } from 'react';
+import { CommonFormProps } from '../../../formrender';
 import { convertToString, evalString } from '../../../utils/string';
 
 // 函数代码编辑器
-export interface CodeTextAreaProps extends TextAreaProps {
+export interface CodeTextAreaProps extends Omit<TextAreaProps, 'value'|'onChange'>,CommonFormProps {
 }
 const CodeTextArea = React.forwardRef<TextAreaRef, CodeTextAreaProps>((props, ref) => {
 

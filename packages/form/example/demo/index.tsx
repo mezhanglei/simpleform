@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import "./index.less";
-// import { Form, useSimpleForm, useFormValues } from '../../lib';
-import { Form, useSimpleForm, useFormValues } from '../../src';
+// import { Form, useSimpleForm } from '../../lib';
+import { Form, useSimpleForm } from '../../src';
 
 export default function Demo() {
 
@@ -27,10 +27,10 @@ export default function Demo() {
             <input {...bindProps} />
           </div>
         )} */}
-        <input {...form.getBindProps('name1')} />
+        <input style={{ height: '32px' }} {...form.getBindProps('name1')} />
       </Form.Item>
       <Form.Item label="Name2" name="name2.a" rules={[{ required: true, message: 'name2 is empty' }]}>
-        {({ bindProps }) => <input {...bindProps} />}
+        {({ bindProps }) => <input style={{ height: '100px' }} {...bindProps} />}
       </Form.Item>
       <Form.Item label="">
         <button>Submit</button>

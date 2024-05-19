@@ -6,13 +6,13 @@ import RequestSetting from './request';
 import OptionList from './list';
 import { EditorCodeMirror } from "../CodeMirror";
 import { getWidgetItem, setWidgetItem } from "../../../utils/utils";
-import { joinFormPath, CommonWidgetProps } from "../../../formrender";
+import { joinFormPath, CommonFormProps } from "../../../formrender";
 
 /**
  * 数据源的配置组件。
  */
 
-export interface SetOptionsProps extends CommonWidgetProps {
+export interface SetOptionsProps extends CommonFormProps<any> {
   includes?: string[]; // 当前可用模块
 }
 
@@ -38,14 +38,13 @@ const SetOptions: React.FC<SetOptionsProps> = (props) => {
     includes = OptionsKeys,
     value,
     onChange,
-    widgetItem,
-    ...rest
+    _options
   } = props;
 
-  const context = widgetItem?.context;
+  const context = _options?.context;
   const { selected, editor } = context?.state || {};
   const buttons = useMemo(() => (OptionsKeys?.filter((key) => includes?.includes(key))), [includes]);
-  const optionSelect: OptionsKey = getWidgetItem(editor, joinFormPath(selected?.path, 'props.optionSelect')) || buttons[0];
+  const optionSelect = getWidgetItem<OptionsKey>(editor, joinFormPath(selected?.path, 'props.optionSelect')) || buttons[0];
 
   const selectTypeChange = (key?: OptionsKey) => {
     if (key) {
@@ -54,7 +53,7 @@ const SetOptions: React.FC<SetOptionsProps> = (props) => {
     }
   };
 
-  const handleChange = (value: unknown) => {
+  const handleChange = (value) => {
     if (!optionSelect) return;
     onChange && onChange(value);
   };

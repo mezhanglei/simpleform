@@ -1,18 +1,20 @@
 import React, { useContext, CSSProperties, useMemo } from 'react';
-import { SimpleFormContext } from './form-context';
+import { SimpleFormContext } from './context';
 import { useFormError } from './hooks';
 import { Item, ItemProps } from './components/Item';
 import { ItemCore, ItemCoreProps } from './item-core';
 
-export type FormItemProps<T = ItemProps> = T & ItemCoreProps & {
+export type FormItemOptions<P = ItemProps> = Omit<P, 'children'> & ItemCoreProps & {
+  component?: React.ComponentType<any> | React.ForwardRefExoticComponent<any> | null;
+}
+export type FormItemProps<P = ItemProps> = FormItemOptions<P> & {
   className?: string;
   style?: CSSProperties;
-  component?: any;
 }
 
-export const FormItem = React.forwardRef<any, FormItemProps>((props, ref) => {
+export const FormItem = React.forwardRef<HTMLDivElement, FormItemProps>((props, ref) => {
   const { form, ...options } = useContext(SimpleFormContext);
-  const mergeProps = Object.assign({}, options, props);
+  const mergeProps = Object.assign(options, props);
   const { children, ...fieldProps } = mergeProps;
   const {
     name,

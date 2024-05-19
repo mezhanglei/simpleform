@@ -1,6 +1,6 @@
 import React from 'react';
 import { Col, ColProps, Row, RowProps } from "antd";
-import { GenerateParams } from '../types';
+import { WidgetContextProps } from '../typings';
 import './grid.less';
 import classnames from 'classnames';
 
@@ -9,7 +9,7 @@ export const getColProps = (props: ColProps, inline?: boolean) => {
   const { xs, sm, md, lg, span, ...restProps } = props || {};
   const maxspan = 24;
   // 计算layout带来的影响
-  const getValue = (inline?: boolean, value?: any) => {
+  const getValue = (inline?: boolean, value?: ColProps['xs']) => {
     if (!inline) {
       return value ?? (span || maxspan);
     }
@@ -23,16 +23,13 @@ export const getColProps = (props: ColProps, inline?: boolean) => {
   };
 };
 
-export interface CustomRowProps extends RowProps, GenerateParams {
-  children: any;
+export interface CustomRowProps extends RowProps, WidgetContextProps {
+  children?: React.ReactNode;
 }
 // row组件
-export const CustomRow = React.forwardRef<any, CustomRowProps>((props, ref) => {
+export const CustomRow = React.forwardRef<HTMLDivElement, CustomRowProps>((props, ref) => {
   const {
-    path,
-    widgetItem,
-    formrender,
-    form,
+    _options,
     children,
     className,
     ...rest
@@ -45,21 +42,18 @@ export const CustomRow = React.forwardRef<any, CustomRowProps>((props, ref) => {
   );
 });
 
-export interface CustomColProps extends ColProps, GenerateParams {
-  children: any;
+export interface CustomColProps extends ColProps, WidgetContextProps {
+  children?: React.ReactNode;
 }
 // col组件
-export const CustomCol = React.forwardRef<any, CustomColProps>((props, ref) => {
+export const CustomCol = React.forwardRef<HTMLDivElement, CustomColProps>((props, ref) => {
   const {
-    path,
-    widgetItem,
-    formrender,
-    form,
+    _options,
     className,
     children,
     ...rest
   } = props;
-  const calcProps = getColProps(rest, widgetItem?.inline);
+  const calcProps = getColProps(rest, _options?.inline);
   const cls = classnames('custom-col', className);
   return (
     <Col ref={ref} className={cls} {...calcProps}>

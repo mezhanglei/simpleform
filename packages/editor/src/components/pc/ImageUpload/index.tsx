@@ -5,16 +5,17 @@ import { UploadFile } from 'antd/lib/upload/interface';
 import { objectToFormData } from '../../../utils/object';
 import { getBase64 } from './util';
 import { IMAGE_MIME_KEYS, isImageFile } from '../../../utils/mime';
-import { CommonWidgetProps } from '../../../formrender';
+import { CommonFormProps } from '../../../formrender';
+import { AxiosInstance } from 'axios';
 
 // 扩展后的文件类型
-export type FileItem = UploadFile & RcFile & Record<string, any>;
-export interface ImageUploadProps extends Omit<UploadProps, 'onChange'>, CommonWidgetProps<Array<FileItem>> {
+export type FileItem = UploadFile & RcFile;
+export interface ImageUploadProps extends Omit<UploadProps, 'onChange'>, CommonFormProps<Array<FileItem>> {
   formdataKey: string; // FormData的key
   maxSize?: number; // 每张图片的限制上传大小
-  uploadCallback?: (data: any) => any; // 上传请求函数回调
+  uploadCallback?: (data: unknown) => Record<string, unknown>; // 上传请求函数回调
 }
-const ImageUpload = React.forwardRef<any, ImageUploadProps>((props, ref) => {
+const ImageUpload = React.forwardRef<unknown, ImageUploadProps>((props, ref) => {
 
   const {
     maxSize = 5,
@@ -30,9 +31,7 @@ const ImageUpload = React.forwardRef<any, ImageUploadProps>((props, ref) => {
     multiple = true,
     children,
     formdataKey = 'file',
-    path,
-    widgetItem,
-    formrender,
+    _options,
     uploadCallback,
     ...rest
   } = props;
@@ -42,7 +41,8 @@ const ImageUpload = React.forwardRef<any, ImageUploadProps>((props, ref) => {
   const [imageTitle, setImageTitle] = useState<string>();
   const [imageSrc, setImageSrc] = useState<string>();
   const [loading, setLoading] = useState<boolean>();
-  const request = formrender?.plugins && formrender?.plugins.request;
+  const formrender = _options?.formrender;
+  const request = formrender?.plugins && formrender?.plugins.request as AxiosInstance;
 
   useEffect(() => {
     setFileList(JSON.parse(JSON.stringify(value || [])));
@@ -82,25 +82,25 @@ const ImageUpload = React.forwardRef<any, ImageUploadProps>((props, ref) => {
     },
     customRequest: async (option) => {
       const file = option?.file as RcFile;
-      if (!file) return;
+      if (!file || typeof action !== 'string') return;
       const cloneData = [...fileList];
       const insertIndex = cloneData?.length;
       const formdata = objectToFormData(data);
       formdata.append(formdataKey, file);
       setLoading(true);
-      request(action, {
+      request?.(action, {
         method: 'post',
         data: formdata,
         headers: headers,
-        onUploadProgress: (event: any) => {
-          const complete = (event.loaded / event.total * 100 | 0);
+        onUploadProgress: (event) => {
+          const complete = event?.total && (event.loaded / event?.total * 100 | 0);
           cloneData[insertIndex] = { ...file, percent: complete };
           setFileList(cloneData);
         }
-      }).then((res: any) => {
+      }).then((res) => {
         const data = res.data;
         const params = typeof uploadCallback === 'function' ? uploadCallback(data) : {};
-        cloneData[insertIndex] = { ...file, status: 'success', ...params };
+        cloneData[insertIndex] = { ...file, status: 'success' as FileItem['status'], ...params };
         if (!cloneData[insertIndex].url) {
           getBase64(file).then((url) => {
             cloneData[insertIndex].thumbUrl = url;

@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { deepSet } from "../formrender";
 
-export function useMethod<T extends (...args: any[]) => any>(method: T) {
+export function useMethod<T extends (...args: unknown[]) => unknown>(method: T) {
   const { current } = useRef<{ method: T, func: T | undefined }>({
     method,
     func: undefined,
@@ -18,7 +18,7 @@ export function useMethod<T extends (...args: any[]) => any>(method: T) {
 }
 
 // 处理列表型的数据
-export function useTableData<T = any>(intialValue?: T[], onChange?: (data: T[]) => void) {
+export function useTableData<T>(intialValue?: T[], onChange?: (data: T[]) => void) {
   const [dataSource, setData] = useState<T[]>(intialValue || []);
   const dataSourceRef = useRef<T[]>(intialValue || []);
 
@@ -35,17 +35,17 @@ export function useTableData<T = any>(intialValue?: T[], onChange?: (data: T[]) 
   };
 
   // 更新目标数据
-  const updateItem = (data: any, rowIndex: number, path?: string) => {
+  const updateItem = (data: unknown, rowIndex: number, path?: string) => {
     const oldData = dataSourceRef.current;
-    const cloneData = oldData ? [...oldData] : [];
+    const cloneData = oldData ? [...oldData] : [] as unknown[];
     let item = cloneData?.[rowIndex] ?? {};
     if (path) {
       cloneData[rowIndex] = deepSet(item, path, data);
     } else {
       cloneData[rowIndex] = data;
     }
-    setDataSource(cloneData);
-    dataChange(cloneData);
+    setDataSource(cloneData as T[]);
+    dataChange(cloneData as T[]);
   };
 
   // 新增一行

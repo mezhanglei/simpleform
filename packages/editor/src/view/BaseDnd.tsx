@@ -1,24 +1,24 @@
 import { ReactSortable, ReactSortableProps } from "react-sortablejs";
 import React, { CSSProperties } from 'react';
 import { defaultGetId, getConfigItem, insertWidgetItem, moveWidgetItem } from '../utils/utils';
-import { CommonWidgetProps, getParent, joinFormPath } from '../formrender';
+import { getParent, joinFormPath, CommonFormProps } from '../formrender';
 import './BaseDnd.less';
 
-export interface ControlDndProps extends Omit<CommonWidgetProps, 'onChange'>, Partial<ReactSortableProps<any>> {
+export interface ControlDndProps extends CommonFormProps, Omit<Partial<ReactSortableProps<any>>, 'onChange'> {
   className?: string;
   style?: CSSProperties;
-  children?: any;
   dndPath?: string;
-  dndList?: Array<any>;
+  dndList?: Array<unknown>;
 }
 
 // 控件的拖放区域组件
-function BaseDnd(props: ControlDndProps & Record<string, any>, ref: any) {
-  const { children, formrender, widgetItem, dndPath, dndList = [], setList = () => { }, ...rest } = props;
-  const context = widgetItem?.context;
+const BaseDnd = React.forwardRef<ReactSortable<any>, ControlDndProps>((props, ref) => {
+  const { children, _options, dndPath, dndList = [], setList = () => { }, ...rest } = props;
+  const context = _options?.context;
+  const formrender = _options?.formrender;
   const { editorConfig, historyRecord } = context?.state || {};
 
-  const onUpdate: ReactSortableProps<any>['onUpdate'] = (params) => {
+  const onUpdate: ControlDndProps['onUpdate'] = (params) => {
     const newIndex = params?.oldIndex;
     if (typeof newIndex !== 'number') return;
     const dropIndex = params?.newIndex;
@@ -29,7 +29,7 @@ function BaseDnd(props: ControlDndProps & Record<string, any>, ref: any) {
     console.log(params, '同域拖放');
   };
 
-  const onAdd: ReactSortableProps<any>['onAdd'] = (params) => {
+  const onAdd: ControlDndProps['onAdd'] = (params) => {
     console.log(params, '跨域拖放');
     const isPanel = params?.item?.dataset?.group == 'panel';
     // 从侧边栏插入进来
@@ -76,6 +76,6 @@ function BaseDnd(props: ControlDndProps & Record<string, any>, ref: any) {
       }
     </ReactSortable>
   );
-};
+});
 
-export default React.forwardRef(BaseDnd);
+export default BaseDnd;

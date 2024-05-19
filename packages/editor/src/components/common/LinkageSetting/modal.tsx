@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import './modal.less';
 import SvgIcon from "../SvgIcon";
-import DefaultFormRender, { useSimpleForm, CommonWidgetProps, CustomWidgetItem, CustomFormRenderProps } from "../../../formrender";
+import DefaultFormRender, { useSimpleForm, CommonFormProps, CustomGenerateWidgetItem } from "../../../formrender";
 import { codeToRule, ruleToCodeStr } from "./utils";
 import CustomModal, { CustomModalProps } from "../AntdModal";
 
@@ -13,8 +13,9 @@ export type RuleSettingItem = {
   code?: string;
   value?: unknown;
 }
-export interface SettingModalProps extends CustomModalProps, CommonWidgetProps<string> {
-  widgetConfig?: CustomWidgetItem;
+export interface SettingModalProps extends CustomModalProps, CommonFormProps<string> {
+  title?: NonNullable<CustomModalProps['modalProps']>['title']
+  widgetConfig?: CustomGenerateWidgetItem;
 }
 
 const prefixCls = 'dynamic-rules';
@@ -36,7 +37,7 @@ const assembleOptions = [{
 /**
  * 联动规则设置弹窗
  */
-const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((props, ref) => {
+const LinkageSettingModal: React.FC<SettingModalProps> = (props) => {
 
   const {
     value,
@@ -44,12 +45,11 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
     widgetConfig,
     title,
     displayElement,
-    widgetItem,
-    ...rest
+    _options
   } = props;
 
   const initialValue: RuleSettingItem[] = [{}];
-  const context = widgetItem?.context;
+  const context = _options?.context;
   const FormRender = context?.state?.FormRender || DefaultFormRender;
   const form = useSimpleForm();
   const [dataSource, setDataSource] = useState<RuleSettingItem[]>([]);
@@ -132,7 +132,7 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
     setDataSource(newData);
   };
 
-  const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = (_, values) => {
+  const onFieldsChange = (_, values) => {
     setDataSource(values);
   };
 
@@ -144,7 +144,13 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
 
 
   return (
-    <CustomModal onOk={handleOk} className={classes.cls} title={title} displayElement={displayElement}>
+    <CustomModal
+      onOk={handleOk}
+      displayElement={displayElement}
+      modalProps={{
+        className: classes.cls,
+        title: title
+      }}>
       <FormRender
         tagName="div"
         form={form}
@@ -153,6 +159,6 @@ const LinkageSettingModal = React.forwardRef<HTMLElement, SettingModalProps>((pr
       />
     </CustomModal>
   );
-});
+};
 
 export default LinkageSettingModal;

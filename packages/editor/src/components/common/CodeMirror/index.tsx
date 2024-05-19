@@ -8,7 +8,7 @@ import { convertToString, evalString } from '../../../utils/string';
 import { javascript } from '@codemirror/lang-javascript';
 import CodeMirror, { ViewUpdate } from '@uiw/react-codemirror';
 import { json } from "@codemirror/lang-json";
-import { CommonWidgetProps } from "../../../formrender";
+import { CommonFormProps } from "../../../formrender";
 
 const prefixCls = 'custom-editor';
 const classes = {
@@ -16,7 +16,7 @@ const classes = {
   disabled: `${prefixCls}-disabled`,
   modal: `${prefixCls}-modal`,
 };
-export interface EditorCodeMirrorProps extends CommonWidgetProps {
+export interface EditorCodeMirrorProps extends CommonFormProps {
   readOnly?: boolean; // 只读
   disabled?: boolean; // 禁止编辑
   className?: string;
@@ -24,7 +24,7 @@ export interface EditorCodeMirrorProps extends CommonWidgetProps {
 }
 export interface EditorCodeMirrorRef {
   getStr?: () => string;
-  getCode?: () => any;
+  getCode?: () => unknown;
 }
 // 代码编辑器(不可以编辑函数)
 export const EditorCodeMirror = React.forwardRef<EditorCodeMirrorRef, EditorCodeMirrorProps>((props, ref) => {
@@ -108,7 +108,7 @@ export const EditorCodeMirrorModal = (props: EditorCodeMirrorProps) => {
   };
 
   return (
-    <CustomModal title="编辑数据" onOk={handleOk} displayElement={
+    <CustomModal modalProps={{ title: '编辑数据' }} onOk={handleOk} displayElement={
       (showModal) => (
         <div>
           <span>{codeStr}</span>

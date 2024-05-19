@@ -3,11 +3,11 @@ import Icon from '../../SvgIcon';
 import { getWidgetItem, setWidgetItem } from '../../../../utils/utils';
 import FormTableColSetting from './column-setting';
 import BaseSelection, { BaseSelectionProps } from '../../../../view/BaseSelection';
-import { joinFormPath, CustomWidgetItem } from '../../../../formrender';
+import { joinFormPath, CustomGenerateWidgetItem } from '../../../../formrender';
 
 export interface ColumnSelectionProps extends BaseSelectionProps {
   colIndex: number;
-  column: CustomWidgetItem;
+  column: CustomGenerateWidgetItem;
 }
 /**
  * 给表单中的控件外围添加选中框
@@ -15,26 +15,22 @@ export interface ColumnSelectionProps extends BaseSelectionProps {
  * @param ref 
  * @returns 
  */
-function ColumnSelection(props: ColumnSelectionProps, ref: any) {
+const ColumnSelection = React.forwardRef<HTMLDivElement, ColumnSelectionProps>((props, ref) => {
   const {
     children,
-    style,
-    className,
-    path,
-    widgetItem,
-    formrender: editor,
-    form: editorForm,
+    _options,
     colIndex,
     column,
-    ...restProps
   } = props;
 
-  const columns = widgetItem?.props?.columns || [];
+  const editor = _options?.formrender;
+  const path = _options?.path;
+  const columns = (_options?.props?.columns || []) as Array<ColumnSelectionProps['column']>;
   const colmunPath = joinFormPath(path, colIndex);
-  const context = widgetItem?.context;
+  const context = _options?.context;
   const { editorConfig } = context?.state || {};
 
-  const onSelect: BaseSelectionProps['onSelect'] = (selected) => {
+  const onSelectHandler: BaseSelectionProps['onSelectHandler'] = (selected) => {
     const selectedItem = getWidgetItem(editor, selected?.path);
     const configSetting = editorConfig?.[selectedItem?.type || ''].setting;
     const baseSetting = configSetting?.['基础属性']?.filter((item) => item.name !== 'name');
@@ -63,13 +59,13 @@ function ColumnSelection(props: ColumnSelectionProps, ref: any) {
     <BaseSelection
       ref={ref}
       {...props}
-      path={colmunPath}
+      _options={{ ..._options, path: colmunPath }}
       configLabel="表格列"
-      onSelect={onSelect}
+      onSelectHandler={onSelectHandler}
       tools={[<Icon key="fuzhi" name="fuzhi" onClick={copyItem} />]}>
       {children}
     </BaseSelection>
   );
-};
+});
 
-export default React.forwardRef(ColumnSelection);
+export default ColumnSelection;

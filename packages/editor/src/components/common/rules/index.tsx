@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import './index.less';
-import { pickObject } from "../../../utils/object";
-import { CommonWidgetProps } from "../../../formrender";
+import { CommonFormProps, pickObject } from "../../../formrender";
 import RequiredComponent from "./required";
 import MinOrMaxComponent from "./minOrMax";
 import PatternComponent from "./pattern";
+import { InputFormRule } from "./core";
 
 
 // 校验规则组件
@@ -16,11 +16,9 @@ const RuleWidget = {
   max: { label: '上限', component: MinOrMaxComponent },
   min: { label: '下限', component: MinOrMaxComponent },
 };
-export type InputFormRuleKey = keyof typeof RuleWidget;
+export type InputFormRuleKey = keyof typeof RuleWidget & string;
 export type RulesKeyList = Array<InputFormRuleKey>;
-export type InputFormRule = Record<InputFormRuleKey, string | boolean> & { message?: string; };
-type RulesMap = Record<InputFormRuleKey, InputFormRule>;
-export interface RulesGroupProps extends CommonWidgetProps<Array<InputFormRule>> {
+export interface RulesGroupProps extends CommonFormProps<Array<InputFormRule>> {
   includes?: Array<InputFormRuleKey>;
 }
 
@@ -37,7 +35,7 @@ const RuleKeys = Object.keys(RuleWidget) as RulesKeyList;
 /**
  * 校验规则的配置组件。
  */
-const RulesGroup = React.forwardRef<HTMLElement, RulesGroupProps>((props, ref) => {
+const RulesGroup: React.FC<RulesGroupProps> = (props) => {
 
   const {
     includes = RuleKeys,
@@ -47,11 +45,11 @@ const RulesGroup = React.forwardRef<HTMLElement, RulesGroupProps>((props, ref) =
   } = props;
 
   const ruleModalRefs = useRef<any>([]);
-  const [rulesMap, setRulesMap] = useState<RulesMap>();
+  const [rulesMap, setRulesMap] = useState<Record<InputFormRuleKey, InputFormRule>>();
   const [checked, setChecked] = useState<RulesKeyList>([]);
 
   const setRulesMapFormValue = (rules?: Array<InputFormRule>) => {
-    const data: any = {};
+    const data: Record<string, InputFormRule> = {};
     if (rules instanceof Array) {
       rules.forEach((rule) => {
         const keys = Object.keys(rule);
@@ -64,7 +62,7 @@ const RulesGroup = React.forwardRef<HTMLElement, RulesGroupProps>((props, ref) =
     setRulesMap(data);
   };
 
-  const getRules = (rulesMap?: RulesMap, checked?: RulesKeyList) => {
+  const getRules = (rulesMap?: Record<InputFormRuleKey, InputFormRule>, checked?: RulesKeyList) => {
     const result = pickObject(rulesMap, checked || []);
     const rules = Object.values(result || {});
     return rules;
@@ -139,6 +137,6 @@ const RulesGroup = React.forwardRef<HTMLElement, RulesGroupProps>((props, ref) =
       </Checkbox.Group>
     </div>
   );
-});
+};
 
 export default RulesGroup;

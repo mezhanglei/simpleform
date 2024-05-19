@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-3.0.15-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-3.1.1-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
 
@@ -71,51 +71,53 @@ const widgetList = [{
 - 节点类型
 继承`@simpleform/form`组件的[FormItemProps](./form#formitem)
 ```javascript
-export type GenerateWidgetItem<T extends Record<string, any> = {}> = FormItemProps & T & {
+// 组件JSON描述
+export interface CustomWidget<P = {}> {
+  type?: string;
+  props?: Record<string, unknown> & { children?: CustomUnionType };
+  widgetList?: WidgetList<P>;
+}
+// 组件节点(字符串表达式编译后)
+export type GenerateWidgetItem<P = {}> = CustomWidget<P> & FormItemProps & {
   inside?: CustomUnionType; // 节点的内层
   outside?: CustomUnionType; // 节点的外层
   readOnly?: boolean; // 只读模式
   readOnlyRender?: CustomUnionType; // 只读模式下的组件
-  typeRender?: CustomUnionType; // 自定义渲染实例
-  hidden?: boolean; // 隐藏节点
-  type?: string; //  注册组件
-  props?: Record<string, any> & { children?: any | Array<CustomWidget> }; // 注册组件的props
-  widgetList?: WidgetList; // 嵌套的子节点(会覆盖props.children)
-}
+  typeRender?: CustomUnionType; // 表单控件自定义渲染
+  hidden?: boolean;
+} & P
 ```
 :::warning
 `readOnly`和`readOnlyRender`只在表单控件节点才会生效
 :::
 
-## 表单注册组件
-表单中的任意组件都会被注入五个上下文参数: 
+## 表单上下文参数
+表单中的任意组件都会被注入上下文参数字段`_options`: 
 - `index`：当前组件所在的列表的索引数字
 - `path`：当前组件所在的节点路径
-- `widgetItem`：当前组件节点的所有信息
 - `formrender`: `SimpleFormRender`的实例
 - `form`: `SimpleForm`的实例
+- 当前节点的信息
 ```jsx | pure
-const CustomInput: React.FC<GenerateParams & InputProps> = (props) => {
+const CustomInput: React.FC<WidgetContextProps & InputProps> = (props) => {
   const {
     value,
     onChange,
-    // index,
-    // path,
-    // widgetItem,
-    // formrender,
-    // form,
+    _options
   } = props;
 
-  // console.log(index, path, widgetItem, formrender, form)
+  console.log(_options, '上下文参数')
 
   return (
     <Input value={value} onChange={onChange} />
   )
 }
 ```
-
+:::warning
+`>=3.1.1`所有上下文参数均在`_options`中，通过props注入进组件中。
+:::
 ## 全局参数注入
-通过`options`可设置每个节点的信息字段，同时节点中的组件上下文参数`widgetItem`可以接收到每个节点的完整信息。
+通过`options`可设置每个节点的参数，在上下文参数`_options`中接收该参数。
 <code src="../../src/render/global.tsx"></code>
 
 ## 表单联动
@@ -155,21 +157,21 @@ const widgetList = [{
 ### Props
 `FormRender`或`FormChildren`组件的`props`
 - `widgetList`: `WidgetItem[]` 渲染表单的DSL形式的json数据
-- `components`：`Record<string, any>`注册表单中的所有组件;
-- `plugins`：`Record<string, any>`表单中需要引入的外来库;
-- `options`： `GenerateWidgetItem | ((field: GenerateWidgetItem) => any)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
-- `renderList`：`(params: GenerateParams<any> & { children?: any }) => any`提供自定义渲染列表的函数.
-- `renderItem`：`(params: GenerateParams<any> & { children?: any }) => any`提供自定义渲染节点的函数.
+- `components`：注册表单中的所有组件;
+- `plugins`：表单中需要引入的外来库;
+- `options`： `GenerateWidgetItem<P> | ((item: GenerateWidgetItem<P>) => GenerateWidgetItem<P>)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
+- `renderList`：`(children, WidgetContextProps) => React.ReactNode`提供自定义渲染列表的函数.
+- `renderItem`：`(children, WidgetContextProps) => React.ReactNode`提供自定义渲染节点的函数.
 - `onRenderChange`: `(newValue: WidgetList) => void;` `widgetList`更改时回调函数
 - `formrender`: `FormRender`通过`useSimpleFormRender()`创建的实例，负责表单界面渲染，选填.
 - `form`: `Form`。通过`useSimpleForm()`创建，负责表单值的管理，选填.
 - `uneval`: `boolean`不执行表单中的字符串表达式.
 
 ### SimpleFormRender Method
-- `updateItemByPath`: `(data?: any, path?: string) => void` 根据`path`获取对应的节点
-- `setItemByPath`: `(data?: any, path?: string) => void` 根据`path`设置对应的节点
+- `updateItemByPath`: `(data?: unknown, path?: string) => void` 根据`path`获取对应的节点
+- `setItemByPath`: `(data?: unknown, path?: string) => void` 根据`path`设置对应的节点
 - `delItemByPath`: `(path?: string) => void` 删除路径`path`对应的节点
-- `insertItemByIndex`: `(data: WidgetItem | WidgetItem[], index?: number, parent?: string) => void` 根据序号和父节点路径添加节点
+- `insertItemByIndex`: `(data: unknown, index?: number, parent?: string) => void` 根据序号和父节点路径添加节点
 - `getItemByPath`: `(path: string) => void` 获取路径`path`对应的节点
 - `moveItemByPath`: `(from: { parent?: string, index: number }, to: { parent?: string, index?: number })` 把树中的选项从一个位置调换到另外一个位置
 - `setWidgetList`: `(data?: WidgetList) => void` 设置表单的`widgetList`属性;

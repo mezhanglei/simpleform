@@ -6,7 +6,7 @@ import { HTTP_STATUS, CancelPending, CustomConfig } from "./config";
 export interface CreateRequestParams extends CreateAxiosDefaults {
   startLoading?: () => void;
   endLoading?: () => void;
-  handleResult?: (data: any) => void;
+  handleResult?: (data) => void;
   handleStatus?: (status: HTTP_STATUS, msg?: string) => void;
   headers?: CustomConfig['headers'];
 }

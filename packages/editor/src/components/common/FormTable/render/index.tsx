@@ -9,14 +9,14 @@ import SvgIcon from '../../SvgIcon';
 import { FormTableProps } from "..";
 import pickAttrs from '../../../../utils/pickAttrs';
 
-const CustomTableCell = (props: any) => {
+const CustomTableCell = (props) => {
   const { name, hidden, formControl, children, ...restProps } = props;
   return (
     <TableCell key={name} {...restProps}>
       {
         React.isValidElement(formControl) ?
           <Form.Item {...restProps} label="" name={name} compact>
-            {hidden === true ? null : ({ bindProps }: any) => React.cloneElement(formControl, bindProps)}
+            {hidden === true ? null : ({ bindProps }) => React.cloneElement(formControl, bindProps)}
           </Form.Item>
           : children
       }
@@ -33,13 +33,15 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
     disabled,
     showBtn,
     pagination = false,
-    form,
-    formrender,
-    path,
-    widgetItem,
+    _options,
+    value,
+    onChange,
     ...rest
   } = props;
-  const curName = widgetItem?.name;
+  const path = _options?.path;
+  const form = _options?.form;
+  const formrender = _options?.formrender;
+  const curName = _options?.name || '';
   const items = Array.from({ length: Math.max(minRows || 0) });
   const defaultValue = useMemo(() => items.map(() => ({ key: defaultGetId('row') })), [items]);
   const {
@@ -47,7 +49,7 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
     setDataSource,
     addItem,
     deleteItem
-  } = useTableData<any>(defaultValue);
+  } = useTableData<unknown>(defaultValue);
 
   useEffect(() => {
     setDataSource(defaultValue);
@@ -80,13 +82,13 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
         onCell: (record: unknown, rowIndex?: number) => {
           const colName = joinFormPath(curName, rowIndex, dataIndex); // 表单字段
           const colPath = joinFormPath(path, 'props.columns', colIndex); // column所在的位置
-          const columnParams = {
+          const _options = {
             form,
             formrender,
             path: colPath,
-            widgetItem: col,
+            ...col
           };
-          const formControl = formrender?.createFormElement({ type, props: Object.assign({ disabled }, columnParams, props) });
+          const formControl = formrender?.createFormElement({ type, props: Object.assign({ disabled, _options }, props) });
           return {
             record,
             name: colName, // 拼接路径
@@ -101,7 +103,7 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
       result.unshift({
         title: '#',
         width: 50,
-        render: (text: any, record, index: number) => {
+        render: (_, _record, index) => {
           if (tableData?.length > minRows) {
             return <SvgIcon name="delete" className="delete-icon" onClick={() => deleteBtn(index)} />;
           }

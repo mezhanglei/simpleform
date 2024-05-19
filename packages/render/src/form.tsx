@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormRenderProps } from './types';
+import { FormRenderProps } from './typings';
 import { Form, useSimpleForm } from '@simpleform/form';
 import FormChildren from './children';
 

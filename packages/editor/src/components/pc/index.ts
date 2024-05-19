@@ -13,13 +13,14 @@ import {
   Cascader,
   Alert,
 } from 'antd';
+import { CustomFormRenderProps } from '../../formrender';
 import bindRequest from '../bind-request';
 import { CustomDivider } from '../common/Divider';
 import FileUpload from './FileUpload';
 import ImageUpload from './ImageUpload';
 
 // ant-design UI组件
-const widgets: any = {
+const widgets: CustomFormRenderProps['components'] = {
   // ui库组件
   "Input": Input, // 输入控件
   "Input.TextArea": Input.TextArea, // 输入文本域

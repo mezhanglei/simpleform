@@ -1,4 +1,4 @@
-import React, { LegacyRef } from 'react';
+import React from 'react';
 import './index.less';
 // 批量引入svg组件
 const svgs = {};
@@ -15,12 +15,12 @@ interface SvgIconProps extends React.HtmlHTMLAttributes<SVGSVGElement> {
   className?: string;
 }
 
-const SvgIcon = React.forwardRef((props: SvgIconProps, ref: LegacyRef<SVGSVGElement>) => {
+const SvgIcon = React.forwardRef<SVGSVGElement, SvgIconProps>((props, ref) => {
   const { name, className, ...rest } = props;
   const svgClass = className ? 'svg-icon ' + className : 'svg-icon';
   // @ts-ignore
   const SvgIconChild = name ? svgs[name] : null;
-  return SvgIconChild ? <SvgIconChild className={svgClass} {...rest} /> : null;
+  return SvgIconChild ? <SvgIconChild className={svgClass} ref={ref} {...rest} /> : null;
 });
 
 export default SvgIcon;

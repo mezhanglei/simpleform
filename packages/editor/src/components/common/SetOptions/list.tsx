@@ -2,10 +2,10 @@ import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import './list.less';
 import SvgIcon from "../SvgIcon";
-import DefaultFormRender, { CommonWidgetProps, CustomFormRenderProps, useSimpleForm } from "../../../formrender";
+import DefaultFormRender, { CommonFormProps, useSimpleForm } from "../../../formrender";
 
 interface OptionItem { label?: string, value?: string }
-export interface OptionListProps extends CommonWidgetProps<Array<OptionItem>> {
+export interface OptionListProps extends CommonFormProps<Array<OptionItem>> {
 }
 
 const prefixCls = 'options-list';
@@ -16,19 +16,18 @@ const classes = {
 /**
  * 列表
  */
-const OptionList = React.forwardRef<HTMLElement, OptionListProps>((props, ref) => {
+const OptionList = React.forwardRef<HTMLDivElement, OptionListProps>((props, ref) => {
 
   const {
     value,
     onChange,
-    widgetItem,
-    ...rest
+    _options
   } = props;
-  const context = widgetItem?.context;
+  const context = _options?.context;
   const FormRender = context?.state?.FormRender || DefaultFormRender;
   const intialValue = [{ label: '', value: '' }];
   const [dataSource, setDataSource] = useState<Array<OptionItem>>([]);
-  const form = useSimpleForm();
+  const form = useSimpleForm<Array<OptionItem>>();
 
   useEffect(() => {
     const options = value instanceof Array ? value : [...intialValue];
@@ -93,13 +92,13 @@ const OptionList = React.forwardRef<HTMLElement, OptionListProps>((props, ref) =
     setDataSource(newData);
   };
 
-  const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = (_, values) => {
+  const onFieldsChange = (_, values) => {
     setDataSource(values);
     onChange && onChange(values);
   };
 
   return (
-    <div>
+    <div ref={ref}>
       <FormRender
         tagName="div"
         form={form}

@@ -14,18 +14,18 @@ export const Classes = {
   TableCell: `${prefix}table-cell`,
 };
 
-export interface ColumnType {
+export interface ColumnType<V = unknown> {
   key: string;
   name: string;
   title: string;
   width?: React.CSSProperties["width"];
   align?: React.CSSProperties["textAlign"];
-  render?: (val: unknown, record?: unknown, rowIndex?: number, colIndex?: number) => any;
+  render?: (val: unknown, record?: V, rowIndex?: number, colIndex?: number) => React.ReactNode;
 }
 
-export type TableBodyOptions = {
-  dataSource?: { [x: string]: any }[];
-  rowKey?: string | ((record: { [x: string]: any }) => string);
+export type TableBodyOptions<V = unknown> = {
+  dataSource?: V[];
+  rowKey?: string | ((record: V) => string);
 }
 
 export type TableOptions = {
@@ -50,7 +50,7 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(({
 }, ref) => {
 
   const getRowKey = useCallback(
-    (record: { [x: string]: any }, rowIndex: number) => {
+    (record, rowIndex: number) => {
       if (typeof rowKey === "function") {
         return rowKey(record);
       }
@@ -60,7 +60,7 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(({
     [rowKey]
   );
 
-  const renderCol = (record: any, rowIndex: number) => {
+  const renderCol = (record, rowIndex: number) => {
     return columns.map((column, colIndex) => {
       const { render, name } = column || {};
       const child = typeof render == 'function' ? render(record[name], record, rowIndex, colIndex) : record[name];

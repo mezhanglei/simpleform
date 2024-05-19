@@ -1,25 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { SimpleForm } from './form-store';
-import { pickObject } from './utils/object';
+import { SimpleForm } from './store';
+import { FormPathType, pickObject } from './utils/utils';
 
-export function useMethod<T extends (...args: any[]) => any>(method: T) {
-  const { current } = React.useRef<{ method: T, func: T | undefined }>({
-    method,
-    func: undefined,
-  });
-  current.method = method;
-
-  // 只初始化一次
-  if (!current.func) {
-    // 返回给使用方的变量
-    current.func = ((...args: unknown[]) => current.method.call(current.method, ...args)) as T;
-  }
-
-  return current.func;
-}
-
-export function useSimpleForm<T extends Object = any>(
-  values?: Partial<T>
+export function useSimpleForm<T>(
+  values?: T
 ) {
   const formRef = useRef(new SimpleForm(values));
   useFormValues(formRef.current);
@@ -28,7 +12,7 @@ export function useSimpleForm<T extends Object = any>(
 
 // 获取error信息
 export function useFormError(form?: SimpleForm, path?: string) {
-  const [error, setError] = useState();
+  const [error, setError] = useState<SimpleForm['formErrors'][string]>();
 
   const subscribeError = () => {
     if (!path || !form) return;
@@ -49,12 +33,12 @@ export function useFormError(form?: SimpleForm, path?: string) {
     };
   }, [JSON.stringify(path)]);
 
-  return [error, setError];
+  return [error, setError] as const;
 }
 
 // 获取表单值
-export function useFormValues<T = unknown>(form: SimpleForm, path?: string | string[]) {
-  const [formValues, setFomValues] = useState<T>();
+export function useFormValues<V>(form: SimpleForm<V>, path?: FormPathType | FormPathType[]) {
+  const [formValues, setFomValues] = useState<SimpleForm<V>['values']>();
 
   const subscribeForm = () => {
     if (!form) return;

@@ -9,7 +9,8 @@ function RootDnd(props: ControlDndProps) {
   return <BaseDnd
     {...props}
     dndList={context?.state?.widgetList || []}
-    widgetItem={{ context: context }} />;
+    _options={{ ...props._options, context }}
+  />;
 };
 
 export default RootDnd;

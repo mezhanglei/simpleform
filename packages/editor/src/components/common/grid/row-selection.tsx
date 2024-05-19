@@ -13,23 +13,20 @@ import { joinFormPath } from '../../../formrender';
  * @param ref 
  * @returns 
  */
-function RowSelection(props: CustomRowProps, ref: any) {
+const RowSelection = React.forwardRef<HTMLDivElement, CustomRowProps>((props, ref) => {
   const {
     children,
-    style,
     className,
-    path,
-    widgetItem,
-    formrender: editor,
-    form: editorForm,
-    ...restProps
+    _options
   } = props;
 
-  const context = widgetItem?.context;
+  const context = _options?.context;
+  const path = _options?.path;
+  const editor = _options?.formrender;
   const { editorConfig } = context?.state || {};
 
   const addCol = () => {
-    const widgetList = widgetItem?.widgetList;
+    const widgetList = _options?.widgetList;
     const nextIndex = widgetList?.length || 0;
     const newItem = {
       ...editorConfig?.['GridCol'],
@@ -47,12 +44,12 @@ function RowSelection(props: CustomRowProps, ref: any) {
     <BaseSelection
       ref={ref}
       {...props}
-      configLabel={widgetItem?.panel?.label}
+      configLabel={_options?.panel?.label}
       className={cls}
       tools={[<SvgIcon key="add" name="add" onClick={addCol} />]}>
       {children}
     </BaseSelection>
   );
-};
+});
 
-export default React.forwardRef(RowSelection);
+export default RowSelection;

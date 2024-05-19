@@ -3,19 +3,21 @@ import SvgIcon from "../../SvgIcon";
 import './index.less';
 import CustomModal from "../../AntdModal";
 import classNames from "classnames";
-import DefaultFormRender, { Form, useSimpleForm, matchExpression, CommonWidgetProps, CustomWidgetItem } from "../../../../formrender";
+import DefaultFormRender, { Form, useSimpleForm, matchExpression, CommonFormProps, CustomGenerateWidgetItem } from "../../../../formrender";
 import { Radio } from "antd";
 import ShowSettingModal from "../../LinkageSetting/ShowSettingModal";
-import { InputFormRule, InputFormRuleKey } from "..";
+import { InputFormRuleKey } from "..";
 
 export interface RuleCoreRefs {
   showRuleModal: () => void
 }
 
-export interface RuleCoreProps extends CommonWidgetProps<any> {
+export type InputFormRule = Record<string, string | boolean> & { message?: string; };
+
+export interface RuleCoreProps extends CommonFormProps<InputFormRule> {
   name?: InputFormRuleKey;
   label?: string;
-  widgetConfig?: CustomWidgetItem;
+  widgetConfig?: CustomGenerateWidgetItem;
   className?: string;
 }
 
@@ -42,18 +44,17 @@ const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
     widgetConfig,
     onChange,
     className,
-    widgetItem,
-    ...rest
+    _options,
   } = props;
 
   const [ruleValue, setRuleValue] = useState<InputFormRule>();
   const [selectType, setSelectType] = useState<string>('handle');
-  const editRef = useRef<any>();
-  const currentForm = useSimpleForm();
-  const context = widgetItem?.context;
+  const editRef = useRef<HTMLSpanElement>(null);
+  const currentForm = useSimpleForm<InputFormRule>();
+  const context = _options?.context;
   const FormRender = context?.state?.FormRender || DefaultFormRender;
 
-  useImperativeHandle(ref, () => ({ showRuleModal: () => editRef.current.click() }));
+  useImperativeHandle(ref, () => ({ showRuleModal: () => editRef.current?.click() }));
 
   const widgetList = name ? [
     selectType === 'dynamic' ? {
@@ -86,7 +87,7 @@ const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
     setRuleValue(value);
   }, [value]);
 
-  const selectTypeChange = (e: any) => {
+  const selectTypeChange = (e) => {
     setSelectType(e.target.value);
   };
 
@@ -127,19 +128,24 @@ const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
 
   return (
     <div className={cls}>
-      <CustomModal title="校验规则" onOk={handleOk} displayElement={
-        (showModal) => (
-          <div className={classes.label}>
-            <label className={classes.edit}>
-              {label}
-            </label>
-            <span ref={editRef} onClick={() => clickEdit(showModal)}>
-              <SvgIcon className={classes.icon} title="编辑" name="edit" />
-            </span>
-            {name && ruleValue && <SvgIcon className={classes.icon} onClick={clearValue} title="清除" name="qingchu" />}
-          </div>
-        )
-      }>
+      <CustomModal
+        modalProps={{
+          title: "校验规则"
+        }}
+        onOk={handleOk}
+        displayElement={
+          (showModal) => (
+            <div className={classes.label}>
+              <label className={classes.edit}>
+                {label}
+              </label>
+              <span ref={editRef} onClick={() => clickEdit(showModal)}>
+                <SvgIcon className={classes.icon} title="编辑" name="edit" />
+              </span>
+              {name && ruleValue && <SvgIcon className={classes.icon} onClick={clearValue} title="清除" name="qingchu" />}
+            </div>
+          )
+        }>
         <Form.Item labelWidth="80" layout='horizontal' label="设置类型">
           <Radio.Group
             options={SelectOptions}

@@ -1,16 +1,17 @@
 import classnames from 'classnames';
-import React, { useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import './BaseSelection.less';
 import pickAttrs from '../utils/pickAttrs';
 import { FormEditorState } from '../context';
 import SvgIcon from '../components/common/SvgIcon';
-import { CommonWidgetProps } from '../formrender';
 import { delWidgetItem } from '../utils/utils';
+import { CommonFormProps } from '../formrender';
 
-export interface BaseSelectionProps extends CommonWidgetProps, Omit<React.HtmlHTMLAttributes<HTMLDivElement>, 'onSelect' | 'onChange'> {
-  tools?: any[]; // 工具栏
+export interface BaseSelectionProps extends CommonFormProps, Omit<React.HtmlHTMLAttributes<HTMLDivElement>, 'draggable' | 'onChange' | 'onSelect'> {
+  tools?: ReactNode[]; // 工具栏
   configLabel?: string; // 当前组件的名字
-  onSelect?: (selected: FormEditorState['selected']) => void;
+  onSelectHandler?: (selected: FormEditorState['selected']) => void;
+  children?: React.ReactNode;
 }
 
 /**
@@ -19,26 +20,25 @@ export interface BaseSelectionProps extends CommonWidgetProps, Omit<React.HtmlHT
  * @param ref 
  * @returns 
  */
-function BaseSelection(props: BaseSelectionProps, ref: any) {
+const BaseSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((props, ref) => {
   const {
     children,
     className,
-    path,
-    widgetItem,
-    formrender: editor,
-    form: editorForm,
+    _options,
     configLabel,
     tools,
     onMouseOver,
     onMouseOut,
-    onSelect,
+    onSelectHandler,
     ...restProps
   } = props;
 
   const prefixCls = "editor-selection";
   const overCls = `${prefixCls}-over`;
+  const context = _options?.context;
+  const path = _options?.path;
+  const editor = _options?.formrender;
   const [isOver, setIsOver] = useState<boolean>(false);
-  const context = widgetItem?.context;
   const { selected, historyRecord, onEvent } = context?.state || {};
   const isSelected = path ? path === selected?.path : false;
 
@@ -46,11 +46,11 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
     path: path
   };
 
-  const chooseItem = (e: any) => {
+  const chooseItem = (e) => {
     e.stopPropagation();
     onEvent && onEvent('select', context);
-    if (onSelect) {
-      onSelect(nextSelected);
+    if (onSelectHandler) {
+      onSelectHandler(nextSelected);
       return;
     }
     context?.dispatch && context?.dispatch((old) => ({
@@ -59,14 +59,14 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
     }));
   };
 
-  const deleteColumn = (e: any) => {
+  const deleteColumn = (e) => {
     e.stopPropagation();
     context?.dispatch && context?.dispatch((old) => ({ ...old, selected: {} }));
     delWidgetItem(editor, path);
     historyRecord?.save();
   };
 
-  const handleMouseOver = (e: any) => {
+  const handleMouseOver = (e) => {
     e.stopPropagation();
     const target = e.currentTarget as HTMLElement;
     if (target) {
@@ -80,7 +80,7 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
     }));
   };
 
-  const handleMouseOut = (e: any) => {
+  const handleMouseOut = (e) => {
     e.stopPropagation();
     const target = e.currentTarget as HTMLElement;
     if (target) {
@@ -109,6 +109,6 @@ function BaseSelection(props: BaseSelectionProps, ref: any) {
       {children}
     </div>
   );
-};
+});
 
-export default React.forwardRef(BaseSelection);
+export default BaseSelection;

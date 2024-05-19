@@ -6,7 +6,7 @@ interface TooltipCustomProps extends React.HtmlHTMLAttributes<HTMLElement> {
   content: string;
 }
 
-export default React.forwardRef((props: TooltipCustomProps, ref: any) => {
+export default React.forwardRef<HTMLAnchorElement, TooltipCustomProps>((props, ref) => {
   const {
     children,
     content,

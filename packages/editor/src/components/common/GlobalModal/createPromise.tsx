@@ -2,18 +2,18 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 // default Provider
-let Container = ({ children }: any) => <>{children}</>;
+let Container = ({ children }) => <>{children}</>;
 
 /**
  * init promise-modal
  * @param {element} CustomContainer
  */
-export const initPromiseModal = (CustomContainer: any) => {
+export const initPromiseModal = (CustomContainer) => {
   Container = CustomContainer || Container;
 };
 
 // 渲染弹窗组件到根节点
-const renderModal = (Template: any, props: any) => {
+const renderModal = (Template, props) => {
   const dom = document.createElement('div');
   dom.setAttribute('class', 'portal-instance-container');
   document.body.appendChild(dom);
@@ -26,8 +26,8 @@ const renderModal = (Template: any, props: any) => {
   return dom;
 };
 
-export const create = async (Template: any, data = {}, options: { unmountDelay?: number } = {}) => {
-  let instance: any = null;
+export const create = async (Template, data = {}, options: { unmountDelay?: number } = {}) => {
+  let instance: Node | null = null;
 
   // unmount
   const unmountedNode = () => {
@@ -48,13 +48,13 @@ export const create = async (Template: any, data = {}, options: { unmountDelay?:
   });
 
   // callbackResolve
-  const callbackResolve = (val: any) => {
+  const callbackResolve = (val) => {
     unmountedNode();
     return Promise.resolve(val);
   };
 
   // callbackReject
-  const callbackReject = (err: any) => {
+  const callbackReject = (err) => {
     unmountedNode();
     return Promise.reject(err);
   };

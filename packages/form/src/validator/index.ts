@@ -1,5 +1,5 @@
-import { TriggerType } from "../item-core";
-import { ValidatorKey, validatorsMap } from "./rules";
+import { ItemCoreProps } from "../item-core";
+import { configValidator, ConfigValidatorKeys } from "./rules";
 export type FormRule = {
   required?: boolean;
   pattern?: RegExp;
@@ -8,42 +8,44 @@ export type FormRule = {
   min?: number;
   message?: string;
   validator?: FormValidator;
-  validateTrigger?: TriggerType;
+  validateTrigger?: ItemCoreProps['validateTrigger'];
 }
 export type FormValidatorCallBack = (message?: string) => void;
-export type FormValidator = (value: any, callBack?: FormValidatorCallBack) => any | Promise<any>;
+export type FormValidator = <T>(value: T, callBack?: FormValidatorCallBack) => T | Promise<T>;
 
 // 处理单条规则
-const handleRule = async (rule?: FormRule | undefined, value?: any, eventName?: TriggerType | boolean) => {
+const handleRule = async (rule?: FormRule, value?: unknown, eventName?: ItemCoreProps['trigger']) => {
   if (!rule) return;
-  const { validateTrigger, message: defaultMessage, ...restRule } = rule || {};
+  const { validateTrigger, message: defaultMessage, validator, ...restRule } = rule || {};
   const canTrigger = isCanTrigger(eventName, validateTrigger);
-  if (!canTrigger) return;
-  // 参与校验的字段
-  const entries = Object.entries(restRule || {});
-  for (let [ruleKey, ruleValue] of entries) {
-    const configRule = validatorsMap[ruleKey as ValidatorKey];
-    // 自定义校验
-    if (ruleKey === 'validator' && typeof ruleValue === 'function') {
-      try {
-        let msg;
-        await ruleValue(value, (err: any) => {
-          msg = err;
-        });
-        return msg;
-      } catch (error: any) {
-        if (typeof error === 'string') {
-          return error;
-        }
-        if (typeof error.message == 'string') {
-          return error.message;
-        }
-        return defaultMessage || true;
+  if (!canTrigger || !restRule) return;
+  // 自定义校验
+  if (typeof validator === 'function') {
+    try {
+      let errorMsg: string | undefined;
+      await validator(value, (err) => {
+        errorMsg = err;
+      });
+      if (errorMsg) {
+        return errorMsg;
       }
-      // 其他字段的校验，返回true表示报错
-      // @ts-ignore
-    } else if (typeof configRule === 'function') {
-      if (configRule(ruleValue, value) === true) {
+    } catch (err: unknown) {
+      if (typeof err === 'string') {
+        return err;
+      }
+      const otherErr = err as { message?: string };
+      if (typeof otherErr.message == 'string') {
+        return otherErr.message;
+      }
+      return defaultMessage || true;
+    }
+  }
+  // 其他校验字段
+  const entries = Object.entries(restRule) as Array<[ConfigValidatorKeys, FormRule[ConfigValidatorKeys]]>;
+  for (let [ruleKey, ruleValue] of entries) {
+    const ruleValidator = configValidator[ruleKey];
+    if (typeof ruleValidator === 'function') {
+      if (ruleValidator(ruleValue, value) === true) {
         return defaultMessage || true;
       }
     }
@@ -51,7 +53,7 @@ const handleRule = async (rule?: FormRule | undefined, value?: any, eventName?: 
 };
 
 // 处理多条规则
-export const handleRules = async (rules?: FormRule[], value?: any, eventName?: TriggerType | boolean) => {
+export const handleRules = async (rules?: FormRule[], value?: unknown, eventName?: ItemCoreProps['trigger']) => {
   if (!(rules instanceof Array)) return;
   for (let i = 0; i < rules.length; i++) {
     const rule = rules[i];
@@ -63,11 +65,10 @@ export const handleRules = async (rules?: FormRule[], value?: any, eventName?: T
 };
 
 // 是否触发校验规则
-export const isCanTrigger = (eventName?: TriggerType | boolean, validateTrigger?: TriggerType | TriggerType[],) => {
+export const isCanTrigger = (eventName?: ItemCoreProps['trigger'], validateTrigger?: ItemCoreProps['validateTrigger']) => {
   // 默认允许触发
-  if (validateTrigger === undefined || eventName === undefined) return true;
-  // 如果为布尔值则返回该值
-  if (typeof eventName === 'boolean') return eventName;
+  if (eventName === undefined) return true;
+  if (validateTrigger === undefined) return true;
   if (typeof validateTrigger === 'string') {
     return validateTrigger === eventName;
   }

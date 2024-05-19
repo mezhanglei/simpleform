@@ -10,7 +10,7 @@ import { EditorCodeMirror } from '../components/common/CodeMirror';
 import './exportJson.less';
 
 export interface ExportJsonModalProps extends ModalWrapperProps {
-  data?: any;
+  data?: object;
   title: string;
 }
 
@@ -37,7 +37,7 @@ export const ExportJsonModal = React.forwardRef<HTMLDivElement, ExportJsonModalP
     onClose && onClose();
   };
 
-  const copyJs = (e: any) => {
+  const copyJs = (e) => {
     const codeStr = convertToString(data);
     const formatStr = codeStr && js_beautify(codeStr, {
       indent_size: 2
@@ -45,7 +45,7 @@ export const ExportJsonModal = React.forwardRef<HTMLDivElement, ExportJsonModalP
     copyToClipboard(formatStr, e);
   };
 
-  const copyJson = (e: any) => {
+  const copyJson = (e) => {
     const codeStr = JSON.stringify(data);
     const formatStr = codeStr && js_beautify(codeStr, {
       indent_size: 2

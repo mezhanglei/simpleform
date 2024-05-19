@@ -1,4 +1,11 @@
-import DefaultFormRender, { FormChildren as DefaultFormChildren, FormRenderProps, FormChildrenProps, GenerateParams, WidgetItem } from '@simpleform/render';
+import DefaultFormRender, {
+  FormChildren as DefaultFormChildren,
+  FormRenderProps,
+  FormChildrenProps,
+  GenerateWidgetItem,
+  WidgetItem,
+  WidgetContextProps
+} from '@simpleform/render';
 import React from 'react';
 import dayjs from 'dayjs';
 import '@simpleform/render/lib/css/main.css';
@@ -24,16 +31,19 @@ export interface CustomOptions {
   // 属性表单
   setting?: ConfigWidgetSetting;
 }
-// 自定义表单节点信息
-export type CustomWidgetItem<T = WidgetItem> = T & CustomOptions;
+// 自定义普通节点信息
+export type CustomWidgetItem = WidgetItem<CustomOptions>;
+export type CustomGenerateWidgetItem = GenerateWidgetItem<CustomOptions>;
+// 组件公共props
+export type CommonFormProps<V = unknown> = WidgetContextProps<CustomOptions> & {
+  value?: V;
+  onChange?: (val?: V) => void;
+  disabled?: boolean;
+  children?: React.ReactNode;
+};
 // 表单渲染数据的类型
 export type FormDesignData = Array<CustomWidgetItem>;
-// 控件的公共输入项props
-export type CommonWidgetProps<T = any> = {
-  value?: T;
-  onChange?: (val?: T) => void;
-  disabled?: boolean;
-} & GenerateParams<CustomOptions>;
+
 
 export type CustomFormChildrenProps = FormChildrenProps<CustomOptions>;
 export function FormChildren(props: CustomFormChildrenProps) {

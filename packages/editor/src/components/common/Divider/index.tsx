@@ -1,9 +1,9 @@
 import { Divider, DividerProps } from 'antd';
 import React from 'react';
-import { CommonWidgetProps } from '../../../formrender';
+import { CommonFormProps } from '../../../formrender';
 
 // 分割线(在拖拽过程中会出现渲染报错，所以需要移除children属性)
-export const CustomDivider = React.forwardRef<any, CommonWidgetProps & DividerProps & { label?: string }>((props, ref) => {
+export const CustomDivider: React.FC<CommonFormProps<unknown> & DividerProps & { label?: string }> = (props) => {
 
   const {
     label,
@@ -13,4 +13,4 @@ export const CustomDivider = React.forwardRef<any, CommonWidgetProps & DividerPr
   return (
     <Divider children={label} {...rest} />
   );
-});
+};

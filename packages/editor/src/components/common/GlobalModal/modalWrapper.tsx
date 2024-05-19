@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import BaseModal, { BaseModalProps } from './baseModal';
 
 export interface ModalWrapperProps extends BaseModalProps {
-  onResolve?: (val?: any) => void;
-  onReject?: (val?: any) => void;
+  onResolve?: (val?: unknown) => void;
+  onReject?: (val?: unknown) => void;
   className?: string;
 }
 
@@ -58,7 +58,7 @@ const ModalWrapper = React.forwardRef<HTMLDivElement, ModalWrapperProps>((props,
         React.isValidElement(children) ? React.cloneElement(children, {
           onConfirm: handleOk,
           onCancel: handleCancel,
-        } as any)
+        } as React.Attributes)
           : children
       }
     </BaseModal>

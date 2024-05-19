@@ -1,18 +1,15 @@
 import React from 'react';
-import FormRender, { GenerateParams } from './FormRender';
+import FormRender, { WidgetContextProps } from './FormRender';
 import { Input, InputProps } from 'antd';
 
-const CustomInput: React.FC<GenerateParams & InputProps> = (props) => {
+const CustomInput: React.FC<WidgetContextProps & InputProps> = (props) => {
   const {
     value,
     onChange,
-    // path,
-    // widgetItem,
-    // formrender,
-    // form,
+    _options,
   } = props;
 
-  // console.log(path, widgetItem, formrender, form)
+  console.log(_options, '上下文参数')
 
   return (
     <Input value={value} onChange={onChange} />

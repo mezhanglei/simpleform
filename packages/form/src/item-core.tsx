@@ -1,48 +1,50 @@
-import { useContext, useEffect, useState } from 'react';
-import { SimpleFormContext, FormInitialValuesContext } from './form-context';
+import React, { useContext, useEffect, useState } from 'react';
+import { SimpleFormContext, FormInitialValuesContext } from './context';
 import { deepGet, getValueFromEvent, toArray } from './utils/utils';
 import { FormRule } from './validator';
 import { isEmpty } from './utils/type';
+import { FormProps } from './form';
 
-export type TriggerType = string;
-export interface FieldChangedParams {
-  name?: string;
-  value: any;
-}
-
+type TriggerType = string;
+export type FormEventHandler<V = unknown, A = unknown> = (obj: { name?: string; value?: V }, values?: A) => void;
 export interface ItemCoreProps {
   name?: string;
   nonform?: boolean;
   index?: number;
   trigger?: TriggerType; // 设置收集字段值变更的时机
   validateTrigger?: TriggerType | TriggerType[];
-  valueProp?: string | ((type: any) => string);
-  valueGetter?: ((...args: any[]) => any);
-  valueSetter?: ((value: any) => any);
+  valueProp?: string | ((type: string) => string);
+  valueGetter?: typeof getValueFromEvent;
+  valueSetter?: <V>(value: V) => V;
   rules?: FormRule[];
-  initialValue?: any;
+  initialValue?: unknown;
   errorClassName?: string;
-  onFieldsChange?: (obj: FieldChangedParams, values?: any) => void;
-  onFieldsMounted?: (obj: FieldChangedParams, values?: any) => void;
-  onValuesChange?: (obj: FieldChangedParams, values?: any) => void;
-  children?: any
+  onFieldsChange?: FormEventHandler;
+  onFieldsMounted?: FormEventHandler;
+  onValuesChange?: FormEventHandler;
+  children?: React.ReactNode | ((P: { className?: string; form?: FormProps['form'], bindProps: ReturnType<NonNullable<FormProps['form']>['getBindProps']> }) => React.ReactNode);
 }
 
 export function getRulesTriggers(rules?: ItemCoreProps['rules']) {
-  const result = [];
+  const result = [] as TriggerType[];
   if (rules instanceof Array) {
     for (let i = 0; i < rules?.length; i++) {
       const rule = rules?.[i];
-      if (rule?.validateTrigger) {
-        result.push(rule?.validateTrigger);
+      const validateTrigger = rule?.validateTrigger;
+      if (validateTrigger) {
+        if (validateTrigger instanceof Array) {
+          result.push(...validateTrigger);
+        } else {
+          result.push(validateTrigger);
+        }
       }
     }
   }
   return result;
 }
 
-export function getTriggers(trigger: ItemCoreProps['trigger'], validateTrigger: ItemCoreProps['validateTrigger'], ruleTriggers: Array<string>) {
-  return new Set<string>([
+export function getTriggers(trigger: ItemCoreProps['trigger'], validateTrigger: ItemCoreProps['validateTrigger'], ruleTriggers: Array<TriggerType>) {
+  return new Set<TriggerType>([
     ...toArray(trigger),
     ...toArray(validateTrigger),
     ...ruleTriggers
@@ -74,9 +76,7 @@ export const ItemCore = (props: ItemCoreProps) => {
   const nonform = rest?.nonform || rest?.readOnly;
   const currentPath = (isEmpty(name) || nonform === true) ? undefined : name;
   const initValue = initialValue ?? deepGet(initialValues, currentPath);
-  const storeValue = form && form.getFieldValue(currentPath);
-  const initialItemValue = storeValue ?? initValue;
-  const [value, setValue] = useState();
+  const [value, setValue] = useState<unknown>();
 
   // 初始化fieldProps
   currentPath && form?.setFieldProps(currentPath, fieldProps);
@@ -99,19 +99,19 @@ export const ItemCore = (props: ItemCoreProps) => {
   // 表单域初始化值
   useEffect(() => {
     if (!currentPath || !form) return;
-    // 回填form.initialValues和回填form.values
-    form.setInitialValues(currentPath, initialItemValue);
-    onFieldsMounted && onFieldsMounted({ name: currentPath, value: initialItemValue }, form?.getFieldValue());
+    // 回填初始值
+    form.setInitialValue(currentPath, initValue);
+    onFieldsMounted && onFieldsMounted({ name: currentPath, value: initValue }, form?.getFieldValue());
     return () => {
       // 清除该表单域的props(在设置值的前面)
       currentPath && form?.setFieldProps(currentPath, undefined);
       // 清除初始值
-      currentPath && form.setInitialValues(currentPath, undefined);
+      currentPath && form.setInitialValue(currentPath, undefined);
     };
   }, [JSON.stringify(currentPath)]);
 
   // 对目标控件进行双向绑定
-  const bindChildren = (children: any) => {
+  const bindChildren = (children: ItemCoreProps['children']) => {
     if (typeof children === 'function') {
       const bindProps = form && form.getBindProps(currentPath, value) || {};
       return children({ className: errorClassName, form: form, bindProps: bindProps });
@@ -121,7 +121,7 @@ export const ItemCore = (props: ItemCoreProps) => {
   };
 
   const childs = bindChildren(children);
-  return childs;
+  return <>{childs}</>;
 };
 
 ItemCore.displayName = "ItemCore";

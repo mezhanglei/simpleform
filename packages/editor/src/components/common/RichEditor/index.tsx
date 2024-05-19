@@ -5,13 +5,13 @@ import './index.less';
 import CustomModal from '../AntdModal';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
-import { CommonWidgetProps } from '../../../formrender';
+import { CommonFormProps } from '../../../formrender';
 
 
-export interface RichEditorProps extends CommonWidgetProps<string> {
+export interface RichEditorProps extends CommonFormProps<string> {
 }
 
-const RichEditor = React.forwardRef<any, RichEditorProps>((props, ref) => {
+const RichEditor: React.FC<RichEditorProps> = (props) => {
 
   const {
     value,
@@ -22,16 +22,17 @@ const RichEditor = React.forwardRef<any, RichEditorProps>((props, ref) => {
   const parentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!parentRef.current) return;
     const quill = new Quill(parentRef.current, {
       theme: 'snow'
     });
-    quill.on('text-change', function (delta, oldDelta, source) {
+    quill.on('text-change', function (_delta, _oldDelta, source) {
       if (source == 'user') {
         const htmlStr = quill.root.innerHTML;
         onChange && onChange(htmlStr);
       }
     });
-    quill.pasteHTML(value || '');
+    quill.clipboard.dangerouslyPasteHTML(value || '');
     const index = quill.getLength();
     quill.setSelection(index, Quill.sources.USER); // 需要设置USER否则移动端光标会异常
     editorRef.current = quill;
@@ -42,7 +43,7 @@ const RichEditor = React.forwardRef<any, RichEditorProps>((props, ref) => {
       <div ref={parentRef}></div>
     </div>
   );
-});
+};
 
 export default RichEditor;
 
@@ -73,14 +74,20 @@ export const RichEditorModalBtn = (props: RichEditorProps & ButtonProps) => {
   const cls = classnames(className, 'rich-editor-modal');
 
   return (
-    <CustomModal className={cls} title="富文本添加" onOk={handleOk} displayElement={
-      (showModal) => (
-        <div>
-          <Input.TextArea value={value} />
-          <Button type="link" className="add-rich-editor" onClick={showModal}>自定义内容</Button>
-        </div>
-      )
-    }>
+    <CustomModal
+      modalProps={{
+        className: cls,
+        title: '富文本添加'
+      }}
+      onOk={handleOk}
+      displayElement={
+        (showModal) => (
+          <div>
+            <Input.TextArea value={value} />
+            <Button type="link" className="add-rich-editor" onClick={showModal}>自定义内容</Button>
+          </div>
+        )
+      }>
       <RichEditor
         value={value}
         onChange={richOnChange}

@@ -1,9 +1,10 @@
 import { Input, InputProps, InputRef } from 'antd';
 import React, { CSSProperties, useEffect, useState } from 'react';
+import { CommonFormProps } from '../../../formrender';
 import { convertToString, evalString } from '../../../utils/string';
 
 // 值的输入框
-export interface CodeInputProps extends InputProps {
+export interface CodeInputProps extends Omit<InputProps, 'value' | 'onChange'>, CommonFormProps {
   style?: CSSProperties;
 }
 const CodeInput = React.forwardRef<InputRef, CodeInputProps>((props, ref) => {
