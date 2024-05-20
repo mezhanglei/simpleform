@@ -44,7 +44,7 @@ export function objectToFormData(obj?: object, formData?: FormData) {
 }
 
 // 深度合并两个对象
-export const deepMergeObject = <V>(obj1: V, obj2: unknown): V => {
+export const deepMergeObject = <V>(obj1: V, obj2?: unknown): V => {
   const obj1Type = Object.prototype.toString.call(obj1);
   const obj2Type = Object.prototype.toString.call(obj2);
   if (obj1Type !== obj2Type || typeof obj2 !== 'object') return obj1;

@@ -3,9 +3,10 @@ import Clipboard from 'clipboard';
 import * as devalue from 'devalue';
 
 // 复制到剪贴板
-export function copyToClipboard(content?: unknown, clickEvent?: any, successFn?: () => void, errorFn?: () => void) {
+export function copyToClipboard(content?: unknown, clickEvent?: Event, successFn?: () => void, errorFn?: () => void) {
   if (typeof content !== 'string') return;
-  const clipboard = new Clipboard(clickEvent.target, {
+  const el = clickEvent?.target as HTMLElement;
+  const clipboard = new Clipboard(el, {
     text: () => content
   });
 
@@ -23,7 +24,7 @@ export function copyToClipboard(content?: unknown, clickEvent?: any, successFn?:
 }
 
 // 将对象转化为普通字符串(非json格式)
-export function convertToString(val, allowFunction: boolean = true): string | undefined {
+export function convertToString(val?: unknown, allowFunction: boolean = true): string | undefined {
   if (isEmpty(val)) return;
   if (typeof val === 'string') return val;
   if (typeof val === 'function') {

@@ -31,7 +31,7 @@ export interface ItemProps {
   style?: CSSProperties;
 }
 
-const prefixCls = 'field-item';
+const prefixCls = 'custom-field-item';
 const createItemCls = (code: string) => (`${prefixCls}--${code}`);
 
 export const Item = React.forwardRef<HTMLDivElement, ItemProps>((props, ref) => {

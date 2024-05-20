@@ -105,7 +105,7 @@ export const Item = React.forwardRef<HTMLDivElement, ItemProps>((props, ref) => 
         !isEmpty(label) && showLabel ? (
           <div className={labelCls} style={mergeLabelStyle}>
             <label ref={labelRef}>
-              {colon === true ? <>{label}:</> : label}
+              {colon === true ? <>{label}：</> : label}
               {tooltip && (
                 <Tooltip content={tooltip}>
                   <SvgIcon name="wenhao" className="label__tooltip" />
