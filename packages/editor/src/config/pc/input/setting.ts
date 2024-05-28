@@ -58,21 +58,21 @@ const operationSetting = [
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
-    props: { children: '隐藏' }
+    children: '隐藏'
   },
   {
     name: 'props.disabled',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
-    props: { children: '禁用' }
+    children: '禁用'
   },
   {
     name: 'props.allowClear',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
-    props: { children: '可清除' }
+    children: '可清除'
   }
 ];
 

@@ -46,24 +46,24 @@ export const widgets = {
 
 export type CustomFormChildrenProps = FormChildrenProps;
 export function FormChildren(props: CustomFormChildrenProps) {
-  const { components, plugins, ...rest } = props;
+  const { components, variables, ...rest } = props;
   return (
     <DefaultFormChildren
       options={{ props: { autoComplete: 'off' } }}
       components={{ ...widgets, ...components }}
-      plugins={{ ...plugins, dayjs }}
+      variables={{ ...variables, dayjs }}
       {...rest}
     />
   );
 }
 export type CustomFormRenderProps = FormRenderProps;
 export default function FormRender(props: CustomFormRenderProps) {
-  const { components, plugins, ...rest } = props;
+  const { components, variables, ...rest } = props;
   return (
     <DefaultFormRender
       options={{ props: { autoComplete: 'off' } }}
       components={{ ...widgets, ...components }}
-      plugins={{ ...plugins, dayjs }}
+      variables={{ ...variables, dayjs }}
       {...rest}
     />
   );

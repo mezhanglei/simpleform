@@ -17,7 +17,7 @@ export interface EditorViewProps {
 function EditorView(props: EditorViewProps) {
 
   const context = useEditorContext();
-  const { platType = 'pc', beforeSelected, editor, editorForm, settingForm, widgetList } = context?.state || {};
+  const { platType = 'pc', selected, editor, editorForm, settingForm, widgetList } = context?.state || {};
   const FormRender = context?.state?.FormRender || DefaultFormRender;
 
   const {
@@ -37,7 +37,7 @@ function EditorView(props: EditorViewProps) {
 
   // 监听编辑区域的初始表单值
   const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = ({ value }) => {
-    setWidgetItem(editor, value, joinFormPath(beforeSelected?.path, 'initialValue'));
+    setWidgetItem(editor, value, joinFormPath(selected?.path, 'initialValue'));
     settingForm && settingForm.setFieldValue('initialValue', value);
   };
 
@@ -72,8 +72,8 @@ function EditorView(props: EditorViewProps) {
 // 编辑区默认的选中框渲染
 const renderItem = (children, params) => {
   const _options = params?._options || {};
-  const isItem = _options?.widgetList ? false : true;
-  // 单个组件批量添加选区
+  const isItem = _options?.children instanceof Array ? false : true;
+  // 无子元素组件默认添加选区
   if (isItem) {
     return <ComponentSelection data-path={_options.path} {...params} children={children} />;
   }

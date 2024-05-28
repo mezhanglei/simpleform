@@ -37,21 +37,21 @@ const operationSetting = [
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
-    props: { children: '隐藏' }
+    children: '隐藏'
   },
   {
     name: 'props.plain',
     type: 'Checkbox',
     inline: true,
     compact: true,
-    props: { children: '正文样式' }
+    children: '正文样式'
   },
   {
     name: 'props.dashed',
     type: 'Checkbox',
     inline: true,
     compact: true,
-    props: { children: '是否虚线' }
+    children: '是否虚线'
   }
 ];
 

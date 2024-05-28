@@ -42,7 +42,7 @@ const OptionList = React.forwardRef<HTMLDivElement, OptionListProps>((props, ref
       align: 'middle',
       className: classes.item
     },
-    widgetList: [
+    children: [
       {
         name: `[${index}]label`,
         compact: true,

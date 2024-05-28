@@ -26,14 +26,14 @@ const RowSelection = React.forwardRef<HTMLDivElement, CustomRowProps>((props, re
   const { editorConfig } = context?.state || {};
 
   const addCol = () => {
-    const widgetList = _options?.widgetList;
-    const nextIndex = widgetList?.length || 0;
+    const childs = _options?.children instanceof Array ? _options?.children : [];
+    const nextIndex = childs?.length || 0;
     const newItem = {
       ...editorConfig?.['GridCol'],
       props: { span: 12 },
-      widgetList: []
+      children: []
     };
-    const colParentPath = joinFormPath(path, 'widgetList');
+    const colParentPath = joinFormPath(path, 'children');
     insertWidgetItem(editor, newItem, nextIndex, colParentPath);
   };
 

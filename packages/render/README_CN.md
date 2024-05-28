@@ -2,7 +2,7 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-3.1.2-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.0.0-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 轻量级动态表单引擎，实现动态渲染表单很简单.
 

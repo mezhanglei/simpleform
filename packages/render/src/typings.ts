@@ -5,29 +5,29 @@ import { SimpleFormRender } from "./store";
 // 组件类型
 export type ReactComponent<P> = React.ComponentType<P> | React.ForwardRefExoticComponent<P>
 // 组件JSON描述
-export interface CustomWidget<P = {}> {
+export type CustomWidget = {
   type?: string;
-  props?: Record<string, unknown> & { children?: CustomUnionType };
-  widgetList?: WidgetList<P>; // 嵌套的子节点(会覆盖props.children)
-}
+  props?: Record<string, unknown>;
+  children?: any;
+};
+// 组件联合类型
+export type CustomUnionType<P = {}> = GenerateWidgetItem<P> | Array<GenerateWidgetItem<P>> | ReactComponent<unknown> | Function | ReactNode;
 // 注册组件
 export interface RegisteredComponents<P = any> {
   [key: string]: ReactComponent<P>;
 }
-// 节点联合类型
-export type CustomUnionType = CustomWidget | Array<CustomWidget> | ReactComponent<unknown> | Function | ReactNode;
 // 表单对象
 export type WidgetList<P = {}> = Array<WidgetItem<P>>
-// 组件节点(字符串表达式编译后)
-export type GenerateWidgetItem<P = {}> = CustomWidget<P> & FormItemProps & {
-  inside?: CustomUnionType; // 节点的内层
-  outside?: CustomUnionType; // 节点的外层
+// 带表单域的组件节点(字符串表达式编译后)
+export type GenerateWidgetItem<P = {}> = P & FormItemProps & CustomWidget & {
+  inside?: CustomUnionType<P>; // 节点的内层
+  outside?: CustomUnionType<P>; // 节点的外层
   readOnly?: boolean; // 只读模式
-  readOnlyRender?: CustomUnionType; // 只读模式下的组件
-  typeRender?: CustomUnionType; // 表单控件自定义渲染
+  readOnlyRender?: CustomUnionType<P>; // 只读模式下的组件
+  typeRender?: CustomUnionType<P>; // 表单控件自定义渲染
   hidden?: boolean;
-} & P
-// 组件节点(字符串表达式编译前)
+};
+// 带表单域的组件节点(字符串表达式编译前)
 export type WidgetItem<P = {}> = {
   [key in keyof GenerateWidgetItem<P>]: (string | GenerateWidgetItem<P>[key])
 }
@@ -44,6 +44,7 @@ export type FormChildrenProps<P = {}> = Pick<FormProps, 'form'> & Pick<GenerateW
   uneval?: boolean;
   components?: RegisteredComponents; // 注册组件
   plugins?: Record<string, unknown>; // 外部模块
+  variables?: Record<string, unknown>; // 外部模块
   widgetList?: WidgetList<P>; // 渲染数据
   renderList?: CustomRenderType;
   renderItem?: CustomRenderType;

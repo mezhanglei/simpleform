@@ -7,15 +7,15 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-3.1.2-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.0.0-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
 
 ## 特性
 - 组件注册(`components`属性): 使用之前需要注册表单控件和非表单组件，如果是表单控件需要控件内部支持`value`和`onChange`两个`props`字段.
-- 组件描述(`widgetList`属性)：我们使用列表来描述界面UI结构, 列表中的每一项都表示一个组件节点.支持节点嵌套`widgetList`属性字段.
+- 组件描述(`widgetList`属性)：我们使用列表来描述界面UI结构, 列表中的每一项都表示一个组件节点.支持节点嵌套`children`属性字段.
 - 组件模块：默认导出`FormRender`, `FormRender`组件由[Form](./form)和`FormChildren`组成, 支持多模块渲染，[Form](./form)组件处理表单的值, `FormChildren`组件处理表单的渲染, 一个`Form`组件可以支持多个`FormChildren`组件在内部渲染.
-- 组件联动：表单属性均可以支持字符串表达式描述联动条件(`widgetList`属性除外).
+- 组件联动：表单属性均可以支持字符串表达式描述联动条件(`children`属性除外).
 
 ## 安装
 
@@ -61,7 +61,7 @@ const widgetList = [{
 }]
 ```
 - 非表单节点:
-无`name`属性的节点, 除了`widgetList`属性外，只有`type`和`props`生成目标节点, 举例：
+无`name`属性的节点, 除了`children`属性外，只有`type`和`props`生成目标节点, 举例：
 ```javascript
 const widgetList = [{
   type: 'CustomCard',
@@ -72,20 +72,20 @@ const widgetList = [{
 继承`@simpleform/form`组件的[FormItemProps](./form#formitem)
 ```javascript
 // 组件JSON描述
-export interface CustomWidget<P = {}> {
+export type CustomWidget<P = {}> = {
   type?: string;
-  props?: Record<string, unknown> & { children?: CustomUnionType };
-  widgetList?: WidgetList<P>;
-}
-// 组件节点(字符串表达式编译后)
-export type GenerateWidgetItem<P = {}> = CustomWidget<P> & FormItemProps & {
-  inside?: CustomUnionType; // 节点的内层
-  outside?: CustomUnionType; // 节点的外层
+  props?: React.Attributes;
+  children?: CustomUnionType<P>;
+};
+// 带表单域的组件节点(字符串表达式编译后)
+export type GenerateWidgetItem<P = {}> = P & FormItemProps & CustomWidget<P> & {
+  inside?: CustomUnionType<P>; // 节点的内层
+  outside?: CustomUnionType<P>; // 节点的外层
   readOnly?: boolean; // 只读模式
-  readOnlyRender?: CustomUnionType; // 只读模式下的组件
-  typeRender?: CustomUnionType; // 表单控件自定义渲染
+  readOnlyRender?: CustomUnionType<P>; // 只读模式下的组件
+  typeRender?: CustomUnionType<P>; // 表单控件自定义渲染
   hidden?: boolean;
-} & P
+};
 ```
 :::warning
 `readOnly`和`readOnlyRender`只在表单控件节点才会生效
@@ -130,7 +130,7 @@ const CustomInput: React.FC<WidgetContextProps & InputProps> = (props) => {
 
 ### 表达式使用规则
 - 目标有且只能有一对`{{`和`}}`包裹.
-- 表达式中使用的模块或变量由`plugins`注入，默认内置的有三个:
+- 表达式中使用的模块或变量由`variables`注入，默认内置的有三个:
   - `form`：即`useSimpleForm()`
   - `formrender`：即`useSimpleFormRender()`
   - `formvalues`：即`form.getFieldValue()`
@@ -145,7 +145,7 @@ const widgetList = [{
   props: {}
 }]
  
-<FormRender widgetList={widgetList} plugins={{ dayjs }} />
+<FormRender widgetList={widgetList} variables={{ dayjs }} />
 ```
 
 ## API
@@ -158,7 +158,7 @@ const widgetList = [{
 `FormRender`或`FormChildren`组件的`props`
 - `widgetList`: `WidgetItem[]` 渲染表单的DSL形式的json数据
 - `components`：注册表单中的所有组件;
-- `plugins`：表单中需要引入的外来库;
+- `variables`: 表单中需要引入的变量;
 - `options`： `GenerateWidgetItem<P> | ((item: GenerateWidgetItem<P>) => GenerateWidgetItem<P>)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
 - `renderList`：`(children, WidgetContextProps) => React.ReactNode`提供自定义渲染列表的函数.
 - `renderItem`：`(children, WidgetContextProps) => React.ReactNode`提供自定义渲染节点的函数.

@@ -16,7 +16,6 @@ export interface FormEditorState {
   settingForm?: SimpleForm | null;
   FormRender?: ReactComponent<any>;
   selected?: { path?: string; setting?: ConfigWidgetSetting };
-  beforeSelected?: { path?: string; setting?: ConfigWidgetSetting };
   widgetList?: FormDesignData;
   editorConfig?: Record<string, CustomWidgetItem>;
   platType?: PlatType;

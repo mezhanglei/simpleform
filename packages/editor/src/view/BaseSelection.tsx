@@ -46,8 +46,7 @@ const BaseSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((prop
     path: path
   };
 
-  const chooseItem = (e) => {
-    e.stopPropagation();
+  const chooseItem = () => {
     onEvent && onEvent('select', context);
     if (onSelectHandler) {
       onSelectHandler(nextSelected);
@@ -74,10 +73,6 @@ const BaseSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((prop
       setIsOver(true);
     }
     onMouseOver && onMouseOver(e);
-    context?.dispatch && context?.dispatch((old) => ({
-      ...old,
-      beforeSelected: nextSelected
-    }));
   };
 
   const handleMouseOut = (e) => {
@@ -102,7 +97,7 @@ const BaseSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((prop
   };
 
   return (
-    <div ref={ref} className={cls} {...pickAttrs(restProps)} onClick={chooseItem} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
+    <div ref={ref} className={cls} {...pickAttrs(restProps)} onClickCapture={chooseItem} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
       {isOver && !isSelected && configLabel && <div className={classes.label}>{configLabel}</div>}
       {(isOver || isSelected) && <SvgIcon className={classes.close} key="close" name="close" onClick={deleteColumn} />}
       {isSelected && <div className={classes.tools}>{tools}</div>}

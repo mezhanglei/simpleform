@@ -8,8 +8,8 @@ export type FormRenderListener<V> = (newValue?: V, oldValue?: V) => void;
 
 // 管理formrender过程中的数据
 export class SimpleFormRender {
-  public plugins: FormRenderProps['plugins'];
-  public components: FormRenderProps['components'];
+  public variables: FormRenderProps['variables'];
+  public registeredComponents: FormRenderProps['components'];
   private widgetList: WidgetList;
   private lastWidgetList: WidgetList | undefined;
   private widgetListListeners: FormRenderListener<WidgetList>[] = [];
@@ -18,32 +18,32 @@ export class SimpleFormRender {
     this.lastWidgetList = undefined;
     this.getWidgetList = this.getWidgetList.bind(this);
     this.setWidgetList = this.setWidgetList.bind(this);
-    this.addPlugin = this.addPlugin.bind(this);
+    this.addModule = this.addModule.bind(this);
     this.getFormComponent = this.getFormComponent.bind(this);
     this.createFormElement = this.createFormElement.bind(this);
-    this.plugins = {};
-    this.components = {};
+    this.variables = {};
+    this.registeredComponents = {};
   }
 
-  // 增加plugin
-  public addPlugin(data: FormRenderProps['plugins']) {
-    this.plugins = Object.assign({}, this.plugins, data);
+  // 增加js模块
+  public addModule(data: FormRenderProps['variables']) {
+    this.variables = Object.assign({}, this.variables, data);
   };
   // 注册组件
   public registry(data: FormRenderProps['components']) {
-    this.components = Object.assign({}, this.components, data);
+    this.registeredComponents = Object.assign({}, this.registeredComponents, data);
   };
 
   // 返回目标声明组件
   public getFormComponent(target?: CustomUnionType) {
-    const typeMap = this.components;
-    return getFormComponent(target, typeMap);
+    const registeredComponents = this.registeredComponents;
+    return getFormComponent(target, registeredComponents);
   }
 
   // 创建components的实例
   public createFormElement(target?: CustomUnionType, commonProps?: unknown) {
-    const typeMap = this.components;
-    return createFormElement(target, typeMap, commonProps);
+    const registeredComponents = this.registeredComponents;
+    return createFormElement(target, commonProps, registeredComponents);
   }
 
   // 获取当前组件的widgetList

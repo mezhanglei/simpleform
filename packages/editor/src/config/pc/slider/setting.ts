@@ -35,28 +35,28 @@ const operationSetting = [
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
-    props: { children: '隐藏' }
+    children: '隐藏'
   },
   {
     name: 'props.disabled',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
-    props: { children: '禁用' }
+    children: '禁用'
   },
   {
     name: 'props.reverse',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
-    props: { children: '反向' }
+    children: '反向'
   },
   {
     name: 'props.vertical',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
-    props: { children: '垂直' }
+    children: '垂直'
   }
 ];
 

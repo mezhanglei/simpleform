@@ -161,17 +161,14 @@ export const getInitialValues = <V>(widgetList?: WidgetList) => {
   let initialValues = {} as V;
   const deepHandleItem = (item: WidgetItem, path: string) => {
     for (const key of Object.keys(item)) {
-      if (key === 'widgetList') {
-        // @ts-ignore
-        const widgetList = item[key] as WidgetList;
+      const val = item[key];
+      if (key === 'children' && val instanceof Array) {
         const curPath = joinFormPath(path, key);
-        widgetList.forEach((child, index) => {
+        val.forEach((child, index) => {
           const childPath = joinFormPath(curPath, index);
           deepHandleItem(child, childPath);
         });
       } else {
-        // @ts-ignore
-        const val = item[key];
         if (key === 'initialValue' && item?.name && val !== undefined) {
           initialValues = (deepSet(initialValues, item.name, val) || {}) as V;
         }

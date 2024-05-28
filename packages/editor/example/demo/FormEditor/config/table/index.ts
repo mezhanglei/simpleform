@@ -5,13 +5,13 @@ export default {
   },
   type: 'Table',
   props: {},
-  widgetList: [
+  children: [
     {
       type: 'TableRow',
-      widgetList: [
+      children: [
         {
           type: 'TableCell',
-          widgetList: [
+          children: [
             {
               type: 'Input',
               name: 'name1',
@@ -21,7 +21,7 @@ export default {
         },
         {
           type: 'TableCell',
-          widgetList: [
+          children: [
             {
               type: 'Input',
               name: 'name2',

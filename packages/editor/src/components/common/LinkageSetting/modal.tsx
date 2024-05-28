@@ -63,7 +63,7 @@ const LinkageSettingModal: React.FC<SettingModalProps> = (props) => {
   }, [value]);
 
   const widgetList = dataSource.map((item, index) => ({
-    widgetList: [
+    children: [
       {
         name: `[${index}]assemble`,
         compact: true,
@@ -81,7 +81,7 @@ const LinkageSettingModal: React.FC<SettingModalProps> = (props) => {
           className: classes.row,
           align: "middle"
         },
-        widgetList: [
+        children: [
           {
             outside: { type: 'col', props: { span: 1 } },
             typeRender: <span className={classes.itemPrefix}>当</span>

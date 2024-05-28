@@ -12,7 +12,7 @@ const operationSetting = [
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
-    props: { children: '隐藏' }
+    children: '隐藏'
   },
 ];
 

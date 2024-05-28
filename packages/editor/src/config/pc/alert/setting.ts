@@ -32,21 +32,21 @@ const operationSetting = [
     name: 'hidden',
     inline: true,
     compact: true,
-    props: { children: '隐藏' }
+    children: '隐藏'
   },
   {
     name: 'props.showIcon',
     type: 'Checkbox',
     inline: true,
     compact: true,
-    props: { children: '显示图标' }
+    children: '显示图标'
   },
   {
     name: 'props.closable',
     type: 'Checkbox',
     inline: true,
     compact: true,
-    props: { children: '可关闭' }
+    children: '可关闭'
   }
 ];
 

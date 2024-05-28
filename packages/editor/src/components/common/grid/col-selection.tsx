@@ -28,7 +28,7 @@ const ColSelection = React.forwardRef<HTMLDivElement, CustomColProps>((props, re
     const newItem = {
       ...editorConfig?.['GridCol'],
       props: { span: 12 },
-      widgetList: []
+      children: []
     };
     insertWidgetItem(editor, newItem, nextIndex, getParent(path));
   };

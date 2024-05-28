@@ -60,14 +60,14 @@ const operationSetting = [
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
-    props: { children: '隐藏' }
+    children: '隐藏'
   },
   {
     name: 'props.disabled',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
-    props: { children: '禁用' }
+    children: '禁用'
   },
   {
     name: 'props.allowClear',
@@ -75,14 +75,14 @@ const operationSetting = [
     inline: true,
     compact: true,
     initialValue: true,
-    props: { children: '可清除' }
+    children: '可清除'
   },
   {
     name: 'props.use12Hours',
     type: 'OperateCheckbox',
     inline: true,
     compact: true,
-    props: { children: '12小时制' }
+    children: '12小时制'
   }
 ];
 

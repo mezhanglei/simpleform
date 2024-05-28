@@ -44,7 +44,7 @@ const OptionList = React.forwardRef<HTMLElement, any>((props, ref) => {
       align: 'middle',
       style: { marginBottom: '10px' }
     },
-    widgetList: [
+    children: [
       {
         name: `[${index}]label`,
         compact: true,

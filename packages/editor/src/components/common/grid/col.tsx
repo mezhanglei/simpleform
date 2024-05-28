@@ -19,6 +19,7 @@ const GridCol = React.forwardRef<HTMLDivElement, CustomColProps>((props, ref) =>
 
   const { _options } = rest || {};
   const isEditor = _options?.isEditor;
+  const dndList = _options?.children instanceof Array ? _options?.children : [];
   const path = _options?.path;
   const cls = classnames(className, {
     'edit-col': isEditor
@@ -30,8 +31,8 @@ const GridCol = React.forwardRef<HTMLDivElement, CustomColProps>((props, ref) =>
         <ColSelection {...rest} >
           <BaseDnd
             {...rest}
-            dndPath={joinFormPath(path, 'widgetList')}
-            dndList={_options?.widgetList || []}>
+            dndPath={joinFormPath(path, 'children')}
+            dndList={dndList}>
             {children}
           </BaseDnd>
         </ColSelection>

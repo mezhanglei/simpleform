@@ -22,7 +22,6 @@ const baseSetting = [
     label: '标签水平排列',
     name: 'labelAlign',
     type: "Select",
-    initialValue: 'right',
     props: {
       style: { width: '100%' },
       allowClear: true,
@@ -46,7 +45,6 @@ const baseSetting = [
     label: '标签宽度',
     name: 'labelWidth',
     type: 'InputNumber',
-    initialValue: 120,
     props: {
       min: 0,
       max: 300
@@ -67,7 +65,6 @@ const baseSetting = [
     name: 'colon',
     type: 'Switch',
     valueProp: 'checked',
-    initialValue: false,
   }
 ];
 

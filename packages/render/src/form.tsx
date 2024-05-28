@@ -13,6 +13,7 @@ export default function FormRender(props: FormRenderProps) {
     widgetList,
     components,
     plugins,
+    variables,
     renderItem,
     renderList,
     inside,
@@ -31,6 +32,7 @@ export default function FormRender(props: FormRenderProps) {
         widgetList={widgetList}
         components={components}
         plugins={plugins}
+        variables={variables}
         renderItem={renderItem}
         renderList={renderList}
         inside={inside}

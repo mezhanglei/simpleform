@@ -13,9 +13,7 @@ export default function Demo() {
       valueProp: 'checked',
       initialValue: true,
       type: 'Checkbox',
-      props: {
-        children: '是否必填'
-      }
+      children: '是否必填'
     },
     {
       label: "展示控件",

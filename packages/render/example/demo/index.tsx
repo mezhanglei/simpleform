@@ -77,12 +77,12 @@ export default function Demo(props) {
       type: 'Select',
       props: {
         labelInValue: true,
-        style: { width: '100%' },
-        children: [
-          { type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } },
-          { type: 'Select.Option', props: { key: 2, value: '2', children: 'option2' } }
-        ]
-      }
+        style: { width: '100%' }
+      },
+      children: [
+        { type: 'Select.Option', props: { key: 1, value: '1' }, children: 'option1' },
+        { type: 'Select.Option', props: { key: 2, value: '2' }, children: 'option2' }
+      ]
     },
     {
       label: 'list[1]',
@@ -91,12 +91,12 @@ export default function Demo(props) {
       type: 'Select',
       props: {
         labelInValue: true,
-        style: { width: '100%' },
-        children: [
-          { type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } },
-          { type: 'Select.Option', props: { key: 2, value: '2', children: 'option2' } }
-        ]
-      }
+        style: { width: '100%' }
+      },
+      children: [
+        { type: 'Select.Option', props: { key: 1, value: '1' }, children: 'option1' },
+        { type: 'Select.Option', props: { key: 2, value: '2' }, children: 'option2' }
+      ]
     },
     {
       label: 'first',
@@ -104,9 +104,9 @@ export default function Demo(props) {
       rules: [{ required: true, message: 'first empty' }],
       type: 'Select',
       props: {
-        style: { width: '100%' },
-        children: [{ type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } }]
-      }
+        style: { width: '100%' }
+      },
+      children: [{ type: 'Select.Option', props: { key: 1, value: '1' }, children: 'option1' }]
     },
     {
       label: 'second',
@@ -114,9 +114,9 @@ export default function Demo(props) {
       rules: [{ required: true, message: 'second empty' }],
       type: 'Select',
       props: {
-        style: { width: '100%' },
-        children: [{ type: 'Select.Option', props: { key: 1, value: '1', children: 'option1' } }]
-      }
+        style: { width: '100%' }
+      },
+      children: [{ type: 'Select.Option', props: { key: 1, value: '1' }, children: 'option1' }]
     },
     {
       label: 'name5',
@@ -126,13 +126,13 @@ export default function Demo(props) {
       valueGetter: "{{(value) => ({span: value})}}",
       type: 'Select',
       props: {
-        style: { width: '100%' },
-        children: [
-          { type: 'Select.Option', props: { key: 1, value: 12, children: 'option1' } },
-          { type: 'Select.Option', props: { key: 2, value: 6, children: 'option2' } },
-          { type: 'Select.Option', props: { key: 3, value: 4, children: 'option3' } }
-        ]
-      }
+        style: { width: '100%' }
+      },
+      children: [
+        { type: 'Select.Option', props: { key: 1, value: 12 }, children: 'option1' },
+        { type: 'Select.Option', props: { key: 2, value: 6 }, children: 'option2' },
+        { type: 'Select.Option', props: { key: 3, value: 4 }, children: 'option3' }
+      ]
     },
     {
       label: 'checkbox',
@@ -142,9 +142,9 @@ export default function Demo(props) {
       rules: [{ required: true, message: 'checkbox empty' }],
       type: 'Checkbox',
       props: {
-        style: { width: '100%' },
-        children: 'option'
-      }
+        style: { width: '100%' }
+      },
+      children: 'option'
     },
   ];
 
