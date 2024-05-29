@@ -121,6 +121,11 @@ export default function FormChildren(props: FormChildrenProps) {
     );
   };
 
+  const _baseOptions = {
+    formrender,
+    form,
+  };
+
   const renderChild = (widgetList?: WidgetList, parent?: string) => {
     if (!(widgetList instanceof Array) || !formrender) return;
     return widgetList.map((item, index) => {
@@ -128,8 +133,7 @@ export default function FormChildren(props: FormChildrenProps) {
       const _options = {
         index,
         path: curPath,
-        formrender,
-        form,
+        ..._baseOptions
       };
       if (item === undefined || item === null || typeof item === 'string' || typeof item === 'number') {
         return item;
@@ -179,9 +183,12 @@ export default function FormChildren(props: FormChildrenProps) {
       }, restField);
       const typeWidget = formrender.createFormElement(mergeItem?.readOnly === true ? readOnlyRender : (typeRender || { type, props }), commonProps);
       const typeChildren = children instanceof Array ? renderChild(children, joinFormPath(curPath, 'children')) : formrender.createFormElement(children, commonProps);
-      const typeChildrenWithSide = withSide(typeChildren, renderList, insideEle, commonProps);
-      const curNode = React.isValidElement(typeWidget)
-        ? React.cloneElement(typeWidget, {}, typeChildrenWithSide)
+      const curNode = React.isValidElement(typeWidget) && !isEmpty(typeChildren)
+        ? React.cloneElement(
+          typeWidget,
+          {},
+          withSide(typeChildren, renderList, insideEle, commonProps)
+        )
         : (isEmpty(typeWidget) ? typeChildren : typeWidget);
       const result = mergeItem?.name ?
         <Form.Item
@@ -197,8 +204,7 @@ export default function FormChildren(props: FormChildrenProps) {
     });
   };
 
-  const withSideChilds = withSide(renderChild(widgetList), renderList, formrender.createFormElement(inside), { _options: { formrender, form } });
-  return <>{withSideChilds}</>;
+  return <>{withSide(renderChild(widgetList), renderList, formrender.createFormElement(inside, { _options: _baseOptions }), { _options: _baseOptions })}</>;
 }
 
 FormChildren.displayName = 'Form.Children';
