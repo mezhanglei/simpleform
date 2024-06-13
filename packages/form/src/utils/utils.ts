@@ -46,7 +46,7 @@ export const pickObject = <T, K extends FormPathType = string>(obj: T | undefine
 };
 
 // 根据路径获取目标对象中的单个值或多个值
-export function deepGet<T>(obj?: T, keys?: string | number) {
+export function deepGet<T>(obj?: T, keys?: FormPathType) {
   if (typeof obj !== 'object') return;
   if (!isObject(obj) && !isArray(obj)) return;
   const parts = pathToArr(keys);

@@ -75,7 +75,7 @@ export const ItemCore = (props: ItemCoreProps) => {
 
   const nonform = rest?.nonform || rest?.readOnly;
   const currentPath = (isEmpty(name) || nonform === true) ? undefined : name;
-  const initValue = initialValue ?? deepGet(initialValues, currentPath);
+  const initValue = initialValue === undefined ? deepGet(initialValues, currentPath) : initialValue;
   const [value, setValue] = useState<unknown>();
 
   // 初始化fieldProps
@@ -100,7 +100,8 @@ export const ItemCore = (props: ItemCoreProps) => {
   useEffect(() => {
     if (!currentPath || !form) return;
     // 回填初始值
-    form.setInitialValue(currentPath, initValue);
+    const storeValue = form.getFieldValue(currentPath);
+    form.setInitialValue(currentPath, initValue ?? storeValue);
     onFieldsMounted && onFieldsMounted({ name: currentPath, value: initValue }, form?.getFieldValue());
     return () => {
       // 清除该表单域的props(在设置值的前面)

@@ -8,4 +8,4 @@ export function deepClone<T>(value: T) {
 // 判断两个值是否相等
 export function isEqual(a: unknown, b: unknown) {
   return compare(a, b);
-}
+};

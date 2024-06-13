@@ -32,12 +32,12 @@ export default function Demo() {
       type: 'Select',
       props: {
         labelInValue: true,
-        style: { width: '100%' }
+        style: { width: '100%' },
+        options: [
+          { label: 'option1', value: 1 },
+          { label: 'option2', value: 2 },
+        ],
       },
-      children: [
-        { type: 'Select.Option', props: { key: 1, value: '1' }, children: 'option1' },
-        { type: 'Select.Option', props: { key: 2, value: '2' }, children: 'option2' }
-      ]
     },
     {
       label: 'list[1]',
@@ -46,12 +46,12 @@ export default function Demo() {
       type: 'Select',
       props: {
         labelInValue: true,
-        style: { width: '100%' }
-      },
-      children: [
-        { type: 'Select.Option', props: { key: 1, value: '1' }, children: 'option1' },
-        { type: 'Select.Option', props: { key: 2, value: '2' }, children: 'option2' }
-      ]
+        style: { width: '100%' },
+        options: [
+          { label: 'option1', value: 1 },
+          { label: 'option2', value: 2 },
+        ],
+      }
     },
     {
       label: 'first',

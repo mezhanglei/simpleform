@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/form
-[![](https://img.shields.io/badge/version-2.1.2-green)](https://www.npmjs.com/package/@simpleform/form)
+[![](https://img.shields.io/badge/version-2.1.5-green)](https://www.npmjs.com/package/@simpleform/form)
 
 > 表单底层组件，通过回调函数方式实现表单值的显示和更新事件的绑定.
 
@@ -70,7 +70,7 @@ import '@simpleform/form/lib/css/main.css'
 | `error` |  展示的报错信息   |  `string`   | -      |
 | `suffix` |  后缀节点   |  `React.ReactNode`   | -      |
 | `footer` |  底部节点   |  `React.ReactNode`   | -      |
-| `tooltip` |  展示标识信息   |  `string`   | -      |
+| `tooltip` |  展示`tooltip`提示   |  `string`   | -      |
 | `compact` |  是否紧凑，会去掉表单域的`margin`   |  `boolean`   | -      |
 
 ### Form.Item
@@ -100,8 +100,8 @@ import '@simpleform/form/lib/css/main.css'
 | `validator`    |   自定义校验函数     |  `(value: unknown) => void/boolean`   | -      |
 | `pattern`  |   正则表达式校验，不符合则报错     |   `RegExp/string`  | -      |
 |  `whitespace`   |  空格校验   |  `boolean`   | -      |
-| `max`    |   表单值为`string`类型时字符串最大长度；`number` 类型时为最大值；`array` 类型时为数组最大长度     |  `number`   | -      |
-|  `min`   |   表单值为`string`类型时字符串最小长度；`number` 类型时为最小值；`array` 类型时为数组最小长度     |  `number`   | -      |
+| `max`    |   表单值为`string`类型时为字符串最大长度；`number` 类型时为数字最大值；`array` 类型时为数组最大长度     |  `number`   | -      |
+|  `min`   |   表单值为`string`类型时为字符串最小长度；`number` 类型时为数字最小值；`array` 类型时为数组最小长度     |  `number`   | -      |
 
 
 ### Method

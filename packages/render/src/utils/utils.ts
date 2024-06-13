@@ -1,16 +1,6 @@
 import { arrayMove } from "./array";
 import { pathToArr, deepSet, joinFormPath, deepGet } from "@simpleform/form";
-import { WidgetItem, WidgetList } from "../typings";
-
-// 匹配字符串表达式
-export const matchExpression = (value?: unknown) => {
-  if (typeof value === 'string') {
-    // /\{\{(.*)\}\}/
-    const reg = new RegExp('\{\{\s*.*?\s*\}\}', 'g');
-    const result = value?.match(reg)?.[0];
-    return result;
-  }
-};
+import { WidgetList } from "../typings";
 
 // 获取路径的末尾节点
 export const getPathEnd = (path?: string) => {
@@ -153,32 +143,4 @@ export const moveDiffLevel = (widgetList: WidgetList | undefined, from: { parent
     const result = insertItemByIndex(widgetList, insertItem, toIndex, toParentPath);
     return setItemByPath(result, undefined, fromPath);
   }
-};
-
-// 提取widgetList中的默认值
-export const getInitialValues = <V>(widgetList?: WidgetList) => {
-  if (!(widgetList instanceof Array)) return;
-  let initialValues = {} as V;
-  const deepHandleItem = (item: WidgetItem, path: string) => {
-    for (const key of Object.keys(item)) {
-      const val = item[key];
-      if (key === 'children' && val instanceof Array) {
-        const curPath = joinFormPath(path, key);
-        val.forEach((child, index) => {
-          const childPath = joinFormPath(curPath, index);
-          deepHandleItem(child, childPath);
-        });
-      } else {
-        if (key === 'initialValue' && item?.name && val !== undefined) {
-          initialValues = (deepSet(initialValues, item.name, val) || {}) as V;
-        }
-      }
-    }
-  };
-
-  widgetList.forEach((item, index) => {
-    const path = `[${index}]`;
-    deepHandleItem(item, path);
-  });
-  return initialValues;
 };

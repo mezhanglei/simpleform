@@ -143,16 +143,14 @@ export class SimpleForm<T = unknown> {
 
   // 设置初始值
   public setInitialValue(path: string, initialValue?: unknown) {
-    const storeValue = deepGet(this.values, path);
     const oldValue = deepGet(this.lastValues, path);
-    const val = initialValue ?? storeValue;
-    this.initialValues = deepSet(this.initialValues, path, val);
+    this.initialValues = deepSet(this.initialValues, path, initialValue);
     // 旧表单值存储
     this.lastValues = deepClone(this.values);
     // 设置值
-    this.values = deepSet(this.values, path, val);
+    this.values = deepSet(this.values, path, initialValue);
     this.notifyFormItem(path);
-    if (isEmpty(oldValue) && val === undefined) {
+    if (isEmpty(oldValue) && initialValue === undefined) {
       return;
     }
     this.notifyFormValue(path);

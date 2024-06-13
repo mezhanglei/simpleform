@@ -1,43 +1,38 @@
-import { convertToString, evalString } from '../../../utils/string';
-import { AssembleType, RuleSettingItem } from "./modal";
+import { convertToString, evalString } from "../../../utils/string";
+import { RuleSettingItem } from "./modal";
 
-// 字符串转化为规则列表
 export const codeToRule = (codeStr?: string) => {
   if (typeof codeStr !== 'string' || !codeStr) return [];
-  let result: RuleSettingItem[] = [];
-  // 将字符串转换为RuleData
-  const handleStr = (str: string) => {
-    if (typeof str !== 'string') return;
-    const matchStrWithBracket = str.match(/\((\S*.*?\s*)\)/)?.[0]; // 匹配目标
-    const matchStr = str.match(/\((\S*.*?\s*)\)/)?.[1]; // 匹配目标(不带括号)
-    if (matchStr) {
-      const matchAssemble = str.match(/^\|\||^\&\&/)?.[0] as AssembleType; // 匹配assemble符号
-      const item = matchStr?.split('?');
-      const code = item[0];
-      const valueStr = matchStr.match(/(?<=\?).*(?=:)/)?.[0] as string;
-      const value = evalString(valueStr);
-      result.push({ assemble: matchAssemble, code, value });
-      // 剩余的字符串继续处理
-      if (matchStrWithBracket) {
-        const restStr = str?.replace(matchStrWithBracket, '');
-        handleStr(restStr);
-      }
-    }
-  };
-  const removedBracket = codeStr?.replace(/\{\{|\}\}/g, '');
-  handleStr(removedBracket);
-  return result;
+  const codeArr = codeStr?.replace(/\{\{|\}\}/g, '').split(/\s*\(|\)\s*/).filter(Boolean);
+  return codeArr.map((item) => {
+    const code = item.trim();
+    if (['||', '&&'].includes(code)) return code;
+    return code.split(/\s*\?|\:\s*/).map((codeItem, index) => index === 0 ? codeItem : evalString(codeItem));
+  }) as Array<RuleSettingItem>;
 };
 
-// 规则列表转化为字符串
-export const ruleToCodeStr = (data?: RuleSettingItem[]) => {
-  let codeStr = data?.reduce((preStr, current) => {
-    const assembleStr = current?.assemble || "";
-    const conditionStr = current?.code || "";
-    const controlValue = current?.value;
-    const currentStr = conditionStr ? `(${conditionStr} ? ${convertToString(controlValue)} : undefined)` : "";
-    return preStr + assembleStr + currentStr;
+const codeJoinLetter = (codeArr?: RuleSettingItem) => {
+  if (!(codeArr instanceof Array)) return codeArr;
+  const list = [codeArr[0], codeArr[1], codeArr[2]];
+  const convertList = list.map((item) => {
+    return typeof item === 'string' ? item : convertToString(item) as string;
+  });
+  return convertList.reduce((prev, curr, index) => {
+    if (index === 0) {
+      return prev.replace('{0}', curr);
+    } else if (index === 1) {
+      return prev.replace('{1}', curr);
+    } else {
+      return prev.replace('{2}', curr);
+    }
+  }, '({0}?{1}:{2})');
+};
+
+export const ruleToCodeStr = (rules?: Array<RuleSettingItem>) => {
+  if (!(rules instanceof Array)) return;
+  const codeStr = rules.reduce<string>((preStr, current) => {
+    const curStr = current instanceof Array ? codeJoinLetter(current) : current;
+    return preStr + (curStr || '');
   }, "");
-  codeStr = codeStr ? `{{${codeStr}}}` : "";
-  return codeStr;
+  return codeStr ? `{{${codeStr}}}` : "";
 };

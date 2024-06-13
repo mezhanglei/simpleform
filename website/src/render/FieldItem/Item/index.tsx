@@ -1,4 +1,4 @@
-import React, { CSSProperties, useRef } from 'react';
+import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 import classnames from 'classnames';
 import './index.less';
 import pickAttrs from '@simpleform/form/src/utils/pickAttrs';
@@ -66,6 +66,7 @@ export const Item = React.forwardRef<HTMLDivElement, ItemProps>((props, ref) => 
 
   const controlRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLLabelElement>(null);
+  const [diff, setDiff] = useState<number>();
 
   const cls = classnames(
     prefixCls,
@@ -83,14 +84,22 @@ export const Item = React.forwardRef<HTMLDivElement, ItemProps>((props, ref) => 
     required === true ? `label__container--required` : ''
   );
 
-  const controlHeight = controlRef.current?.offsetHeight || 0;
-  const labelHeight = labelRef.current?.offsetHeight || 0;
-  const labelMt = controlHeight - labelHeight > 0 && layout === "horizontal" && controlHeight <= 36 ? (controlHeight - labelHeight) / 2 : undefined;
+  const getDiff = () => {
+    const controlHeight = controlRef.current?.offsetHeight || 0;
+    const labelHeight = labelRef.current?.offsetHeight || 0;
+    const labelMt = controlHeight - labelHeight > 0 && layout === "horizontal" && controlHeight <= 42 ? (controlHeight - labelHeight) / 2 : undefined;
+    return labelMt;
+  };
+
+  useEffect(() => {
+    setDiff(getDiff());
+  }, []);
+
   const mergeLabelStyle = {
     marginRight: gutter,
     width: labelWidth,
     textAlign: labelAlign,
-    marginTop: labelMt,
+    marginTop: diff || getDiff(),
     ...labelStyle
   };
 
@@ -105,7 +114,7 @@ export const Item = React.forwardRef<HTMLDivElement, ItemProps>((props, ref) => 
         !isEmpty(label) && showLabel ? (
           <div className={labelCls} style={mergeLabelStyle}>
             <label ref={labelRef}>
-              {colon === true ? <>{label}:</> : label}
+              {colon === true ? <>{label}：</> : label}
               {tooltip && (
                 <Tooltip content={tooltip}>
                   <SvgIcon name="wenhao" className="label__tooltip" />

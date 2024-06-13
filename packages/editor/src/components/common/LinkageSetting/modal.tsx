@@ -5,14 +5,8 @@ import DefaultFormRender, { useSimpleForm, CommonFormProps, CustomGenerateWidget
 import { codeToRule, ruleToCodeStr } from "./utils";
 import CustomModal, { CustomModalProps } from "../AntdModal";
 
-// 集合类型
-export type AssembleType = '&&' | '||'
 // 规则条件的渲染数据类型
-export type RuleSettingItem = {
-  assemble?: AssembleType;
-  code?: string;
-  value?: unknown;
-}
+export type RuleSettingItem = unknown[] | '||' | '&&' | '';
 export interface SettingModalProps extends CustomModalProps, CommonFormProps<string> {
   title?: NonNullable<CustomModalProps['modalProps']>['title']
   widgetConfig?: CustomGenerateWidgetItem;
@@ -48,33 +42,22 @@ const LinkageSettingModal: React.FC<SettingModalProps> = (props) => {
     _options
   } = props;
 
-  const initialValue: RuleSettingItem[] = [{}];
   const context = _options?.context;
   const FormRender = context?.state?.FormRender || DefaultFormRender;
   const form = useSimpleForm();
-  const [dataSource, setDataSource] = useState<RuleSettingItem[]>([]);
+  const [dataSource, setDataSource] = useState<Array<RuleSettingItem>>([]);
 
   useEffect(() => {
     const currentValue = typeof value === 'string' ? value : undefined;
     const ruleData = codeToRule(currentValue);
-    const options = ruleData.length ? ruleData : [...initialValue];
+    const options = ruleData.length ? ruleData : [[]];
     setDataSource(options);
     form.setFieldsValue(options);
   }, [value]);
 
-  const widgetList = dataSource.map((item, index) => ({
-    children: [
-      {
-        name: `[${index}]assemble`,
-        compact: true,
-        hidden: index === 0,
-        type: 'Select',
-        props: {
-          className: classes.assemble,
-          options: assembleOptions
-        }
-      },
-      {
+  const widgetList = dataSource.map((item, index) => {
+    if (item instanceof Array) {
+      return {
         type: 'row',
         props: {
           gutter: 8,
@@ -89,7 +72,7 @@ const LinkageSettingModal: React.FC<SettingModalProps> = (props) => {
           {
             outside: { type: 'col', props: { span: 8 } },
             compact: true,
-            name: `[${index}]code`,
+            name: `[${index}][0]`,
             type: "Input.TextArea",
             props: {
               placeholder: "formvalues['表单字段'] == 值",
@@ -101,7 +84,7 @@ const LinkageSettingModal: React.FC<SettingModalProps> = (props) => {
           },
           {
             outside: { type: 'col', props: { span: 5 } },
-            name: `[${index}]value`,
+            name: `[${index}][1]`,
             compact: true,
             ...widgetConfig
           },
@@ -113,12 +96,23 @@ const LinkageSettingModal: React.FC<SettingModalProps> = (props) => {
               <SvgIcon name="delete" className={classes.icon} onClick={() => deleteItem(index)} />
           }
         ]
-      }
-    ]
-  }));
+      };
+    } else {
+      return {
+        name: `[${index}]`,
+        compact: true,
+        hidden: index === 0,
+        type: 'Select',
+        props: {
+          className: classes.assemble,
+          options: assembleOptions
+        }
+      };
+    }
+  });
 
   const addNewItem = () => {
-    const newDataSource = dataSource.concat([{ assemble: '||' }]);
+    const newDataSource = dataSource.concat(['||', []]);
     form.setFieldsValue(newDataSource);
     setDataSource(newDataSource);
   };
@@ -127,7 +121,7 @@ const LinkageSettingModal: React.FC<SettingModalProps> = (props) => {
     const oldData = [...dataSource];
     if (!oldData) return;
     const newData = [...oldData];
-    newData.splice(index, 1);
+    newData.splice(index - 1, 2);
     form.setFieldsValue(newData);
     setDataSource(newData);
   };
@@ -149,7 +143,8 @@ const LinkageSettingModal: React.FC<SettingModalProps> = (props) => {
       displayElement={displayElement}
       modalProps={{
         className: classes.cls,
-        title: title
+        title: title,
+        destroyOnClose: false
       }}>
       <FormRender
         tagName="div"

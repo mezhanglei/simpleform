@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-4.0.2-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.0.5-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
 
@@ -72,13 +72,13 @@ const widgetList = [{
 继承`@simpleform/form`组件的[FormItemProps](./form#formitem)
 ```javascript
 // 组件JSON描述
-export type CustomWidget<P = {}> = {
+export type CustomWidget = {
   type?: string;
-  props?: React.Attributes;
-  children?: CustomUnionType<P>;
+  props?: Record<string, unknown>;
+  children?: any; // 嵌套子节点
 };
 // 带表单域的组件节点(字符串表达式编译后)
-export type GenerateWidgetItem<P = {}> = P & FormItemProps & CustomWidget<P> & {
+export type GenerateWidgetItem<P = {}> = P & FormItemProps & CustomWidget & {
   inside?: CustomUnionType<P>; // 节点的内层
   outside?: CustomUnionType<P>; // 节点的外层
   readOnly?: boolean; // 只读模式
@@ -88,11 +88,11 @@ export type GenerateWidgetItem<P = {}> = P & FormItemProps & CustomWidget<P> & {
 };
 ```
 :::warning
-`readOnly`和`readOnlyRender`只在表单控件节点才会生效
+`>=4`版本嵌套子节点由`widgetList`字段名改为`children`。
 :::
 
 ## 表单上下文参数
-表单中的任意组件都会被注入上下文参数字段`_options`: 
+表单中的任意组件都会被注入上下文参数字段`_options`:
 - `index`：当前组件所在的列表的索引数字
 - `path`：当前组件所在的节点路径
 - `formrender`: `SimpleFormRender`的实例
@@ -114,10 +114,10 @@ const CustomInput: React.FC<WidgetContextProps & InputProps> = (props) => {
 }
 ```
 :::warning
-`>=3.1.1`所有上下文参数均在`_options`中，通过props注入进组件中。
+`>=3.1.1`所有上下文参数均在`_options`中，通过`props`注入进组件中。
 :::
 ## 全局参数注入
-通过`options`可设置每个节点的参数，在上下文参数`_options`中接收该参数。
+通过`options`属性设置的参数会和每个节点的属性浅合并, 优先级比节点的当前属性低。
 <code src="../../src/render/global.tsx"></code>
 
 ## 表单联动

@@ -14,7 +14,7 @@ order: 1
   {({ bindProps }) =>  <input {...bindProps} />}
 </Form.Item>
 ```
-2. 通过`form`实例的`getBindProps`方法来实现值和事件的双向绑定.
+2. 通过`form`实例的`getBindProps`方法来实现值和事件的双向绑定(不推荐).
 ```javascript
 ...
 

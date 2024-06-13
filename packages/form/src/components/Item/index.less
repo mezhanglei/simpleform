@@ -1,81 +1,83 @@
-// label样式
-.field-item .label__container {
-  font-size: 14px;
-  overflow-wrap: break-word;
-  word-break: break-all;
-
-  .label__tooltip {
-    cursor: help;
-    writing-mode: horizontal-tb;
-    margin-inline-start: 4px;
-  }
-
-  &--required label::before {
-    display: inline-block;
-    margin-inline-end: 4px;
-    color: #ff4d4f;
-    font-size: 14px;
-    font-family: SimSun, sans-serif;
-    line-height: 1;
-    content: "*";
-  }
-}
-
-// 内容样式
-.field-item .control__container {
-  position: relative;
-
-  .item__control {
-    margin-left: 0px;
-    margin-right: 0px;
-    overflow-wrap: break-word;
-    word-break: break-word;
-  }
-
-  .item__suffix {
-    margin-left: 10px;
-    font-size: 14px;
-    margin-top: 3px;
-  }
-
-  .item__footer {
-    width: 100%;
-    margin-top: 8px;
-  }
-
-  .item__message {
-    font-size: 12px;
-    color: red;
-  }
-
-  &--error .item__control {
-
-    .ant-input,
-    .ant-select .ant-select-selector,
-    .ant-input-number,
-    .ant-checkbox,
-    .ant-picker,
-    .ant-mentions,
-    .ant-radio,
-    .ant-rate,
-    .ant-slider,
-    .ant-switch,
-    .ant-upload {
-      border-color: #ff4d4f;
-
-      &:hover {
-        border-color: #ff7875;
-        box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
-        border-right-width: 1px !important;
-        outline: 0;
-      }
-    }
-  }
-}
-
 // 表单域样式
 .field-item {
   margin-bottom: 16px;
+
+  // label样式
+  .label__container {
+    font-size: 14px;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    line-height: normal;
+
+    .label__tooltip {
+      cursor: help;
+      writing-mode: horizontal-tb;
+      margin-inline-start: 4px;
+    }
+
+    &--required label::before {
+      display: inline-block;
+      margin-inline-end: 4px;
+      color: #ff4d4f;
+      font-size: 14px;
+      font-family: SimSun, sans-serif;
+      line-height: 1;
+      content: "*";
+    }
+  }
+
+  // 内容样式
+  .control__container {
+    position: relative;
+
+    .item__control {
+      margin-left: 0px;
+      margin-right: 0px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      padding: 0.1px; // c触发BFC
+    }
+
+    .item__suffix {
+      margin-left: 10px;
+      font-size: 14px;
+      margin-top: 3px;
+    }
+
+    .item__footer {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .item__message {
+      font-size: 12px;
+      color: red;
+    }
+
+    &--error .item__control {
+
+      .ant-input,
+      .ant-select .ant-select-selector,
+      .ant-input-number,
+      .ant-checkbox,
+      .ant-picker,
+      .ant-mentions,
+      .ant-radio,
+      .ant-rate,
+      .ant-slider,
+      .ant-switch,
+      .ant-upload {
+        border-color: #ff4d4f;
+
+        &:hover {
+          border-color: #ff7875;
+          box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+          border-right-width: 1px !important;
+          outline: 0;
+        }
+      }
+    }
+  }
 
   &--horizontal {
     display: inline-flex;

@@ -130,7 +130,8 @@ const RuleCore = React.forwardRef<RuleCoreRefs, RuleCoreProps>((props, ref) => {
     <div className={cls}>
       <CustomModal
         modalProps={{
-          title: "校验规则"
+          title: "校验规则",
+          destroyOnClose: false
         }}
         onOk={handleOk}
         displayElement={
