@@ -16,7 +16,8 @@ export default function bindRequest(Component: ReactComponent<any>, codeStr: str
     const target = props?.[codeStr];
     const _options = props._options;
     const formrender = _options?.formrender;
-    const request = formrender?.variables && formrender.variables.request as AxiosInstance;
+    const defineConfig = formrender?.config;
+    const request = defineConfig?.variables?.request as AxiosInstance;
 
     const [response, setResponse] = useState<unknown[]>([]);
     const [isRequest, setIsRequest] = useState<boolean>();

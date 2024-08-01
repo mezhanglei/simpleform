@@ -1,6 +1,6 @@
 {
   "name": "@simpleform/form",
-  "version": "2.1.5",
+  "version": "2.1.9",
   "description": "simple form component",
   "author": "mezhanglei <496623925@qq.com>",
   "homepage": "https://github.com/mezhanglei/simpleform#readme",
@@ -45,7 +45,6 @@
   "dependencies": {
     "classnames": "^2.3.2",
     "copy-anything": "^3.0.5",
-    "react-fast-compare": "^3.2.2",
     "react-tooltip": "^5.23.0"
   },
   "peerDependencies": {

@@ -16,19 +16,18 @@ import RichEditor from "./richEditor";
 import RichText from "./richText";
 // 布局组件
 import Grid from './grid';
-import GridRow from './grid/row';
-import GridCol from './grid/col';
 import Divider from './divider';
 import Alert from './alert';
+import LayoutTable from './layoutTable';
 // 组合组件
 import FormTable from "./formTable";
 
 export default {
   // 布局组件
-  // tableLayout,
   "Grid": Grid,
   "Divider": Divider,
   "Alert": Alert,
+  "LayoutTable": LayoutTable,
   // 控件组合
   "FormTable": FormTable,
   // 基础控件
@@ -48,6 +47,4 @@ export default {
   "ImageUpload": ImageUpload,
   "RichText": RichText,
   "RichEditor": RichEditor,
-  "GridRow": GridRow,
-  "GridCol": GridCol,
 };

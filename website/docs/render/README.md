@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-4.0.5-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.1.14-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
 
@@ -61,34 +61,32 @@ const widgetList = [{
 }]
 ```
 - 非表单节点:
-无`name`属性的节点, 除了`children`属性外，只有`type`和`props`生成目标节点, 举例：
+无`name`属性的节点, 由`type`渲染出来组件, 其他属性为该组件的属性, 举例：
 ```javascript
 const widgetList = [{
   type: 'CustomCard',
-  props: {}
+  // ...其他属性
 }]
 ```
 - 节点类型
 继承`@simpleform/form`组件的[FormItemProps](./form#formitem)
 ```javascript
-// 组件JSON描述
-export type CustomWidget = {
+// 带表单域的组件节点(字符串表达式编译后)
+export type GenerateWidgetItem<P = {}> = P & FormItemProps & {
   type?: string;
   props?: Record<string, unknown>;
   children?: any; // 嵌套子节点
-};
-// 带表单域的组件节点(字符串表达式编译后)
-export type GenerateWidgetItem<P = {}> = P & FormItemProps & CustomWidget & {
   inside?: CustomUnionType<P>; // 节点的内层
   outside?: CustomUnionType<P>; // 节点的外层
   readOnly?: boolean; // 只读模式
-  readOnlyRender?: CustomUnionType<P>; // 只读模式下的组件
-  typeRender?: CustomUnionType<P>; // 表单控件自定义渲染
+  readOnlyRender?: ReactNode | ((context?: WidgetContextProps) => ReactNode); // 只读模式下的组件
+  typeRender?: ReactNode | ((context?: WidgetContextProps) => ReactNode); // 表单控件自定义渲染
   hidden?: boolean;
 };
 ```
 :::warning
 `>=4`版本嵌套子节点由`widgetList`字段名改为`children`。
+`>=4.1.12`版本`readOnlyRender`字段和`typeRender`字段的组件类型变更。
 :::
 
 ## 表单上下文参数
@@ -97,7 +95,7 @@ export type GenerateWidgetItem<P = {}> = P & FormItemProps & CustomWidget & {
 - `path`：当前组件所在的节点路径
 - `formrender`: `SimpleFormRender`的实例
 - `form`: `SimpleForm`的实例
-- 当前节点的信息
+- 节点组件的其他属性
 ```jsx | pure
 const CustomInput: React.FC<WidgetContextProps & InputProps> = (props) => {
   const {

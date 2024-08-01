@@ -1,6 +1,7 @@
 import { Col, Row } from 'antd';
 import React from 'react';
 import { EditorPanel, EditorProvider, EditorSetting, EditorTools, EditorView } from '@simpleform/editor';
+import '@simpleform/editor/lib/css/main.css';
 import FormRender from '../FormRender';
 import EditorConfig from './config';
 import panelData from './config/panelData';

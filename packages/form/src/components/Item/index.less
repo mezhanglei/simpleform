@@ -1,6 +1,8 @@
 // 表单域样式
 .field-item {
-  margin-bottom: 16px;
+  &:not(:last-child) {
+    margin-bottom: 16px;
+  }
 
   // label样式
   .label__container {
@@ -35,7 +37,7 @@
       margin-right: 0px;
       overflow-wrap: break-word;
       word-break: break-word;
-      padding: 0.1px; // c触发BFC
+      padding: 0.1px; // 触发BFC
     }
 
     .item__suffix {

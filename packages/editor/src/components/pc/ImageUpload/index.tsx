@@ -42,7 +42,8 @@ const ImageUpload = React.forwardRef<unknown, ImageUploadProps>((props, ref) => 
   const [imageSrc, setImageSrc] = useState<string>();
   const [loading, setLoading] = useState<boolean>();
   const formrender = _options?.formrender;
-  const request = formrender?.variables && formrender?.variables.request as AxiosInstance;
+  const defineConfig = formrender?.config;
+  const request = defineConfig?.variables.request as AxiosInstance;
 
   useEffect(() => {
     setFileList(JSON.parse(JSON.stringify(value || [])));

@@ -1,7 +1,7 @@
 import { PathValue } from "../typings";
 import { ItemCoreProps } from "../item-core";
-import { deepClone } from "./object";
 import { isArray, isEmpty, isObject } from "./type";
+import { deepClone } from "./object";
 
 export type FormPathType = string | number | Array<string | number>;
 // 接收路径字符串或数组字符串，返回数组字符串表示路径
@@ -65,10 +65,9 @@ export function deepSet<T, P extends FormPathType>(obj?: T, path?: P, value?: un
   if (!parts?.length) return obj;
   // 有值但是非对象和数组的不允许赋值
   if (obj && !isObject(obj) && !isArray(obj)) return obj;
-
   const isIndex = <N>(code: N) => (typeof code === 'number' ? true : isWithBracket(code));
-  let temp = (isEmpty(obj) ? (isIndex(parts[0]) ? [] : {}) : deepClone(obj)) as Record<string, unknown>;
-  const cloneData = temp as T;
+  const cloneData = (!obj ? (isIndex(parts[0]) ? [] : {}) : deepClone(obj)) as T;
+  let temp = cloneData;
   for (let i = 0; i < parts?.length; i++) {
     const curKey = formatFormKey(parts[i]);
     const nextKey = parts[i + 1];
@@ -90,7 +89,7 @@ export function deepSet<T, P extends FormPathType>(obj?: T, path?: P, value?: un
       if (isEmpty(temp[curKey])) {
         temp[curKey] = isIndex(nextKey) ? [] : {};
       }
-      temp = temp[curKey] as Record<string, unknown>;
+      temp = temp[curKey];
     }
   }
   return cloneData;
@@ -113,12 +112,12 @@ export function getValuePropName(valueProp?: ItemCoreProps['valueProp'], type?: 
 }
 
 // 从事件对象中取值
-export function getValueFromEvent<V extends unknown>(val: V) {
-  const eventTarget = (val as React.ChangeEvent<HTMLInputElement>)?.target;
+export function getValueFromEvent<V extends unknown>(...args) {
+  const eventTarget = (args[0] as React.ChangeEvent<HTMLInputElement>)?.target;
   if (eventTarget) {
-    return eventTarget.type === 'checkbox' ? eventTarget.checked : eventTarget.value;
+    return eventTarget.type === 'checkbox' ? eventTarget.checked : eventTarget.value as V;
   }
-  return val;
+  return args[0] as V;
 }
 
 // 是否携带中括号

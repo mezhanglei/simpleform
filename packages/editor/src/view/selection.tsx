@@ -4,7 +4,7 @@ import BaseSelection, { BaseSelectionProps } from './BaseSelection';
 import SvgIcon from '../components/common/SvgIcon';
 import { getParent } from '../formrender';
 
-const ControlSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((props, ref) => {
+const CommonSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((props, ref) => {
   const {
     children,
     _options,
@@ -36,4 +36,4 @@ const ControlSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((p
   );
 });
 
-export default ControlSelection;
+export default CommonSelection;

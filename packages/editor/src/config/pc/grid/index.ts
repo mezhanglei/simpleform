@@ -1,18 +1,17 @@
+import GridSetting from './setting';
 import GridCol from './col';
-import GridRow from './row';
 
 export default {
-  ...GridRow,
-  children: [
-    {
-      ...GridCol,
-      props: { span: 12 },
-      children: []
-    },
-    {
-      ...GridCol,
-      props: { span: 12 },
-      children: []
-    }
+  panel: {
+    icon: 'grid',
+    label: '栅格布局',
+    nonform: true,
+    nonselection: true,
+  },
+  type: 'Grid',
+  setting: { ...GridSetting },
+  cols: [
+    { ...GridCol, children: [] },
+    { ...GridCol, children: [] }
   ]
 };

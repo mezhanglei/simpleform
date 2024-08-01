@@ -8,6 +8,7 @@ import { delWidgetItem } from '../utils/utils';
 import { CommonFormProps } from '../formrender';
 
 export interface BaseSelectionProps extends CommonFormProps, Omit<React.HtmlHTMLAttributes<HTMLDivElement>, 'draggable' | 'onChange' | 'onSelect'> {
+  hiddenDel?: boolean;
   tools?: ReactNode[]; // 工具栏
   configLabel?: string; // 当前组件的名字
   onSelectHandler?: (selected: FormEditorState['selected']) => void;
@@ -27,6 +28,7 @@ const BaseSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((prop
     _options,
     configLabel,
     tools,
+    hiddenDel,
     onMouseOver,
     onMouseOut,
     onSelectHandler,
@@ -99,7 +101,7 @@ const BaseSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((prop
   return (
     <div ref={ref} className={cls} {...pickAttrs(restProps)} onClickCapture={chooseItem} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
       {isOver && !isSelected && configLabel && <div className={classes.label}>{configLabel}</div>}
-      {(isOver || isSelected) && <SvgIcon className={classes.close} key="close" name="close" onClick={deleteColumn} />}
+      {(isOver || isSelected) && !hiddenDel && <SvgIcon className={classes.close} key="close" name="close" onClick={deleteColumn} />}
       {isSelected && <div className={classes.tools}>{tools}</div>}
       {children}
     </div>

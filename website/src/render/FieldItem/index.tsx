@@ -9,19 +9,19 @@ export default function Demo() {
     label: "姓名",
     name: 'name',
     readOnly: true,
-    readOnlyRender: "xxx",
+    readOnlyRender: () => "xxx",
     props: {},
   }, {
     label: "联系电话",
     name: 'phone',
     readOnly: true,
-    readOnlyRender: "xxxx-xxx-xxx",
+    readOnlyRender: () => "xxxx-xxx-xxx",
     props: {},
   }, {
     label: "职位",
     name: 'job',
     readOnly: true,
-    readOnlyRender: "产品经理",
+    readOnlyRender: () => "产品经理",
     props: {},
   }, {
     label: "住址",

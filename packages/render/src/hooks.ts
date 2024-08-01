@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SimpleFormRender } from './store';
 import { WidgetList } from './typings';
 
@@ -7,26 +7,28 @@ export function useSimpleFormRender() {
 }
 
 // 获取widgetList的state数据
-export function useWidgetList(formrender: SimpleFormRender) {
+export function useWidgetList(formrender: SimpleFormRender, callback?: Function) {
   const [widgetList, setWidgetList] = useState<WidgetList>();
 
-  const subscribeData = () => {
-    if (!formrender) return;
-    formrender.subscribeWidgetList((newValue) => {
-      setWidgetList(newValue);
-    });
-  };
+  const subscribe = useCallback(() => {
+    if (formrender?.subscribeWidgetList) {
+      formrender.subscribeWidgetList((newValue, oldValue) => {
+        setWidgetList(newValue);
+        callback?.(newValue, oldValue);
+      });
+    }
+  }, [formrender?.subscribeWidgetList, callback]);
 
   useMemo(() => {
-    subscribeData();
-  }, []);
+    subscribe?.();
+  }, [subscribe]);
 
   useEffect(() => {
-    subscribeData();
+    subscribe?.();
     return () => {
       formrender && formrender.unsubscribeWidgetList();
     };
-  }, []);
+  }, [subscribe]);
 
   return [widgetList, setWidgetList] as const;
 }

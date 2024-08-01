@@ -7,12 +7,11 @@ import DefaultFormRender, {
   WidgetContextProps
 } from '@simpleform/render';
 import React from 'react';
-import dayjs from 'dayjs';
 import '@simpleform/render/lib/css/main.css';
-import widgets from './components';
 import { ConfigWidgetSetting, FormEditorContextProps } from './context';
 import createRequest from './utils/request';
 import bindRequest from './components/bind-request';
+import defineConfig from './defineConfig';
 
 export * from '@simpleform/render';
 export { createRequest, bindRequest };
@@ -25,17 +24,18 @@ export interface CustomOptions {
   panel?: {
     label?: string; // 配置组件的名
     icon?: string; // 配置组件的图标
-    nonform?: boolean; // 非表单控件
+    nonform?: boolean; // 是否为非表单
+    nonselection?: boolean; // 是否禁止添加通用选中框
     includes?: string[]; // 子元素限制可以添加的组件类型
   };
   // 属性表单
   setting?: ConfigWidgetSetting;
 }
 // 自定义普通节点信息
-export type CustomWidgetItem = WidgetItem<CustomOptions>;
-export type CustomGenerateWidgetItem = GenerateWidgetItem<CustomOptions>;
+export type CustomWidgetItem = WidgetItem<CustomOptions> & { type?: string };
+export type CustomGenerateWidgetItem = GenerateWidgetItem<CustomOptions> & { type?: string };
 // 组件公共props
-export type CommonFormProps<V = unknown> = WidgetContextProps<CustomOptions> & {
+export type CommonFormProps<V = unknown, O = unknown> = WidgetContextProps<CustomOptions & O> & {
   value?: V;
   onChange?: (val?: V) => void;
   disabled?: boolean;
@@ -44,15 +44,14 @@ export type CommonFormProps<V = unknown> = WidgetContextProps<CustomOptions> & {
 // 表单渲染数据的类型
 export type FormDesignData = Array<CustomWidgetItem>;
 
-
 export type CustomFormChildrenProps = FormChildrenProps<CustomOptions>;
 export function FormChildren(props: CustomFormChildrenProps) {
   const { components, variables, ...rest } = props;
   return (
     <DefaultFormChildren
-      options={{ props: { autoComplete: 'off' } }}
-      components={{ ...widgets, ...components }}
-      variables={{ ...variables, dayjs }}
+      options={defineConfig.options}
+      components={{ ...defineConfig.registeredComponents, ...components }}
+      variables={{ ...variables, ...defineConfig?.variables }}
       {...rest}
     />
   );
@@ -62,9 +61,9 @@ export default function FormRender(props: CustomFormRenderProps) {
   const { components, variables, ...rest } = props;
   return (
     <DefaultFormRender
-      options={{ props: { autoComplete: 'off' } }}
-      components={{ ...widgets, ...components }}
-      variables={{ ...variables, dayjs }}
+      options={defineConfig.options}
+      components={{ ...defineConfig.registeredComponents, ...components }}
+      variables={{ ...variables, ...defineConfig?.variables }}
       {...rest}
     />
   );

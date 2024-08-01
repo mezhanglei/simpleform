@@ -1,5 +1,5 @@
 const panelData = {
-  '布局组件': ['Grid', 'Divider', 'Alert'],
+  '布局组件': ['LayoutTable', 'Grid', 'Divider', 'Alert'],
   '控件组合': ['FormTable'],
   '基础控件': [
     "Input",

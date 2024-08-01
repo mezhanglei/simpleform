@@ -1,28 +1,12 @@
 import React, { useEffect, useMemo } from "react";
 import { Button, message, Table, TableProps } from "antd";
-import { Form, joinFormPath } from "../../../../formrender";
-import { TableCell } from "./components";
+import { renderWidgetItem, joinFormPath } from "../../../../formrender";
 import './index.less';
 import { useTableData } from "../../../../utils/hooks";
 import { defaultGetId } from "../../../../utils/utils";
 import SvgIcon from '../../SvgIcon';
 import { FormTableProps } from "..";
 import pickAttrs from '../../../../utils/pickAttrs';
-
-const CustomTableCell = (props) => {
-  const { name, hidden, formControl, children, ...restProps } = props;
-  return (
-    <TableCell key={name} {...restProps}>
-      {
-        React.isValidElement(formControl) ?
-          <Form.Item {...restProps} label="" name={name} compact>
-            {hidden === true ? null : ({ bindProps }) => React.cloneElement(formControl, bindProps)}
-          </Form.Item>
-          : children
-      }
-    </TableCell>
-  );
-};
 
 const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
   const {
@@ -38,8 +22,8 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
     onChange,
     ...rest
   } = props;
-  const path = _options?.path;
   const form = _options?.form;
+  const path = _options?.path;
   const formrender = _options?.formrender;
   const curName = _options?.name || '';
   const items = Array.from({ length: Math.max(minRows || 0) });
@@ -72,30 +56,22 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
 
   const newColumns = useMemo(() => {
     const result = columns?.map((col, colIndex) => {
-      const { name, label, type, props, ...restCol } = col;
-      const dataIndex = name; // 列属性
-      const title = label; // 列标题
+      const { name, label, render, ...restCol } = col;
       return {
         ...restCol,
         dataIndex: name,
-        title: title,
-        onCell: (record: unknown, rowIndex?: number) => {
-          const colName = joinFormPath(curName, rowIndex, dataIndex); // 表单字段
-          const colPath = joinFormPath(path, 'props.columns', colIndex); // column所在的位置
-          const _options = {
-            form,
-            formrender,
-            path: colPath,
-            ...col
-          };
-          const formControl = formrender?.createFormElement({ type, props: Object.assign({ disabled, _options }, props) });
-          return {
-            record,
-            name: colName, // 拼接路径
-            formControl: formControl,
-            ...restCol,
-          };
-        },
+        title: label,
+        render: (_, record, rowIndex) => {
+          const originRender = render?.(_, record, rowIndex);
+          const isEditable = !!(restCol?.type || restCol?.typeRender);
+          if (!isEditable) {
+            return originRender;
+          }
+          const childName = joinFormPath(curName, rowIndex, name);
+          const widget = { ...restCol, index: rowIndex, name: childName, label: '' };
+          const _options = { ...widget, path, props: { disabled } };
+          return renderWidgetItem(formrender, widget, _options);
+        }
       };
     }) as TableProps<any>['columns'] || [];
     if (showBtn) {
@@ -122,7 +98,6 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
         ref={ref}
         rowKey="key"
         scroll={{ y: 400 }}
-        components={{ body: { cell: CustomTableCell } }}
         pagination={pagination}
         {...pickAttrs(rest)}
       />

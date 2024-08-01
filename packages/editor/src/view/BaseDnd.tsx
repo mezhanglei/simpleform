@@ -31,10 +31,11 @@ const BaseDnd = React.forwardRef<ReactSortable<any>, ControlDndProps>((props, re
 
   const onAdd: ControlDndProps['onAdd'] = (params) => {
     console.log(params, '跨域拖放');
-    const isPanel = params?.item?.dataset?.group == 'panel';
+    const from = params?.item;
+    const isPanel = from?.dataset?.group === 'panel';
     // 从侧边栏插入进来
     if (isPanel) {
-      const fromId = params?.item?.dataset?.type;
+      const fromId = from?.dataset?.type;
       const dropIndex = params?.newIndex;
       const dropParent = dndPath;
       const configItem = getConfigItem(fromId, editorConfig);
@@ -42,7 +43,12 @@ const BaseDnd = React.forwardRef<ReactSortable<any>, ControlDndProps>((props, re
       insertWidgetItem(formrender, newItem, dropIndex, dropParent);
       context?.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: joinFormPath(dropParent, dropIndex) }) }));
     } else {
-      const fromParent = getParent(params?.item?.dataset?.path);
+      const fromPath = from?.dataset?.path;
+      if(!fromPath) {
+        console.error('未设置data-path属性');
+        return;
+      }
+      const fromParent = getParent(fromPath);
       const fromIndex = params?.oldIndex;
       if (typeof fromIndex !== 'number') return;
       const dropIndex = params?.newIndex;

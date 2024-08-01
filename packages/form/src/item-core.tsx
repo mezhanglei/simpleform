@@ -85,11 +85,9 @@ export const ItemCore = (props: ItemCoreProps) => {
   useEffect(() => {
     if (!currentPath || !form) return;
     // 订阅目标控件
-    form.subscribeFormItem(currentPath, (newValue, oldValue) => {
+    form.subscribeFormItem(currentPath, (newValue) => {
       setValue(newValue);
-      if (!(isEmpty(newValue) && isEmpty(oldValue))) {
-        onValuesChange && onValuesChange({ name: currentPath, value: newValue }, form?.getFieldValue());
-      }
+      onValuesChange && onValuesChange({ name: currentPath, value: newValue }, form?.getFieldValue());
     });
     return () => {
       form.unsubscribeFormItem(currentPath);
@@ -101,7 +99,8 @@ export const ItemCore = (props: ItemCoreProps) => {
     if (!currentPath || !form) return;
     // 回填初始值
     const storeValue = form.getFieldValue(currentPath);
-    form.setInitialValue(currentPath, initValue ?? storeValue);
+    const result = initValue ?? storeValue;
+    form.setInitialValue(currentPath, result);
     onFieldsMounted && onFieldsMounted({ name: currentPath, value: initValue }, form?.getFieldValue());
     return () => {
       // 清除该表单域的props(在设置值的前面)

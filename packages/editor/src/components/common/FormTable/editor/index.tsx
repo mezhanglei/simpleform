@@ -1,15 +1,17 @@
 import React from "react";
 import classnames from "classnames";
 import './index.less';
-import ColumnSelection from "./column-selection";
 import { FormTableProps } from "..";
 import pickAttrs from '../../../../utils/pickAttrs';
-import { CustomFormRenderProps, Form, joinFormPath } from "../../../../formrender";
+import { CustomFormRenderProps, joinFormPath, renderWidgetItem } from "../../../../formrender";
 import BaseDnd from "../../../../view/BaseDnd";
+import Icon from '../../SvgIcon';
+import { getCommonOptions, getWidgetItem, setWidgetItem } from '../../../../utils/utils';
+import FormTableColSetting from './column-setting';
+import BaseSelection, { BaseSelectionProps } from '../../../../view/BaseSelection';
 
 const EditorTable = React.forwardRef<HTMLDivElement, FormTableProps<unknown>>(({
   columns = [],
-  disabled,
   className,
   style,
   value,
@@ -30,18 +32,40 @@ const EditorTable = React.forwardRef<HTMLDivElement, FormTableProps<unknown>>(({
     placeholder: `${prefix}-placeholder`,
   };
 
-  const path = _options?.path;
-  const form = _options?.form;
-  const formrender = _options?.formrender;
-  const context = _options?.context;
-  const { settingForm } = context?.state || {};
+  const { path, formrender, context } = _options || {};
+  const commonOptions = getCommonOptions(_options);
+  const columnsPath = joinFormPath(path, 'props.columns');
+  const { settingForm, editorConfig } = context?.state || {};
 
   // 监听列控件设置值
   const columnInputChange: CustomFormRenderProps['onValuesChange'] = ({ value }) => {
     settingForm && settingForm.setFieldValue('initialValue', value);
   };
 
-  const columnsPath = joinFormPath(path, 'props.columns');
+  const onSelectHandler: BaseSelectionProps['onSelectHandler'] = (selected) => {
+    const selectedItem = getWidgetItem(formrender, selected?.path);
+    const configSetting = editorConfig?.[selectedItem?.type || ''].setting;
+    const baseSetting = configSetting?.['基础属性']?.filter((item) => item.name !== 'name');
+    const mergeSetting = Object.assign(FormTableColSetting, {
+      '基础属性': baseSetting,
+      '操作属性': configSetting?.['操作属性'],
+      '校验规则': configSetting?.['校验规则']
+    });
+    context?.dispatch && context?.dispatch((old) => ({
+      ...old,
+      selected: Object.assign({ setting: mergeSetting }, selected)
+    }));
+  };
+
+  const copyItem = (column, colIndex) => {
+    const nextColIndex = colIndex + 1;
+    const cloneColumns = [...columns];
+    const newColumn = {
+      ...column
+    };
+    cloneColumns.splice(nextColIndex, 0, newColumn);
+    setWidgetItem(formrender, cloneColumns, path);
+  };
 
   return (
     <div
@@ -61,27 +85,33 @@ const EditorTable = React.forwardRef<HTMLDivElement, FormTableProps<unknown>>(({
         }}
       >
         {
-          columns?.map((column, colIndex) => {
-            const { label, type, props, ...restColumn } = column;
-            const columnInstance = formrender?.createFormElement({ type: type, props: Object.assign({ disabled, form: form, formrender: formrender }, props) });
+          columns?.map((col, colIndex) => {
+            const { label } = col;
+            const { renderItem, renderList, ...restOptions } = commonOptions;
+            const _childOptions = {
+              ...restOptions,
+              index: colIndex,
+              path: joinFormPath(columnsPath, colIndex),
+            };
+            const instance = renderWidgetItem(formrender, { ...col, label: '' }, _childOptions, columnInputChange);
             return (
-              <ColumnSelection
+              <BaseSelection
                 key={colIndex}
                 className={Classes.TableSelection}
-                column={column}
-                colIndex={colIndex}
-                _options={{ ..._options, path: columnsPath }}>
+                _options={_childOptions}
+                configLabel="表格列"
+                onSelectHandler={onSelectHandler}
+                tools={[<Icon key="fuzhi" name="fuzhi" onClick={() => copyItem(col, colIndex)} />]}
+              >
                 <div className={Classes.TableCol}>
                   <div className={Classes.TableColHead}>
                     {label}
                   </div>
                   <div className={Classes.TableColBody}>
-                    <Form.Item {...restColumn} label="" onValuesChange={columnInputChange}>
-                      {React.isValidElement(columnInstance) ? ({ bindProps }) => React.cloneElement(columnInstance, bindProps) : columnInstance}
-                    </Form.Item>
+                    {instance}
                   </div>
                 </div>
-              </ColumnSelection>
+              </BaseSelection>
             );
           })
         }

@@ -22,12 +22,11 @@ export default function Demo() {
   return (
     <Form initialValues={{ name1: 1111 }} form={form} onSubmit={onSubmit}>
       <Form.Item tooltip='11111' label="Name1" name="name1" rules={[{ required: true, message: 'name1 is Empty' }, { validator: validator, message: '自定义校验' }]}>
-        {/* {({ bindProps }) => (
+        {({ bindProps }) => (
           <div>
             <input {...bindProps} />
           </div>
-        )} */}
-        <input style={{ height: '32px' }} {...form.getBindProps('name1')} />
+        )}
       </Form.Item>
       <Form.Item label="Name2" name="name2.a" rules={[{ required: true, message: 'name2 is empty' }]}>
         {({ bindProps }) => <input style={{ height: '100px' }} {...bindProps} />}

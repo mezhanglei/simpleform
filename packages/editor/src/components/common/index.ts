@@ -7,8 +7,8 @@ import RichEditor, { RichEditorModalBtn } from './RichEditor';
 import { RichText } from './RichText';
 import FormTable from './FormTable';
 import Collapse from './Collapse';
-import Table, { TableBody, TableCell, TableHead, TableRow } from './LayoutTable';
-import { GridCol, GridRow } from './grid';
+import Grid from './grid';
+import LayoutTable from './LayoutTable';
 import OperateCheckbox from './LinkageSetting/checkbox';
 
 // 编辑器公共组件
@@ -23,12 +23,7 @@ export default {
   RichText,
   RichEditorModalBtn,
   FormTable,
+  LayoutTable,
   Collapse,
-  Table,
-  TableCell,
-  TableRow,
-  TableHead,
-  TableBody,
-  GridRow,
-  GridCol
+  Grid,
 };

@@ -1,7 +1,8 @@
 import { deepMergeObject } from './object';
 import { nanoid } from 'nanoid';
-import { SimpleFormRender, getInitialValues, getPathEnd, CustomGenerateWidgetItem } from '../formrender';
+import { SimpleFormRender, getInitialValues, getPathEnd, CustomGenerateWidgetItem, CommonFormProps } from '../formrender';
 import { ConfigWidgetSetting, FormEditorState } from '../context';
+import React from 'react';
 
 export const defaultGetId = (key?: string) => {
   return typeof key == 'string' ? `${key.replace(/\./g, '')}_${nanoid(6)}` : '';
@@ -34,13 +35,13 @@ export const getSettingInitial = (setting?: ConfigWidgetSetting) => {
   return initialValues;
 };
 
-// 返回配置组件信息
+// 返回组件config信息
 export const getConfigItem = (type: string | undefined, editorConfig?: FormEditorState['editorConfig']) => {
   if (!type || !editorConfig) return;
   const configItem = editorConfig[type] as CustomGenerateWidgetItem;
   const { setting, ...rest } = configItem;
-  const initialValues = getSettingInitial(typeof setting === 'object' ? setting : {});
-  return deepMergeObject(initialValues, rest);
+  const initialData = getSettingInitial(typeof setting === 'object' ? setting : {});
+  return deepMergeObject(initialData, rest);
 };
 
 // 根据路径获取节点的值和属性
@@ -75,3 +76,8 @@ export const delWidgetItem = (formrender?: SimpleFormRender | null, path?: strin
   formrender?.delItemByPath(path);
 };
 
+// 提取对象中公共的选项
+export const getCommonOptions = (_options?: CommonFormProps['_options']) => {
+  const { isEditor, formrender, form, renderItem, renderList, context, props } = _options || {};
+  return { isEditor, formrender, form, context, renderItem, renderList, props };
+};

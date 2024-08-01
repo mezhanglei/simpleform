@@ -1,60 +1,81 @@
-import { deepClone } from "./utils/object";
 import { CustomUnionType, FormRenderProps, WidgetList } from "./typings";
 import { getItemByPath, setItemByPath, moveSameLevel, moveDiffLevel, getKeyValueByIndex, insertItemByIndex } from "./utils/utils";
 import { createFormElement, getFormComponent } from "./utils/transform";
-import { joinFormPath } from "@simpleform/form";
+import { Form, joinFormPath } from "@simpleform/form";
+import { deepClone, isObject } from "./utils";
+import { CustomCol, CustomRow } from "./components";
+
+// 浅合并配置信息(只支持对象或数组)
+export const mergeDefineConfig = (oldConfig, newConfig) => {
+  if (!isObject(newConfig)) return oldConfig;
+  const cloneConfig = { ...oldConfig };
+  Object.keys(newConfig).forEach((key) => {
+    const oldItem = oldConfig && oldConfig[key];
+    const newItem = newConfig[key];
+    if (oldItem) {
+      cloneConfig[key] = oldItem instanceof Array ? [...oldItem, ...newItem] : { ...oldItem, ...newItem };
+    } else {
+      cloneConfig[key] = newItem;
+    }
+  });
+  return cloneConfig;
+};
 
 export type FormRenderListener<V> = (newValue?: V, oldValue?: V) => void;
 
 // 管理formrender过程中的数据
 export class SimpleFormRender {
-  public variables: FormRenderProps['variables'];
-  public registeredComponents: FormRenderProps['components'];
+  public config?: {
+    variables?: FormRenderProps['variables'];
+    registeredComponents?: FormRenderProps['components'];
+  };
   private widgetList: WidgetList;
   private lastWidgetList: WidgetList | undefined;
   private widgetListListeners: FormRenderListener<WidgetList>[] = [];
-  constructor() {
+  constructor(config?: SimpleFormRender['config']) {
     this.widgetList = [];
     this.lastWidgetList = undefined;
     this.getWidgetList = this.getWidgetList.bind(this);
     this.setWidgetList = this.setWidgetList.bind(this);
-    this.addModule = this.addModule.bind(this);
+    this.defineConfig = this.defineConfig.bind(this);
     this.getFormComponent = this.getFormComponent.bind(this);
     this.createFormElement = this.createFormElement.bind(this);
-    this.variables = {};
-    this.registeredComponents = {};
+    this.config = config || {
+      registeredComponents: {
+        'row': CustomRow,
+        'col': CustomCol,
+        'Form.Item': Form.Item
+      }
+    };
   }
 
-  // 增加js模块
-  public addModule(data: FormRenderProps['variables']) {
-    this.variables = Object.assign({}, this.variables, data);
-  };
-  // 注册组件
-  public registry(data: FormRenderProps['components']) {
-    this.registeredComponents = Object.assign({}, this.registeredComponents, data);
-  };
+  // formrender的所有配置
+  public defineConfig(data?: SimpleFormRender['config']) {
+    this.config = mergeDefineConfig(this.config, data);
+  }
 
   // 返回目标声明组件
   public getFormComponent(target?: CustomUnionType) {
-    const registeredComponents = this.registeredComponents;
-    return getFormComponent(target, registeredComponents);
+    const components = this.config?.registeredComponents;
+    return getFormComponent(target, components);
   }
 
   // 创建components的实例
   public createFormElement(target?: CustomUnionType, commonProps?: unknown) {
-    const registeredComponents = this.registeredComponents;
-    return createFormElement(target, commonProps, registeredComponents);
+    const components = this.config?.registeredComponents;
+    return createFormElement(target, commonProps, components);
   }
 
   // 获取当前组件的widgetList
   public getWidgetList() {
-    return deepClone(this.widgetList || []);
+    return deepClone(this.widgetList) || [];
   }
 
   // 设置widgetList
-  setWidgetList(data?: SimpleFormRender['widgetList']) {
+  setWidgetList(data?: SimpleFormRender['widgetList'], option?: { ignore?: boolean }) {
     this.lastWidgetList = this.widgetList;
     this.widgetList = data || [];
+    if (option?.ignore) return;
     this.notifyWidgetList();
   }
 

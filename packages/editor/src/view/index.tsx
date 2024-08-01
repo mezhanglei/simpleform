@@ -2,7 +2,7 @@ import React, { CSSProperties } from 'react';
 import classnames from 'classnames';
 import './index.less';
 import RootDnd from './RootDnd';
-import ComponentSelection from './selection';
+import CommonSelection from './selection';
 import DefaultFormRender, { CustomFormRenderProps, joinFormPath } from '../formrender';
 import { setWidgetItem } from '../utils/utils';
 import { FormEditorContextProps, useEditorContext } from '../context';
@@ -72,12 +72,11 @@ function EditorView(props: EditorViewProps) {
 // 编辑区默认的选中框渲染
 const renderItem = (children, params) => {
   const _options = params?._options || {};
-  const isItem = _options?.children instanceof Array ? false : true;
-  // 无子元素组件默认添加选区
-  if (isItem) {
-    return <ComponentSelection data-path={_options.path} {...params} children={children} />;
+  const nonselection = _options?.panel?.nonselection;
+  if (nonselection) {
+    return children;
   }
-  return children;
+  return <CommonSelection data-path={_options.path} {...params} children={children} />;
 };
 
 EditorView.displayName = 'editor-view';

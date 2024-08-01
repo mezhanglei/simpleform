@@ -1,25 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FormChildrenProps, GenerateWidgetItem, WidgetList, ReactComponent, WidgetContextProps } from './typings';
-import { Form, joinFormPath, SimpleFormContext } from '@simpleform/form';
-import { isEqual } from './utils/object';
+import { FormChildrenProps, GenerateWidgetItem } from './typings';
+import { joinFormPath, SimpleFormContext } from '@simpleform/form';
 import '@simpleform/form/lib/css/main.css';
 import { useSimpleFormRender } from './hooks';
-import { isEmpty } from './utils/type';
-import { CustomCol, CustomRow } from './components';
 import { SimpleFormRender } from './store';
-import { evalAttr, traverseWidgetList, withSide } from './utils/transform';
-import { isValidComponent } from './utils';
-
-const defaultComponents = {
-  'row': CustomRow,
-  'col': CustomCol,
-  'Form.Item': Form.Item
-};
+import { evalAttr, renderWidgetItem, traverseWidgetList, withSide } from './utils/transform';
 
 // 渲染表单children
 export default function FormChildren(props: FormChildrenProps) {
   const curFormrender = useSimpleFormRender();
-  const { form: curForm } = useContext(SimpleFormContext);
+  const { form: curForm, ...restOptions } = useContext(SimpleFormContext);
   const {
     uneval,
     components,
@@ -35,30 +25,39 @@ export default function FormChildren(props: FormChildrenProps) {
     options
   } = props;
 
+  const _baseOptions = {
+    ...restOptions,
+    formrender,
+    form,
+    renderItem,
+    renderList
+  };
+
   const [widgetList, setWidgetList] = useState<SimpleFormRender['widgetList']>([]);
-  const [compileItems, setCompileItems] = useState<Record<string, GenerateWidgetItem>>({});
-  formrender.registry(Object.assign({}, defaultComponents, components));
-  formrender.addModule(plugins);
-  formrender.addModule(variables);
+  const [widgetListMap, setWidgetListMap] = useState<Record<string, GenerateWidgetItem>>({});
+  formrender.defineConfig({
+    variables: Object.assign({}, plugins, variables),
+    registeredComponents: components,
+  });
 
   // 从SimpleFormRender中订阅更新widgetList
   useEffect(() => {
-    if (!formrender) return;
-    formrender.subscribeWidgetList((newValue, oldValue) => {
-      setWidgetList(newValue || []);
-      if (!isEqual(newValue, oldValue)) {
+    if (formrender.subscribeWidgetList) {
+      formrender.subscribeWidgetList((newValue, oldValue) => {
+        setWidgetList(newValue || []);
         onRenderChange && onRenderChange(newValue, oldValue);
-      }
-    });
+      });
+    }
     return () => {
       formrender?.unsubscribeWidgetList();
     };
-  }, [formrender, onRenderChange]);
+  }, [formrender.subscribeWidgetList, onRenderChange]);
 
-  // 从props中更新widgetList
+  // 从props中同步widgetList, 不触发subscribeWidgetList监听
   useEffect(() => {
     if (!formrender) return;
-    formrender.setWidgetList(propsWidgetList);
+    setWidgetList(propsWidgetList || []);
+    formrender.setWidgetList(propsWidgetList, { ignore: true });
   }, [propsWidgetList]);
 
   // 变化时更新
@@ -70,7 +69,7 @@ export default function FormChildren(props: FormChildrenProps) {
   // 递归遍历编译表达式信息
   const handleExpression = () => {
     const data = {};
-    traverseWidgetList(widgetList, (item, path) => {
+    traverseWidgetList(widgetList, (item, { path }) => {
       const mergeVariables = {
         form: form,
         formrender: formrender,
@@ -80,97 +79,24 @@ export default function FormChildren(props: FormChildrenProps) {
       };
       data[path] = evalAttr(item, mergeVariables, uneval);
     });
-    setCompileItems(data);
+    setWidgetListMap(data);
   };
 
-  const baseContext = {
-    _options: {
-      formrender,
-      form,
-    },
-  } as WidgetContextProps;
+  const childs = widgetList instanceof Array && widgetList.map((_, index) => {
+    const curPath = joinFormPath(index);
+    const compileItem = widgetListMap[curPath];
+    if (!compileItem) return;
+    const optionsProps = typeof options === 'function' ? options(compileItem) : options;
+    const childOptions = {
+      ..._baseOptions,
+      ...optionsProps,
+      index,
+      path: curPath,
+    };
+    return renderWidgetItem(formrender, compileItem, childOptions, handleExpression);
+  });
 
-  const renderChild = (widgetList?: WidgetList, parent?: string) => {
-    if (!(widgetList instanceof Array) || !formrender) return;
-    return widgetList.map((item, index) => {
-      const curPath = joinFormPath(parent, `[${index}]`);
-      const itemProps = {
-        _options: {
-          ...baseContext['_options'],
-          index,
-          path: curPath
-        }
-      };
-      if (item === undefined || item === null || typeof item === 'string' || typeof item === 'number') {
-        return item;
-      }
-      // 判断是否为ReactElment
-      if (React.isValidElement(item)) {
-        return React.cloneElement(item, itemProps);
-      }
-      // 判断是否为ReactComponent
-      if (isValidComponent(item)) {
-        return React.createElement(item as ReactComponent<unknown>, itemProps as React.Attributes);
-      }
-      const compileItem = compileItems[curPath];
-      if (!compileItem) return;
-      const optionsProps = typeof options === 'function' ? options(compileItem) : options;
-      const mergeItem = Object.assign({}, optionsProps, compileItem, { props: Object.assign({}, optionsProps?.props, compileItem?.props) });
-      const mergeProps = {
-        _options: {
-          ...itemProps['_options'],
-          ...mergeItem
-        }
-      };
-      const {
-        hidden,
-        readOnlyRender,
-        type,
-        props,
-        typeRender,
-        footer,
-        suffix,
-        component,
-        inside,
-        outside,
-        children,
-        onValuesChange,
-        ...restField
-      } = mergeItem;
-      if (hidden === true) return;
-      const footerEle = formrender.createFormElement(footer, mergeProps);
-      const suffixEle = formrender.createFormElement(suffix, mergeProps);
-      const insideEle = formrender.createFormElement(inside, mergeProps);
-      const outsideEle = formrender.createFormElement(outside, mergeProps);
-      const fieldProps = Object.assign({
-        footer: footerEle,
-        suffix: suffixEle,
-        component: formrender.getFormComponent(component),
-      }, restField);
-      const typeWidget = formrender.createFormElement(mergeItem?.readOnly === true ? readOnlyRender : (typeRender || { type, props }), mergeProps);
-      const typeChildren = children instanceof Array ? renderChild(children, joinFormPath(curPath, 'children')) : formrender.createFormElement(children, mergeProps);
-      const curNode = React.isValidElement(typeWidget) && !isEmpty(typeChildren)
-        ? React.cloneElement(
-          typeWidget,
-          {},
-          withSide(typeChildren, renderList, insideEle, mergeProps)
-        )
-        : (isEmpty(typeWidget) ? typeChildren : typeWidget);
-      const result = mergeItem?.name ?
-        <Form.Item
-          {...fieldProps}
-          onValuesChange={(...args) => {
-            onValuesChange && onValuesChange(...args);
-            handleExpression();
-          }}>
-          {({ bindProps }) => React.isValidElement(curNode) ? React.cloneElement(curNode, bindProps) : curNode}
-        </Form.Item>
-        : curNode;
-      return withSide(result, renderItem, outsideEle, mergeProps);
-    });
-  };
-
-  return <>{withSide(renderChild(widgetList), renderList, formrender.createFormElement(inside, baseContext), baseContext)}</>;
+  return <>{withSide(childs, renderList, formrender.createFormElement(inside, { _options: _baseOptions }), { _options: _baseOptions })}</>;
 }
 
 FormChildren.displayName = 'Form.Children';

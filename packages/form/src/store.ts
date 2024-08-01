@@ -79,11 +79,11 @@ export class SimpleForm<T = unknown> {
   }
 
   // 给目标控件绑定change事件
-  bindChange<V>(path?: string, eventName?: string, val?: V) {
+  bindChange(path?: string, eventName?: string, ...args) {
     if (!path) return;
     const props = this.getFieldProps(path);
     const { valueGetter, onFieldsChange } = props || {};
-    const newValue = typeof valueGetter == 'function' ? valueGetter(val) : undefined;
+    const newValue = typeof valueGetter == 'function' ? valueGetter(...args) : undefined;
     this.setFieldValue(path, newValue, eventName);
     // 主动onchange事件
     onFieldsChange && onFieldsChange({ name: path, value: newValue }, this.getFieldValue());
@@ -104,8 +104,8 @@ export class SimpleForm<T = unknown> {
       bindProps[valuePropName] = newChildValue;
     }
     triggers.forEach((eventName) => {
-      bindProps[eventName] = <V>(val: V) => {
-        this.bindChange(path, eventName, val);
+      bindProps[eventName] = (...args) => {
+        this.bindChange(path, eventName, ...args);
       };
     });
     return nonform === true ? {} : bindProps;
@@ -142,17 +142,15 @@ export class SimpleForm<T = unknown> {
   }
 
   // 设置初始值
-  public setInitialValue(path: string, initialValue?: unknown) {
+  public setInitialValue(path: string, initialValue?: unknown, option?: { ignore?: true }) {
     const oldValue = deepGet(this.lastValues, path);
     this.initialValues = deepSet(this.initialValues, path, initialValue);
     // 旧表单值存储
-    this.lastValues = deepClone(this.values);
+    this.lastValues = this.values;
     // 设置值
     this.values = deepSet(this.values, path, initialValue);
+    if (isEmpty(oldValue) && initialValue === undefined || option?.ignore) return;
     this.notifyFormItem(path);
-    if (isEmpty(oldValue) && initialValue === undefined) {
-      return;
-    }
     this.notifyFormValue(path);
     this.notifyFormValues();
   }
@@ -163,11 +161,13 @@ export class SimpleForm<T = unknown> {
   }
 
   // 更新表单值，单个表单值或多个表单值
-  public setFieldValue(path: string, value?: unknown, eventName?: FieldProps['trigger']) {
+  public setFieldValue(path: object, eventName?: FieldProps['trigger']): void;
+  public setFieldValue(path: string, value?: unknown, eventName?: FieldProps['trigger']): void;
+  public setFieldValue(path: string | object, value?: unknown, eventName?: FieldProps['trigger']) {
     // 设置单个表单值
     const setFormItemValue = (path: string, value?: unknown, eventName?: FieldProps['trigger']) => {
       // 旧表单值存储
-      this.lastValues = deepClone(this.values);
+      this.lastValues = this.values;
       // 设置值
       this.values = deepSet(this.values, path, value);
       // 规则
@@ -192,7 +192,7 @@ export class SimpleForm<T = unknown> {
 
   // 设置表单值(覆盖更新)
   public setFieldsValue<V>(values?: V) {
-    this.lastValues = deepClone(this.values);
+    this.lastValues = this.values;
     this.values = values;
     this.notifyFormItem();
     this.notifyFormValue();
@@ -230,7 +230,7 @@ export class SimpleForm<T = unknown> {
 
   // 设置error信息(覆盖更新)
   private setFieldsError(erros?: FormErrors) {
-    this.formErrors = deepClone(erros || {});
+    this.formErrors = { ...erros };
     this.notifyError();
   }
 

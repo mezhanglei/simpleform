@@ -1,8 +1,15 @@
 import React from 'react';
-import { Classes } from './Table';
 import classNames from 'classnames';
 import pickAttrs from '../../../utils/pickAttrs';
 
+const prefix = "form-table";
+export const Classes = {
+  Table: `${prefix}`,
+  TableBody: `${prefix}-body`,
+  TableRow: `${prefix}-row`,
+  TableHead: `${prefix}-head`,
+  TableCell: `${prefix}-cell`,
+};
 export interface TableCellProps extends React.HtmlHTMLAttributes<HTMLTableCellElement> {
   componentType?: "th" | "td"
 }
