@@ -1,11 +1,11 @@
 import React, { CSSProperties } from 'react';
 import classnames from 'classnames';
 import './index.less';
-import { defaultGetId, getConfigItem, getListIndex, insertWidgetItem } from '../utils/utils';
+import { defaultGetId, getConfigItem, getListIndex, getWidgetItem, insertWidgetItem } from '../utils/utils';
 import { ReactSortable } from "react-sortablejs";
 import { FormEditorContextProps, useEditorContext } from '../context';
 import { getParent } from '../formrender';
-import { Tag } from 'antd';
+import { message, Tag } from 'antd';
 
 const defaultPanelData = {
   '布局组件': ['Grid', 'Divider', 'Alert'],
@@ -52,6 +52,12 @@ function EditorPanel(props: EditorPanelProps) {
 
   const onChange = (key: string) => {
     const newIndex = getListIndex(editor, selected?.path) + 1; // 插入位置序号
+    const item = getWidgetItem(editor, selected?.path);
+    // 如果选中的是容器不允许点击插入
+    if (item?.children) {
+      message.info('请选择拖拽方式插入');
+      return;
+    };
     const configItem = getConfigItem(key, editorConfig); // 插入新组件
     const newItem = configItem?.panel?.nonform ? configItem : Object.assign({ name: defaultGetId(configItem?.type) }, configItem);
     insertWidgetItem(editor, newItem, newIndex, getParent(selected?.path));

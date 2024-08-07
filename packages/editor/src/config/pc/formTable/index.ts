@@ -8,7 +8,6 @@ export default {
   label: '可编辑表格',
   type: 'FormTable',
   props: {
-    showBtn: true,
     columns: [],
   },
   setting: { ...Setting },

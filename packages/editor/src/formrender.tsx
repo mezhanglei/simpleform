@@ -35,7 +35,7 @@ export interface CustomOptions {
 export type CustomWidgetItem = WidgetItem<CustomOptions> & { type?: string };
 export type CustomGenerateWidgetItem = GenerateWidgetItem<CustomOptions> & { type?: string };
 // 组件公共props
-export type CommonFormProps<V = unknown, O = unknown> = WidgetContextProps<CustomOptions & O> & {
+export type CommonFormProps<V = unknown, C = unknown> = WidgetContextProps<CustomOptions & C> & {
   value?: V;
   onChange?: (val?: V) => void;
   disabled?: boolean;
@@ -50,7 +50,7 @@ export function FormChildren(props: CustomFormChildrenProps) {
   return (
     <DefaultFormChildren
       options={defineConfig.options}
-      components={{ ...defineConfig.registeredComponents, ...components }}
+      components={{ ...defineConfig.components, ...components }}
       variables={{ ...variables, ...defineConfig?.variables }}
       {...rest}
     />
@@ -62,7 +62,7 @@ export default function FormRender(props: CustomFormRenderProps) {
   return (
     <DefaultFormRender
       options={defineConfig.options}
-      components={{ ...defineConfig.registeredComponents, ...components }}
+      components={{ ...defineConfig.components, ...components }}
       variables={{ ...variables, ...defineConfig?.variables }}
       {...rest}
     />

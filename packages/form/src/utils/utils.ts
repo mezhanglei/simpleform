@@ -24,7 +24,7 @@ export function formatFormKey(code?: unknown) {
 export const pickObject = <T, K extends FormPathType = string>(obj: T | undefined, keys: Array<K> | ((key?: keyof T, value?: T[keyof T]) => boolean)) => {
   if (obj === undefined || obj === null) return obj;
   if (!isObject(obj) && !isArray(obj)) return;
-  const initial = {} as Record<string, unknown>;
+  const initial = {} as PathValue<T, K>;
   if (keys instanceof Array) {
     for (const k of keys) {
       const changedKey = typeof k === 'string' || typeof k === 'number' ? k : joinFormPath(k);
@@ -42,21 +42,21 @@ export const pickObject = <T, K extends FormPathType = string>(obj: T | undefine
       }
     }
   }
-  return initial as PathValue<T, K>;
+  return initial;
 };
 
 // 根据路径获取目标对象中的单个值或多个值
-export function deepGet<T>(obj?: T, keys?: FormPathType) {
+export function deepGet<T, Path extends FormPathType>(obj?: T, keys?: Path) {
   if (typeof obj !== 'object') return;
   if (!isObject(obj) && !isArray(obj)) return;
   const parts = pathToArr(keys);
   if (!parts?.length) return;
-  let temp = obj as unknown;
+  let temp = obj as T;
   for (const k of parts) {
     const key = formatFormKey(k);
-    temp = (temp as object)?.[key];
+    temp = (temp)?.[key];
   }
-  return temp as PathValue<T, keyof typeof keys>;
+  return temp as PathValue<T, Path>;
 }
 
 // 给对象目标属性添加值, ['a', 0] 和 ['a', '[0]'] 等同于 'a[0]'

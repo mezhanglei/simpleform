@@ -4,6 +4,32 @@ import { CustomRenderType, CustomUnionType, FormRenderProps, GenerateWidgetItem,
 import { isValidComponent } from "./ReactIs";
 import { isEmpty, isObject } from './type';
 
+// 合并表单配置项(浅合并，嵌套属性合并只允许一层深度)
+export const mergeFormOptions = <V>(
+  oldConfig: V,
+  newConfig?: Partial<V>,
+  mergeFunNames: string[] = ['onValuesChange', 'onFieldsMounted', 'onFieldsChange']) => {
+  if (!isObject(newConfig)) return oldConfig;
+  const cloneConfig = { ...oldConfig };
+  Object.keys(newConfig || {}).forEach((key) => {
+    const oldItem = oldConfig?.[key];
+    const newItem = newConfig?.[key];
+    if (oldItem instanceof Array) {
+      cloneConfig[key] = oldItem.concat(newItem);
+    } else if (isObject(oldItem) && !React.isValidElement(oldItem)) {
+      cloneConfig[key] = { ...oldItem, ...newItem };
+    } else if (typeof oldItem === 'function' && mergeFunNames.includes(key)) {
+      cloneConfig[key] = (...args: unknown[]) => {
+        oldItem?.(...args);
+        return newItem?.(...args);
+      };
+    } else {
+      cloneConfig[key] = newItem;
+    }
+  });
+  return cloneConfig;
+};
+
 // 递归遍历转换嵌套对象的子属性
 export const traverseMapObject = (val, callback) => {
   const isElement = React.isValidElement(val);
@@ -67,7 +93,7 @@ export const getInitialValues = <V>(widgetList?: WidgetList) => {
 };
 
 // 返回组件声明或者空
-export const getFormComponent = (target?: any, registeredComponents?: RegisteredComponents) => {
+export const getFormComponent = (target?: any, widgets?: RegisteredComponents) => {
   if (target === undefined || target === null) {
     return target;
   }
@@ -81,14 +107,14 @@ export const getFormComponent = (target?: any, registeredComponents?: Registered
     return target?.type;
   }
   if (typeof target?.type === 'string') {
-    return registeredComponents?.[target?.type];
+    return widgets?.[target?.type];
   }
 };
 
 // 创建元素
-export const createFormElement = (target?: CustomUnionType, props?: unknown, registeredComponents?: RegisteredComponents): React.ReactNode => {
+export const createFormElement = (target?: CustomUnionType, props?: unknown, widgets?: RegisteredComponents): React.ReactNode => {
   if (target instanceof Array) {
-    return target.map((item) => createFormElement(item, props, registeredComponents));
+    return target.map((item) => createFormElement(item, props, widgets));
   }
   if (target === undefined || target === null || typeof target === 'string' || typeof target === 'number') {
     return target;
@@ -99,7 +125,7 @@ export const createFormElement = (target?: CustomUnionType, props?: unknown, reg
   }
   // 判断是否为声明组件
   const widgetItem = target as GenerateWidgetItem;
-  const Com = getFormComponent(widgetItem, registeredComponents);
+  const Com = getFormComponent(widgetItem, widgets);
   if (Com) {
     const mergeProps = Object.assign({}, props, widgetItem?.props) as React.Attributes;
     return React.createElement(Com, mergeProps);
@@ -146,7 +172,11 @@ export const withSide = (target?: React.ReactNode, customRender?: CustomRenderTy
   return cloneChilds;
 };
 
-export const renderWidgetItem = (formrender?: FormRenderProps['formrender'], target?: CustomUnionType, options?: WidgetContextProps['_options'], callback?: FormRenderProps['onValuesChange']) => {
+export const renderWidgetItem = (
+  formrender?: FormRenderProps['formrender'],
+  target?: CustomUnionType,
+  options?: WidgetContextProps['_options'],
+) => {
   if (!formrender) return;
   if (target === undefined || target === null || typeof target === 'string' || typeof target === 'number') {
     return target;
@@ -159,11 +189,7 @@ export const renderWidgetItem = (formrender?: FormRenderProps['formrender'], tar
   if (isValidComponent(target)) {
     return React.createElement(target as ReactComponent<unknown>, { _options: options } as React.Attributes);
   }
-  const mergeItem = {
-    ...options,
-    ...(target as GenerateWidgetItem),
-    props: { ...options?.props, ...(target as GenerateWidgetItem).props }
-  };
+  const mergeItem = mergeFormOptions(options, target as GenerateWidgetItem) || {};
   const {
     hidden,
     readOnlyRender,
@@ -192,7 +218,7 @@ export const renderWidgetItem = (formrender?: FormRenderProps['formrender'], tar
       index: childIndex,
       path: joinFormPath(mergeItem?.path, 'children', childIndex)
     };
-    return renderWidgetItem(formrender, child, childOptions, callback);
+    return renderWidgetItem(formrender, child, childOptions);
   }) : formrender.createFormElement(children, childContext);
   const curNode = React.isValidElement(typeWidget) && !isEmpty(typeChildren)
     ? React.cloneElement(
@@ -207,10 +233,6 @@ export const renderWidgetItem = (formrender?: FormRenderProps['formrender'], tar
       footer: formrender.createFormElement(restItem?.footer, childContext),
       suffix: formrender.createFormElement(restItem?.suffix, childContext),
       component: formrender.getFormComponent(restItem?.component),
-      onValuesChange: (...args) => {
-        restItem?.onValuesChange?.(...args);
-        callback && callback(...args);
-      }
     },
       (({ bindProps }) => React.isValidElement(curNode) ?
         React.cloneElement(curNode, {

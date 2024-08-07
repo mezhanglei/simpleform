@@ -1,15 +1,15 @@
 import React, { CSSProperties, useMemo } from "react";
 import classnames from "classnames";
 import './index.less';
-import { TableBody, TableRow } from "./components";
 import pickAttrs from '../../../utils/pickAttrs';
 import BaseSelection from '../../../view/BaseSelection';
 import SvgIcon from '../SvgIcon';
 import { joinFormPath, CommonFormProps, CustomGenerateWidgetItem } from "../../../formrender";
 import TableCell from './TableCell';
 import { getCommonOptions, setWidgetItem } from '../../../utils/utils';
-import TableMergeUtils from "../../../utils/table-utils";
-import { TableCellType } from "../../../utils/table-utils/util";
+import TableMergeUtils from "../../../utils/tableUtils";
+import { TableCellType } from "../../../utils/tableUtils/util";
+import cellConfig from '../../../config/pc/layoutTable/cell';
 
 const prefix = "r-";
 export const Classes = {
@@ -20,24 +20,31 @@ export const Classes = {
   TableCell: `${prefix}table-cell`,
 };
 
-export interface TableProps extends CommonFormProps<unknown, { rows?: Array<Array<CustomGenerateWidgetItem & TableCellType>>; }> {
+export type LayoutTableRows = Array<Array<CustomGenerateWidgetItem & TableCellType>>;
+
+export interface LayoutTableProps extends CommonFormProps<unknown, { rows: LayoutTableRows }> {
   className?: string;
   style?: CSSProperties;
   tableLayout?: React.CSSProperties["tableLayout"];
 }
 
-const Table = React.forwardRef<HTMLTableElement, TableProps>((props, ref) => {
+const Table = React.forwardRef<HTMLTableElement, LayoutTableProps>((props, ref) => {
 
   const { tableLayout, className, style, ...rest } = props;
   const { _options } = rest || {};
   const { formrender, isEditor, rows = [], path: tablePath } = _options || {};
   const commonOptions = getCommonOptions(_options);
   const rowsPath = joinFormPath(tablePath, 'rows');
-  const tableUtils = useMemo(() => new TableMergeUtils(rows, {
+  const tableUtils = useMemo(() => new TableMergeUtils<{
+    children: LayoutTableRows
+  }>(rows, {
     minRetainRow: 1,
     minSplitHcolspan: 1,
     minSplitVrowspan: 1,
     fixRowType: 2,
+    CELL_DEFAULT_CONFIG: {
+      ...cellConfig
+    },
     onUpdate(newData) {
       setWidgetItem(formrender, newData?.rows, rowsPath);
     }
@@ -58,29 +65,26 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>((props, ref) => {
       {...pickAttrs(rest)}
       ref={ref}
     >
-      <TableBody className={Classes.TableBody}>
+      <tbody className={Classes.TableBody}>
         {
           rows?.map((cols, rowIndex) => {
             return (
-              <TableRow className={Classes.TableRow} key={joinFormPath(tablePath, rowIndex)}>
+              <tr className={Classes.TableRow} key={joinFormPath(tablePath, rowIndex)}>
                 {
                   cols?.map((col, colIndex) => {
-                    const colProps = { ..._options?.props, ...col?.props, tableUtils };
                     const _childOptions = {
                       ...commonOptions,
-                      ...col,
-                      props: colProps,
                       index: colIndex,
                       path: joinFormPath(tablePath, 'rows', rowIndex, colIndex),
                     };
-                    return <TableCell key={_childOptions?.path} {...colProps} className={Classes.TableCell} rows={rows} rowIndex={rowIndex} column={col} colIndex={colIndex} _options={_childOptions} />;
+                    return <TableCell key={_childOptions?.path} {...col} tableUtils={tableUtils} className={Classes.TableCell} rows={rows} rowIndex={rowIndex} cols={cols} colIndex={colIndex} _options={_childOptions} />;
                   })
                 }
-              </TableRow>
+              </tr>
             );
           })
         }
-      </TableBody>
+      </tbody>
     </table>
   );
 

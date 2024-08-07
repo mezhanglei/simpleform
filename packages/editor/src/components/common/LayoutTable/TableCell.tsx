@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import BaseSelection, { BaseSelectionProps } from '../../../view/BaseSelection';
-import { CustomGenerateWidgetItem, joinFormPath, renderWidgetItem, } from "../../../formrender";
-import { TableCell, TableCellProps } from './components';
+import { joinFormPath, renderWidgetItem, } from "../../../formrender";
 import classnames from 'classnames';
 import BaseDnd from '../../../view/BaseDnd';
 import { getCommonOptions } from '../../../utils/utils';
@@ -9,16 +8,15 @@ import SvgIcon from '../SvgIcon';
 import './index.less';
 import { Menu, MenuDivider, MenuItem } from '@szhsin/react-menu';
 import '@szhsin/react-menu/dist/index.css';
-import { insertTableCol } from './utils';
-import { TableProps } from '.';
-import TableMergeUtils from "../../../utils/table-utils";
+import { LayoutTableRows } from '.';
+import TableMergeUtils from "../../../utils/tableUtils";
 
-export type CustomTableCellProps = Omit<TableCellProps, 'draggable' | 'onSelect'> & BaseSelectionProps & {
-  rows: NonNullable<TableProps['_options']>['rows'];
+export type CustomTableCellProps = React.HtmlHTMLAttributes<HTMLTableCellElement> & BaseSelectionProps & {
+  rows: NonNullable<LayoutTableRows>;
   rowIndex: number;
-  column: TableCellProps & { children?: CustomGenerateWidgetItem[] };
+  cols: NonNullable<LayoutTableRows[number]>;
   colIndex: number;
-  tableUtils: TableMergeUtils
+  tableUtils: TableMergeUtils;
 };
 
 const CustomTableCell = React.forwardRef<HTMLTableCellElement, CustomTableCellProps>((props, ref) => {
@@ -26,16 +24,70 @@ const CustomTableCell = React.forwardRef<HTMLTableCellElement, CustomTableCellPr
     className,
     rows,
     rowIndex,
-    column,
+    cols,
     colIndex,
     tableUtils,
     ...rest
   } = props;
 
   const { _options } = rest || {};
-  const { isEditor, path, formrender } = _options || {};
-  const widgetList = column?.children || [];
+  const { isEditor, path, formrender, context } = _options || {};
+  const widgetList = cols?.[colIndex]?.children || [];
   const commonOptions = getCommonOptions(_options);
+  const [selectCell, setSelectCell] = useState<{ rowIndex: number; colIndex: number }>({
+    rowIndex: -1,
+    colIndex: -1,
+  });
+  const [disabledHandles, setDisabledHandles] = useState(tableUtils.getDisabledHandles());
+
+  const handleSelectCell = (rowIndex: number, colIndex: number) => {
+    setSelectCell({
+      rowIndex,
+      colIndex
+    });
+    const handles = tableUtils.getDisabledHandles(
+      rowIndex,
+      colIndex
+    );
+    setDisabledHandles(handles);
+  };
+
+  const handleFn = (operateName: string) => {
+    const { rowIndex, colIndex } = selectCell;
+    if (rowIndex > -1 && colIndex > -1) {
+      switch (operateName) {
+        case "insertTopRow": {
+          const res = tableUtils.insertRow(rowIndex, colIndex, 0);
+          res && handleSelectCell(res?.rowIndex, res?.colIndex);
+          break;
+        }
+        case "insertBottomRow": {
+          const res = tableUtils.insertRow(rowIndex, colIndex, 1);
+          res && handleSelectCell(res?.rowIndex, res?.colIndex);
+          break;
+        }
+
+        case "insertLeftCol": {
+          const res = tableUtils.insertCol(rowIndex, colIndex, 0);
+          res && handleSelectCell(res?.rowIndex, res?.colIndex);
+          break;
+        }
+        case "insertRightCol": {
+          const res = tableUtils.insertCol(rowIndex, colIndex, 1);
+          res && handleSelectCell(res?.rowIndex, res?.colIndex);
+          break;
+        }
+        default: {
+          const fn = (tableUtils[operateName] as Function).bind(tableUtils);
+          if (fn) {
+            const res = fn(rowIndex, colIndex);
+            res && handleSelectCell(res?.rowIndex, res?.colIndex);
+          }
+        }
+      }
+    }
+  };
+
   const cls = classnames(className, {
     'edit-cell': isEditor
   });
@@ -52,28 +104,28 @@ const CustomTableCell = React.forwardRef<HTMLTableCellElement, CustomTableCellPr
 
   const operateBtn = (
     <Menu menuButton={<span><SvgIcon name="menu" /></span>}>
-      <MenuItem key="1" onClick={insertTableCol}>插入左侧列</MenuItem>
-      <MenuItem key="2">插入右侧列</MenuItem>
-      <MenuItem key="3">插入上方行</MenuItem>
-      <MenuItem key="4">插入下方行</MenuItem>
+      <MenuItem key="1" disabled={disabledHandles?.includes('insertCol')} onClick={() => handleFn('insertLeftCol')}>插入左侧列</MenuItem>
+      <MenuItem key="2" disabled={disabledHandles?.includes('insertCol')} onClick={() => handleFn('insertRightCol')}>插入右侧列</MenuItem>
+      <MenuItem key="3" disabled={disabledHandles?.includes('insertRow')} onClick={() => handleFn('insertTopRow')}>插入上方行</MenuItem>
+      <MenuItem key="4" disabled={disabledHandles?.includes('insertRow')} onClick={() => handleFn('insertBottomRow')}>插入下方行</MenuItem>
       <MenuDivider />
-      <MenuItem key="5" disabled>合并左侧单元格</MenuItem>
-      <MenuItem key="6" disabled>合并右侧单元格</MenuItem>
-      <MenuItem key="7" disabled>合并整行</MenuItem>
+      <MenuItem key="5" disabled={disabledHandles?.includes('leftMerge')} onClick={() => handleFn('leftMerge')}>合并左侧单元格</MenuItem>
+      <MenuItem key="6" disabled={disabledHandles?.includes('rightMerge')} onClick={() => handleFn('rightMerge')}>合并右侧单元格</MenuItem>
+      {/* <MenuItem key="7" disabled={disabledHandles?.includes('')}>合并整行</MenuItem> */}
       <MenuDivider />
-      <MenuItem key="8" disabled>合并上方单元格</MenuItem>
-      <MenuItem key="9" disabled>合并下方单元格</MenuItem>
-      <MenuItem key="10" disabled>合并整列</MenuItem>
+      <MenuItem key="8" disabled={disabledHandles?.includes('topMerge')} onClick={() => handleFn('topMerge')}>合并上方单元格</MenuItem>
+      <MenuItem key="9" disabled={disabledHandles?.includes('bottomMerge')} onClick={() => handleFn('bottomMerge')}>合并下方单元格</MenuItem>
+      {/* <MenuItem key="10" disabled={disabledHandles?.includes('')}>合并整列</MenuItem> */}
       <MenuDivider />
-      <MenuItem key="11" disabled>撤销行合并</MenuItem>
-      <MenuItem key="12" disabled>撤销列合并</MenuItem>
-      <MenuItem key="13" disabled>删除整列</MenuItem>
-      <MenuItem key="14" disabled>删除整行</MenuItem>
+      <MenuItem key="11" disabled={disabledHandles?.includes('splitH')} onClick={() => handleFn('splitH')}>水平拆分</MenuItem>
+      <MenuItem key="12" disabled={disabledHandles?.includes('splitV')} onClick={() => handleFn('splitV')}>垂直拆分</MenuItem>
+      <MenuItem key="13" disabled={disabledHandles?.includes('delCol')} onClick={() => handleFn('delCol')}>删除整列</MenuItem>
+      <MenuItem key="14" disabled={disabledHandles?.includes('delRow')} onClick={() => handleFn('delRow')}>删除整行</MenuItem>
     </Menu>
   );
 
   return (
-    <TableCell ref={ref} className={cls} {...rest}>
+    <td ref={ref} className={cls} {...rest}>
       {isEditor ?
         <BaseSelection
           hiddenDel
@@ -81,6 +133,10 @@ const CustomTableCell = React.forwardRef<HTMLTableCellElement, CustomTableCellPr
           className="cell-selection"
           configLabel="单元格"
           tools={[operateBtn]}
+          onSelectHandler={(nextSelected) => {
+            context?.dispatch((old) => ({ ...old, selected: nextSelected }));
+            handleSelectCell(rowIndex, colIndex);
+          }}
         >
           <BaseDnd
             _options={_options}
@@ -93,7 +149,7 @@ const CustomTableCell = React.forwardRef<HTMLTableCellElement, CustomTableCellPr
         :
         childs
       }
-    </TableCell>
+    </td>
   );
 });
 

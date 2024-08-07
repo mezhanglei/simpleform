@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormRender as DefaultFormRender, FormChildren as DefaultFormChildren, createRequest, CustomFormChildrenProps, CustomFormRenderProps } from '../../../src';
-import widgets from './components';
+import defineConfig from './defineConfig';
 
 export * from '../../../src';
 
@@ -14,7 +14,7 @@ export function FormChildren(props: CustomFormChildrenProps) {
   return (
     <DefaultFormChildren
       options={{ props: { autoComplete: 'off' } }}
-      components={{ ...widgets, ...components }}
+      components={{ ...defineConfig.components, ...components }}
       variables={{ ...variables, request: createRequest(axiosConfig) }}
       {...rest}
     />
@@ -26,7 +26,7 @@ export default function FormRender(props: CustomFormRenderProps) {
   return (
     <DefaultFormRender
       options={{ props: { autoComplete: 'off' } }}
-      components={{ ...widgets, ...components }}
+      components={{ ...defineConfig.components, ...components }}
       variables={{ ...variables, request: createRequest(axiosConfig) }}
       {...rest}
     />

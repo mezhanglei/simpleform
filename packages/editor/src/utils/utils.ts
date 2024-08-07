@@ -47,7 +47,7 @@ export const getConfigItem = (type: string | undefined, editorConfig?: FormEdito
 // 根据路径获取节点的值和属性
 export const getWidgetItem = <V = CustomGenerateWidgetItem>(formrender?: SimpleFormRender | null, path?: string) => {
   if (!formrender) return;
-  const item = formrender.getItemByPath<V>(path);
+  const item = formrender.getItemByPath(path) as (V | undefined);
   return item;
 };
 

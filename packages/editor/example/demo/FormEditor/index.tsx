@@ -1,10 +1,9 @@
 import { Col, Row } from 'antd';
 import React, { CSSProperties } from 'react';
-import { EditorPanel, EditorProvider, EditorProviderProps, EditorSetting, EditorTools, EditorView } from '../../../src';
-import FormRender from '../FormRender';
+import FormRender, { EditorPanel, EditorProvider, EditorProviderProps, EditorSetting, EditorTools, EditorView } from '../FormRender';
 import EditorConfig from './config';
-import panelData from './config/panelData';
-import ImportModal from './template';
+import panelData from './panelData';
+import ImportModal from './ImportTemplate';
 import './index.less';
 
 const renderTools = (context) => {

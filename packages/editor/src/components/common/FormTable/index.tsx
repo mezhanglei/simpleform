@@ -8,7 +8,7 @@ export interface FormTableProps<V = unknown> extends Omit<TableProps<any>, 'titl
   minRows?: number; // 表格默认最少行数
   maxRows?: number; // 表格默认最大行数
   disabled?: boolean; // 禁用
-  showBtn?: boolean; // 展示或隐藏增减按钮
+  buttons?: Array<'add' | 'delete'>; // 展示或隐藏增减按钮
   columns: CustomColumnType<V>[];
   className?: string;
   style?: CSSProperties;

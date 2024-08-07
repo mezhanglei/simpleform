@@ -21,7 +21,7 @@ export default {
     dayjs
   },
   // 注册组件
-  registeredComponents: {
+  components: {
     "Input": Input,
     "Input.TextArea": Input.TextArea,
     "Input.Password": Input.Password,

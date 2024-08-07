@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
-import { CommonWidgetProps } from '../../../../../src';
-import FormRender, { useSimpleForm, FormRenderProps } from '../../../FormRender';
+import FormRender, { useSimpleForm, FormRenderProps, CommonFormProps } from '..';
 import data from './data';
 
-const ExampleGroup = (props: CommonWidgetProps) => {
+const ExampleGroup = (props: CommonFormProps) => {
   const form = useSimpleForm();
   const { value, onChange, disabled } = props;
 

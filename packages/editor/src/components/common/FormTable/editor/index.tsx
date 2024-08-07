@@ -42,8 +42,8 @@ const EditorTable = React.forwardRef<HTMLDivElement, FormTableProps<unknown>>(({
     settingForm && settingForm.setFieldValue('initialValue', value);
   };
 
-  const onSelectHandler: BaseSelectionProps['onSelectHandler'] = (selected) => {
-    const selectedItem = getWidgetItem(formrender, selected?.path);
+  const onSelectHandler: BaseSelectionProps['onSelectHandler'] = (nextSelected) => {
+    const selectedItem = getWidgetItem(formrender, nextSelected?.path);
     const configSetting = editorConfig?.[selectedItem?.type || ''].setting;
     const baseSetting = configSetting?.['基础属性']?.filter((item) => item.name !== 'name');
     const mergeSetting = Object.assign(FormTableColSetting, {
@@ -53,7 +53,7 @@ const EditorTable = React.forwardRef<HTMLDivElement, FormTableProps<unknown>>(({
     });
     context?.dispatch && context?.dispatch((old) => ({
       ...old,
-      selected: Object.assign({ setting: mergeSetting }, selected)
+      selected: Object.assign({ setting: mergeSetting }, nextSelected)
     }));
   };
 
@@ -92,8 +92,10 @@ const EditorTable = React.forwardRef<HTMLDivElement, FormTableProps<unknown>>(({
               ...restOptions,
               index: colIndex,
               path: joinFormPath(columnsPath, colIndex),
+              onValuesChange: columnInputChange
             };
-            const instance = renderWidgetItem(formrender, { ...col, label: '' }, _childOptions, columnInputChange);
+            const widget = { ...col, label: '' };
+            const instance = renderWidgetItem(formrender, widget, _childOptions);
             return (
               <BaseSelection
                 key={colIndex}

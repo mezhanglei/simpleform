@@ -33,13 +33,6 @@ const operationSetting = [
     compact: true,
     children: '禁用'
   },
-  {
-    name: 'props.showBtn',
-    type: 'OperateCheckbox',
-    inline: true,
-    compact: true,
-    children: '可增删'
-  },
 ];
 
 const rulesSetting = [

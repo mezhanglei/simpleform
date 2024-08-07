@@ -28,7 +28,7 @@ const SelectedSetting = React.forwardRef<HTMLDivElement, SelectedSettingProps>((
     if (!selected) return;
     const selectedItem = getWidgetItem(editor, selected?.path);
     const configSetting = editorConfig?.[selectedItem?.type || '']?.setting;
-    const setting = selected?.setting;
+    const setting = selectedItem?.setting;
     return setting || configSetting;
   }, [editor, selectedPath, editorConfig]);
 

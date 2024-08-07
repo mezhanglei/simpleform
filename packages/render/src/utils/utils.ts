@@ -1,5 +1,5 @@
 import { arrayMove } from "./array";
-import { pathToArr, deepSet, joinFormPath, deepGet } from "@simpleform/form";
+import { pathToArr, deepSet, joinFormPath, deepGet, FormPathType } from "@simpleform/form";
 import { WidgetList } from "../typings";
 
 // 获取路径的末尾节点
@@ -23,26 +23,22 @@ export const getPathLen = (path?: string) => {
 };
 
 // 设置指定路径的值
-export const setItemByPath = (widgetList?: WidgetList, data?: unknown, path?: string) => {
+export const setItemByPath = <V>(widgetList?: V, data?: unknown, path?: string) => {
   const pathArr = pathToArr(path);
   // 无路径时表示设置当前值
-  if (pathArr.length == 0) return data as WidgetList;
+  if (pathArr.length == 0) return data as V;
   return deepSet(widgetList, path, data);
 };
 
 // 根据path获取指定路径的项
-export type GetItemByPath = {
-  (widgetList?: WidgetList): WidgetList | undefined;
-  <V>(widgetList?: WidgetList, path?: string): V | undefined;
-}
-export const getItemByPath: GetItemByPath = (widgetList?: WidgetList, path?: string) => {
+export const getItemByPath = <V, Path extends FormPathType = string>(widgetList?: V, path?: Path) => {
   return deepGet(widgetList, path);
 };
 
 // 根据index获取目标项
 export const getKeyValueByIndex = <V>(widgetList?: WidgetList, index?: number, parent?: string) => {
   if (!(widgetList instanceof Array) || typeof index !== 'number') return;
-  const container = (parent ? getItemByPath(widgetList, parent) : widgetList) as (Array<V> | Record<string, V>);
+  const container = (parent ? getItemByPath(widgetList, parent) : widgetList);
   if (!container) return;
   const childKeys = Object.keys(container || {});
   const isList = container instanceof Array;
@@ -51,27 +47,17 @@ export const getKeyValueByIndex = <V>(widgetList?: WidgetList, index?: number, p
 };
 
 // 转化为有序列表
-export const toEntries = <T>(data: T) => {
+export const toEntries = <V>(data) => {
   if (!data) return { isList: false, entries: [] };
-  const temp = [] as Array<unknown>;
   const isList = data instanceof Array;
-  for (let key of Object.keys(data)) {
-    const value = data[key];
-    const item = [key, value];
-    temp.push(item);
-  }
   return {
     isList,
-    entries: temp as Array<T extends Array<infer I> | Record<string, infer I> ? [string, I] : unknown>
+    entries: Object.entries(data) as Array<[string, V]>
   };
 };
 
 // 从有序列表中还原源数据
-export type ParseEntries = {
-  <T>(entries: Array<[string, T]>): Record<string, T>;
-  <T>(entries: Array<[string, T]>, isList: boolean): Array<T> | Record<string, T>;
-}
-export const parseEntries: ParseEntries = <T>(entries: Array<[string, T]>, isList?: boolean) => {
+export const parseEntries = <T>(entries: Array<[string, T]>, isList?: boolean) => {
   if (isList) {
     const temp = [] as unknown[];
     for (let i = 0; i < entries.length; i++) {
@@ -87,7 +73,7 @@ export const parseEntries: ParseEntries = <T>(entries: Array<[string, T]>, isLis
 // 插入数据
 export const insertItemByIndex = <V>(widgetList?: WidgetList, data?: V | Array<V>, index?: number, parent?: string) => {
   if (!data) return;
-  const container = (parent ? getItemByPath(widgetList, parent) : widgetList) as (Array<V> | Record<string, V>);
+  const container = (parent ? getItemByPath(widgetList, parent) : widgetList);
   const entriesData = toEntries(container);
   const isList = entriesData?.isList;
   const addItems = isList ? Object.entries(data instanceof Array ? data : [data]) : Object.entries(data || {});
@@ -110,7 +96,7 @@ export const moveSameLevel = (widgetList: WidgetList | undefined, from: { parent
   let toIndex = to?.index;
   // 同域排序
   if (fromParentPath === toParentPath) {
-    const fromParent = (fromParentPath ? getItemByPath(widgetList, fromParentPath) : widgetList) as (Array<unknown> | Record<string, unknown>);
+    const fromParent = (fromParentPath ? getItemByPath(widgetList, fromParentPath) : widgetList);
     // 转成列表以便排序
     const entriesData = toEntries(fromParent);
     const entries = entriesData?.entries;

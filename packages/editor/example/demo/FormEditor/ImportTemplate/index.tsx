@@ -4,7 +4,7 @@ import { Button, Flex, Tag } from 'antd';
 import './index.less';
 import { CustomOptions, FormDesignData } from '../../FormRender';
 import ModalWrapper, { ModalWrapperProps } from '../../../../src/components/common/GlobalModal/modalWrapper';
-import templates from './data';
+import demo from './demo';
 
 export interface TemplateItem {
   img: string;
@@ -17,6 +17,12 @@ export interface ImportModalProps extends Partial<ModalWrapperProps> {
   context?: CustomOptions['context'];
 }
 
+// 模板列表
+const templateList = [{
+  name: 'demo',
+  data: demo,
+}];
+
 const ImportModal: React.FC<ImportModalProps> = (props) => {
 
   const {
@@ -25,7 +31,7 @@ const ImportModal: React.FC<ImportModalProps> = (props) => {
     open,
     context,
     onClose,
-    data = templates,
+    data = templateList,
     onSelect,
     ...rest
   } = props;

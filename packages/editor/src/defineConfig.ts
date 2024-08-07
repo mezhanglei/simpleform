@@ -8,7 +8,7 @@ export default {
     dayjs
   },
   // 注册组件
-  registeredComponents: widgets,
+  components: widgets,
   // 节点属性默认配置
   options: {
     props: { autoComplete: 'off' }

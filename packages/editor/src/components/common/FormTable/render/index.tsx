@@ -15,7 +15,7 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
     minRows = 0,
     maxRows = 50,
     disabled,
-    showBtn,
+    buttons = ['add', 'delete'],
     pagination = false,
     _options,
     value,
@@ -23,7 +23,6 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
     ...rest
   } = props;
   const form = _options?.form;
-  const path = _options?.path;
   const formrender = _options?.formrender;
   const curName = _options?.name || '';
   const items = Array.from({ length: Math.max(minRows || 0) });
@@ -55,7 +54,7 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
   };
 
   const newColumns = useMemo(() => {
-    const result = columns?.map((col, colIndex) => {
+    const result = columns?.map((col) => {
       const { name, label, render, ...restCol } = col;
       return {
         ...restCol,
@@ -68,13 +67,13 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
             return originRender;
           }
           const childName = joinFormPath(curName, rowIndex, name);
-          const widget = { ...restCol, index: rowIndex, name: childName, label: '' };
-          const _options = { ...widget, path, props: { disabled } };
+          const widget = { ...restCol, name: childName, label: '' };
+          const _options = { form, formrender, index: rowIndex, props: { disabled } };
           return renderWidgetItem(formrender, widget, _options);
         }
       };
     }) as TableProps<any>['columns'] || [];
-    if (showBtn) {
+    if (buttons?.includes('delete')) {
       // 添加删除按键
       result.unshift({
         title: '#',
@@ -87,7 +86,7 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
       });
     }
     return result;
-  }, [columns, showBtn, tableData, disabled]);
+  }, [columns, buttons, tableData, disabled]);
 
   return (
     <>
@@ -101,7 +100,7 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
         pagination={pagination}
         {...pickAttrs(rest)}
       />
-      {showBtn && <Button type="link" className="add-btn" disabled={disabled} onClick={addBtn}>+添加</Button>}
+      {buttons?.includes('add') && <Button type="link" className="add-btn" disabled={disabled} onClick={addBtn}>+添加</Button>}
     </>
   );
 });

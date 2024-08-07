@@ -1,3 +1,5 @@
+import cellSetting from './cell-setting';
+
 export default {
   panel: {
     label: '单元格',
@@ -8,5 +10,5 @@ export default {
   colspan: 1,
   rowspan: 1,
   children: [],
-  setting: {},
+  setting: cellSetting,
 };

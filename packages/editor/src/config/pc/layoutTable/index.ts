@@ -1,4 +1,5 @@
 import TableCellConfig from './cell';
+import Setting from './setting';
 export default {
   panel: {
     icon: 'table',
@@ -10,5 +11,5 @@ export default {
   rows: [
     [TableCellConfig]
   ],
-  setting: {},
+  setting: Setting,
 };

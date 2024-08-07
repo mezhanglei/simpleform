@@ -11,7 +11,7 @@ export function FormChildren(props: CustomFormChildrenProps) {
   return (
     <DefaultFormChildren
       options={defineConfig.options}
-      components={{ ...defineConfig.registeredComponents, ...components }}
+      components={{ ...defineConfig.components, ...components }}
       variables={{ ...variables, ...defineConfig.variables }}
       {...rest}
     />
@@ -23,7 +23,7 @@ export default function FormRender(props: CustomFormRenderProps) {
   return (
     <DefaultFormRender
       options={defineConfig.options}
-      components={{ ...defineConfig.registeredComponents, ...components }}
+      components={{ ...defineConfig.components, ...components }}
       variables={{ ...variables, ...defineConfig.variables }}
       {...rest}
     />
