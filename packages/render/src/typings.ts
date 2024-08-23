@@ -29,18 +29,23 @@ export type WidgetItem<P = {}> = {
   [key in keyof GenerateWidgetItem<P>]: (string | GenerateWidgetItem<P>[key])
 }
 // 组件注入参数
-export type WidgetOptions<P = {}> = GenerateWidgetItem<P> & Pick<FormChildrenProps, 'form' | 'formrender' | 'renderList' | 'renderItem'> & {
-  index?: number;
-  path?: string;
-}
+export type WidgetOptions<P = {}> = GenerateWidgetItem<P> &
+  Pick<FormChildrenProps, 'formrender'> &
+  Pick<FormProps, 'form'> & {
+    index?: number;
+    path?: string;
+  }
 export type WidgetContextProps<P = {}> = { _options?: WidgetOptions<P> };
 export type CustomRenderType = <C, P = {}>(children?: C, context?: WidgetContextProps<P>) => C;
-export type FormChildrenProps<P = {}> = Pick<FormProps, 'form'> & Pick<GenerateWidgetItem<P>, 'inside'> & {
+export type FormChildrenProps<P = {}> = {
+  wrapper?: GenerateWidgetItem<P>['inside'];
+  /**@deprecated no longer recommended */
+  form?: FormProps['form'];
   formrender?: SimpleFormRender;
   options?: GenerateWidgetItem<P> | ((item?: GenerateWidgetItem<P>) => GenerateWidgetItem<P>);
-  uneval?: boolean;
+  parser?: <V>(value?: unknown, variables?: object) => V
   components?: RegisteredComponents; // 注册组件
-  /**@deprecated plugins由variables代替 */
+  /**@deprecated no longer recommended, please use 'variables' instead */
   plugins?: Record<string, unknown>; // 外部模块
   variables?: Record<string, unknown>; // 外部模块
   widgetList?: WidgetList<P>; // 渲染数据
@@ -48,4 +53,4 @@ export type FormChildrenProps<P = {}> = Pick<FormProps, 'form'> & Pick<GenerateW
   renderItem?: CustomRenderType;
   onRenderChange?: (newData?: WidgetList<P>, oldData?: WidgetList<P>) => void;
 }
-export type FormRenderProps<P = {}> = FormProps & FormChildrenProps<P>;
+export type FormRenderProps<P = {}> = FormProps & Omit<FormChildrenProps<P>, 'form'>;

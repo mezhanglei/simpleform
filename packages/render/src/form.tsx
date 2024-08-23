@@ -9,14 +9,14 @@ export default function FormRender(props: FormRenderProps) {
   const {
     formrender,
     form = curForm,
-    uneval,
+    parser,
+    wrapper,
     widgetList,
     components,
     plugins,
     variables,
     renderItem,
     renderList,
-    inside,
     onRenderChange,
     options,
     ...formOptions
@@ -25,9 +25,9 @@ export default function FormRender(props: FormRenderProps) {
   return (
     <Form form={form} {...formOptions}>
       <FormChildren
+        wrapper={wrapper}
         options={options}
-        uneval={uneval}
-        form={form}
+        parser={parser}
         formrender={formrender}
         widgetList={widgetList}
         components={components}
@@ -35,7 +35,6 @@ export default function FormRender(props: FormRenderProps) {
         variables={variables}
         renderItem={renderItem}
         renderList={renderList}
-        inside={inside}
         onRenderChange={onRenderChange}
       />
     </Form>

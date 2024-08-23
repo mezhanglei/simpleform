@@ -38,17 +38,17 @@ export function useFormError(form?: SimpleForm, path?: string) {
 
 // 获取表单值
 export function useFormValues<V>(form: SimpleForm<V>, path?: FormPathType) {
-  const [values, setValues] = useState<SimpleForm<V>['values']>();
+  const [values, setValues] = useState<Partial<V>>();
   const keys = path instanceof Array ? path : path !== undefined && [path];
 
   const subscribe = useCallback(() => {
-    if (form?.subscribeFormValues) {
-      form?.subscribeFormValues((newVal) => {
-        const result = keys ? pickObject(newVal, keys) : newVal;
+    if (form?.subscribeGlobalForm) {
+      form?.subscribeGlobalForm((newVal) => {
+        const result = keys ? pickObject(newVal, keys) as Partial<V> : newVal;
         setValues(result);
       });
     }
-  }, [form?.subscribeFormValues, JSON.stringify(path)]);
+  }, [form?.subscribeGlobalForm, JSON.stringify(path)]);
 
   useMemo(() => {
     subscribe?.();
@@ -57,7 +57,7 @@ export function useFormValues<V>(form: SimpleForm<V>, path?: FormPathType) {
   useEffect(() => {
     subscribe?.();
     return () => {
-      form && form.unsubscribeFormValues();
+      form && form.unsubscribeGlobalForm();
     };
   }, [subscribe]);
 

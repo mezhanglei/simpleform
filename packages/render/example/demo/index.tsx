@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import "./index.less";
 import FormRender, { useSimpleForm } from '../../src/index';
+import '../../lib/css/main.css';
 import { Button, Checkbox, Input, Radio, Select } from 'antd';
 
 // 原子组件
@@ -161,7 +162,7 @@ export default function Demo(props) {
     <div>
       <FormRender
         form={form}
-        inside={{ type: 'row' }}
+        wrapper={{ type: 'row' }}
         // formrender={formrender}
         widgetList={widgetList}
         components={defaultComponents}

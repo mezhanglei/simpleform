@@ -87,9 +87,8 @@ const EditorTable = React.forwardRef<HTMLDivElement, FormTableProps<unknown>>(({
         {
           columns?.map((col, colIndex) => {
             const { label } = col;
-            const { renderItem, renderList, ...restOptions } = commonOptions;
             const _childOptions = {
-              ...restOptions,
+              ...commonOptions,
               index: colIndex,
               path: joinFormPath(columnsPath, colIndex),
               onValuesChange: columnInputChange

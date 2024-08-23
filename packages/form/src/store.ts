@@ -18,7 +18,7 @@ export class SimpleForm<T = unknown> {
 
   private formItemListeners: Array<FormListener<unknown>> = [];
   private formValueListeners: Array<FormListener<unknown>> = [];
-  private formValuesListeners: Array<FormListener<T>['onChange']> = [];
+  private globalFormListeners: Array<FormListener<T>['onChange']> = [];
   private errorListeners: Array<FormListener<ReturnType<SimpleForm['getFieldError']>>> = [];
 
   private initialValues?: unknown;
@@ -49,6 +49,7 @@ export class SimpleForm<T = unknown> {
 
     this.reset = this.reset.bind(this);
     this.validate = this.validate.bind(this);
+    this.notifyForm = this.notifyForm.bind(this);
 
     this.subscribeError = this.subscribeError.bind(this);
     this.unsubscribeError = this.unsubscribeError.bind(this);
@@ -62,9 +63,9 @@ export class SimpleForm<T = unknown> {
     this.unsubscribeFormValue = this.unsubscribeFormValue.bind(this);
     this.notifyFormValue = this.notifyFormValue.bind(this);
 
-    this.subscribeFormValues = this.subscribeFormValues.bind(this);
-    this.unsubscribeFormValues = this.unsubscribeFormValues.bind(this);
-    this.notifyFormValues = this.notifyFormValues.bind(this);
+    this.subscribeGlobalForm = this.subscribeGlobalForm.bind(this);
+    this.unsubscribeGlobalForm = this.unsubscribeGlobalForm.bind(this);
+    this.notifyGlobalForm = this.notifyGlobalForm.bind(this);
   }
 
   // 获取
@@ -141,18 +142,22 @@ export class SimpleForm<T = unknown> {
     return path === undefined ? val : deepGet(val, path);
   }
 
-  // 设置初始值
-  public setInitialValue(path: string, initialValue?: unknown, option?: { ignore?: true }) {
-    const oldValue = deepGet(this.lastValues, path);
+  // 初始值设置
+  public setInitialValue(path: string, initialValue?: unknown) {
+    const oldValue = this.getFieldValue(path);
+    if (isEmpty(oldValue) && initialValue === undefined) return;
     this.initialValues = deepSet(this.initialValues, path, initialValue);
     // 旧表单值存储
     this.lastValues = this.values;
     // 设置值
     this.values = deepSet(this.values, path, initialValue);
-    if (isEmpty(oldValue) && initialValue === undefined || option?.ignore) return;
+    this.notifyForm(path);
+  }
+
+  public notifyForm(path?: string) {
     this.notifyFormItem(path);
     this.notifyFormValue(path);
-    this.notifyFormValues();
+    this.notifyGlobalForm();
   }
 
   // 获取初始值
@@ -177,9 +182,7 @@ export class SimpleForm<T = unknown> {
         // 校验规则
         this.validate(path, eventName);
       }
-      this.notifyFormItem(path);
-      this.notifyFormValue(path);
-      this.notifyFormValues();
+      this.notifyForm(path);
     };
 
     if (typeof path === 'string') {
@@ -194,9 +197,7 @@ export class SimpleForm<T = unknown> {
   public setFieldsValue<V>(values?: V) {
     this.lastValues = this.values;
     this.values = values;
-    this.notifyFormItem();
-    this.notifyFormValue();
-    this.notifyFormValues();
+    this.notifyForm();
   }
 
   // 重置表单
@@ -340,19 +341,19 @@ export class SimpleForm<T = unknown> {
   }
 
   // 订阅整个表单值(表单控件消失不会卸载)
-  public subscribeFormValues(listener: SimpleForm<T>['formValuesListeners'][number]) {
-    this.formValuesListeners.push(listener);
+  public subscribeGlobalForm(listener: SimpleForm<T>['globalFormListeners'][number]) {
+    this.globalFormListeners.push(listener);
     return () => {
-      this.unsubscribeFormValues();
+      this.unsubscribeGlobalForm();
     };
   }
   // 卸载
-  public unsubscribeFormValues() {
-    this.formValuesListeners = [];
+  public unsubscribeGlobalForm() {
+    this.globalFormListeners = [];
   }
   // 同步
-  private notifyFormValues() {
-    this.formValuesListeners.forEach((onChange) => onChange(this.getFieldValue(), this.getLastValue()));
+  private notifyGlobalForm() {
+    this.globalFormListeners.forEach((onChange) => onChange(this.getFieldValue(), this.getLastValue()));
   }
 
   // 订阅表单错误的变动

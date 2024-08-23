@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-4.1.18-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.1.25-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
 
@@ -128,23 +128,28 @@ const CustomInput: React.FC<WidgetContextProps & InputProps> = (props) => {
 
 ### 表达式使用规则
 - 目标有且只能有一对`{{`和`}}`包裹.
+- 导出`toExpression`方法可以代替手写序列化
 - 表达式中使用的模块或变量由`variables`注入，默认内置的有三个:
   - `form`：即`useSimpleForm()`
   - `formrender`：即`useSimpleFormRender()`
   - `formvalues`：即`form.getFieldValue()`
 ```javascript
 import dayjs from 'dayjs';
-import FormRender from "./FormRender";
+import FormRender, { toExpression } from "./FormRender";
 
 const widgetList = [{
   label: "name3",
   initialValue: "{{dayjs().format('YYYY-MM-DD')}}",
+  // initialValue: toExpression(dayjs().format('YYYY-MM-DD')),
   type: 'Input',
   props: {}
 }]
  
 <FormRender widgetList={widgetList} variables={{ dayjs }} />
 ```
+:::warning
+`>=4.1.25`导出序列化函数`toExpression`和反序列化函数`parseExpression`
+:::
 
 ## API
 
@@ -157,13 +162,17 @@ const widgetList = [{
 - `widgetList`: `WidgetItem[]` 渲染表单的DSL形式的json数据
 - `components`：注册表单中的所有组件;
 - `variables`: 表单中需要引入的变量;
+- `wrapper`: `FormChildren`的父节点
 - `options`： `GenerateWidgetItem<P> | ((item: GenerateWidgetItem<P>) => GenerateWidgetItem<P>)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
 - `renderList`：`(children, WidgetContextProps) => React.ReactNode`提供自定义渲染列表的函数.
 - `renderItem`：`(children, WidgetContextProps) => React.ReactNode`提供自定义渲染节点的函数.
 - `onRenderChange`: `(newValue: WidgetList) => void;` `widgetList`更改时回调函数
 - `formrender`: `FormRender`通过`useSimpleFormRender()`创建的实例，负责表单界面渲染，选填.
 - `form`: `Form`。通过`useSimpleForm()`创建，负责表单值的管理，选填.
-- `uneval`: `boolean`不执行表单中的字符串表达式.
+- `parser`: `<V>(value?: unknown, variables?: object) => V` 字符串表达式解析函数，默认方法为`parseExpression`, 传`null`则表示不解析表达式.
+:::warning
+`>=4.1.25`新增`parser`和`wrapper`, 并且移除`uneval`.
+:::
 
 ### SimpleFormRender Method
 - `updateItemByPath`: `(data?: unknown, path?: string) => void` 根据`path`获取对应的节点

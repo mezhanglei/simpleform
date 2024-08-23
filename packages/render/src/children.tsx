@@ -1,60 +1,52 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { FormChildrenProps } from './typings';
-import { joinFormPath, SimpleFormContext } from '@simpleform/form';
+import { SimpleFormContext } from '@simpleform/form';
 import '@simpleform/form/lib/css/main.css';
 import { useSimpleFormRender } from './hooks';
 import { SimpleFormRender } from './store';
-import { evalAttr, renderWidgetItem, withSide } from './utils/transform';
+import { parseExpression, renderWidgetList, withSide, mergeFormOptions } from './utils/transform';
 import { deepClone } from './utils';
 
 // 渲染表单children
 export default function FormChildren(props: FormChildrenProps) {
   const curFormrender = useSimpleFormRender();
-  const { form: curForm, ...restOptions } = useContext(SimpleFormContext);
+  const formContext = useContext(SimpleFormContext);
   const {
-    uneval,
-    components,
-    plugins = {},
-    variables = {},
+    wrapper,
+    options,
+    plugins,
+    variables,
     onRenderChange,
-    renderItem,
     renderList,
-    inside,
-    widgetList: propsWidgetList,
-    form = curForm,
+    widgetList: propWidgetList,
+    parser = parseExpression,
+    form = formContext?.form,
     formrender = curFormrender,
-    options
   } = props;
+  const curVariables = Object.assign({}, plugins, variables);
+  formrender.defineConfig({
+    ...props,
+    parser,
+    formrender,
+    form,
+    variables: curVariables,
+  });
 
   const _baseOptions = {
-    ...restOptions,
+    ...formContext,
+    ...(typeof options === 'function' ? options() : options),
     formrender,
     form,
-    renderItem,
-    renderList
-  };
-
-  const mergeVariables = {
-    form,
-    formrender,
-    formvalues: form && form.getFieldValue() || {},
-    ...plugins,
-    ...variables
   };
 
   const [widgetList, setWidgetList] = useState<SimpleFormRender['widgetList']>([]);
-
-  formrender.defineConfig({
-    variables: Object.assign({}, plugins, variables),
-    components: components,
-  });
 
   // 从SimpleFormRender中订阅更新widgetList
   useEffect(() => {
     if (formrender.subscribeWidgetList) {
       formrender.subscribeWidgetList((newValue, oldValue) => {
         setWidgetList(newValue || []);
-        onRenderChange && onRenderChange(newValue, oldValue);
+        onRenderChange?.(newValue, oldValue);
       });
     }
     return () => {
@@ -65,30 +57,24 @@ export default function FormChildren(props: FormChildrenProps) {
   // 从props中同步widgetList, 不触发subscribeWidgetList监听
   useEffect(() => {
     if (!formrender) return;
-    const cloneData = deepClone(propsWidgetList);
+    const cloneData = deepClone(propWidgetList);
     setWidgetList(cloneData || []);
     formrender.setWidgetList(cloneData, { ignore: true });
-  }, [propsWidgetList]);
+  }, [propWidgetList]);
 
-  const childs = widgetList instanceof Array && widgetList.map((item, index) => {
-    const curPath = joinFormPath(index);
-    const generateWidgetItem = evalAttr(item, mergeVariables, uneval);
-    if (!generateWidgetItem) return;
-    const optionsProps = typeof options === 'function' ? options(generateWidgetItem) : options;
-    const childOptions = {
-      ..._baseOptions,
-      ...optionsProps,
-      index,
-      path: curPath,
-      // 监听表单值，重新渲染
-      onValuesChange: () => {
-        setWidgetList(old => [...old]);
-      },
-    };
-    return renderWidgetItem(formrender, generateWidgetItem, childOptions);
-  });
+  const childs = renderWidgetList(formrender, widgetList, mergeFormOptions(_baseOptions, {
+    // 监听表单值，重新渲染
+    onValuesChange: () => {
+      setWidgetList(old => [...old]);
+    },
+  }));
 
-  return <>{withSide(childs, renderList, formrender.createFormElement(inside, { _options: _baseOptions }), { _options: _baseOptions })}</>;
+  return <>{
+    withSide(
+      childs,
+      renderList,
+      formrender.createFormElement(wrapper, { _options: _baseOptions }), { _options: _baseOptions })
+  }</>;
 }
 
 FormChildren.displayName = 'Form.Children';

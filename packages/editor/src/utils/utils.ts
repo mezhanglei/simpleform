@@ -78,6 +78,6 @@ export const delWidgetItem = (formrender?: SimpleFormRender | null, path?: strin
 
 // 提取对象中公共的选项
 export const getCommonOptions = (_options?: CommonFormProps['_options']) => {
-  const { isEditor, formrender, form, renderItem, renderList, context, props } = _options || {};
-  return { isEditor, formrender, form, context, renderItem, renderList, props };
+  const { isEditor, formrender, form, context, props } = _options || {};
+  return { isEditor, formrender, form, context, props };
 };

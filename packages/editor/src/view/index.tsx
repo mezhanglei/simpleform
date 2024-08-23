@@ -55,13 +55,13 @@ function EditorView(props: EditorViewProps) {
         }}>
         <PlatContainer plat={platType}>
           <FormRender
+            wrapper={RootDnd}
             options={{ isEditor: true, context: context }}
             formrender={editor}
             form={editorForm}
             widgetList={widgetList}
             onRenderChange={onRenderChange}
             onFieldsChange={onFieldsChange}
-            inside={RootDnd}
             renderItem={renderItem}
           />
         </PlatContainer>

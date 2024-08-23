@@ -100,7 +100,7 @@ export function comparePrefix(prefix: FormPathType, path: FormPathType) {
   const prefixParts = pathToArr(prefix);
   const parts = pathToArr(path);
   if (!parts?.length) return false;
-  if (prefixParts?.length !== parts?.length) return false;
+  if (prefixParts?.length > parts?.length) return false;
   return prefixParts?.every((item, index) => {
     return item == parts[index];
   });

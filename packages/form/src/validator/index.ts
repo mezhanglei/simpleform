@@ -18,7 +18,7 @@ const handleRule = async (rule?: FormRule, value?: unknown, eventName?: ItemCore
   if (!rule) return;
   const { validateTrigger, message: defaultMessage, validator, ...restRule } = rule || {};
   const canTrigger = isCanTrigger(eventName, validateTrigger);
-  if (!canTrigger || !restRule) return;
+  if (!canTrigger) return;
   // 自定义校验
   if (typeof validator === 'function') {
     try {
@@ -41,7 +41,7 @@ const handleRule = async (rule?: FormRule, value?: unknown, eventName?: ItemCore
     }
   }
   // 其他校验字段
-  const entries = Object.entries(restRule) as Array<[ConfigValidatorKeys, FormRule[ConfigValidatorKeys]]>;
+  const entries = Object.entries(restRule || {}) as Array<[ConfigValidatorKeys, FormRule[ConfigValidatorKeys]]>;
   for (let [ruleKey, ruleValue] of entries) {
     const ruleValidator = configValidator[ruleKey];
     if (typeof ruleValidator === 'function') {

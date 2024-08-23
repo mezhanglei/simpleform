@@ -3,6 +3,7 @@ import React from 'react';
 import { CustomRenderType, CustomUnionType, FormRenderProps, GenerateWidgetItem, ReactComponent, RegisteredComponents, WidgetContextProps, WidgetItem, WidgetList } from "../typings";
 import { isValidComponent } from "./ReactIs";
 import { isEmpty, isObject } from './type';
+import serialize from 'serialize-javascript';
 
 // 合并表单配置项(浅合并，嵌套属性合并只允许一层深度)
 export const mergeFormOptions = <V>(
@@ -14,9 +15,7 @@ export const mergeFormOptions = <V>(
   Object.keys(newConfig || {}).forEach((key) => {
     const oldItem = oldConfig?.[key];
     const newItem = newConfig?.[key];
-    if (oldItem instanceof Array) {
-      cloneConfig[key] = oldItem.concat(newItem);
-    } else if (isObject(oldItem) && !React.isValidElement(oldItem)) {
+    if (isObject(oldItem) && isObject(newItem) && !React.isValidElement(oldItem)) {
       cloneConfig[key] = { ...oldItem, ...newItem };
     } else if (typeof oldItem === 'function' && mergeFunNames.includes(key)) {
       cloneConfig[key] = (...args: unknown[]) => {
@@ -28,6 +27,46 @@ export const mergeFormOptions = <V>(
     }
   });
   return cloneConfig;
+};
+
+// 匹配字符串表达式
+export const matchExpression = (value?: unknown) => {
+  if (typeof value === 'string') {
+    // /{{([\s\S]+?)}}/g
+    const reg = new RegExp('\{\{\s*.*?\s*\}\}', 'g');
+    const result = value?.match(reg)?.[0];
+    return result;
+  }
+};
+
+// 序列化成字符串
+export const toExpression = (val?: unknown) => {
+  if (val === undefined || val === null || val === '') return;
+  const str = serialize(val);
+  return str ? '{{ ' + str + ' }}' : undefined;
+};
+
+// 从序列化字符串转化为js
+export const parseExpression = <V>(value: V, variables?: object) => {
+  if (typeof value === 'string') {
+    const matchStr = matchExpression(value);
+    if (matchStr) {
+      // 引入变量
+      const curVariables = { ...variables };
+      const variableKeys = Object.keys(curVariables); // 变量名
+      const variableValues = Object.values(curVariables); // 变量
+      const target = matchStr?.replace(/\{\{|\}\}/g, '');;
+      const codeStr = "return " + target;
+      // 函数最后一个参数为函数体，前面均为传入的变量名
+      const action = new Function(...variableKeys, codeStr);
+      const result = action(...variableValues);
+      return result;
+    } else {
+      return value;
+    }
+  } else {
+    return value;
+  }
 };
 
 // 递归遍历转换嵌套对象的子属性
@@ -60,22 +99,12 @@ export const traverseWidgetList = <R>(
   });
 };
 
-// 匹配字符串表达式
-export const matchExpression = (value?: unknown) => {
-  if (typeof value === 'string') {
-    // /{{([\s\S]+?)}}/g
-    const reg = new RegExp('\{\{\s*.*?\s*\}\}', 'g');
-    const result = value?.match(reg)?.[0];
-    return result;
-  }
-};
-
 // 递归解析对象或数组中的每个属性
-export const evalAttr = <V>(val: V, variables?: object, uneval?: boolean) => {
+export const evalAttr = <V>(val: V, variables?: object, parser?: FormRenderProps['parser']) => {
   const isElement = React.isValidElement(val);
-  if (isElement) return val;
+  if (isElement || typeof parser !== 'function') return val;
   return traverseMapObject(val, (target) => {
-    const generateItem = compileExpression(target, variables, uneval);
+    const generateItem = parser(target, variables);
     return generateItem;
   });
 };
@@ -132,38 +161,6 @@ export const createFormElement = (target?: CustomUnionType, props?: unknown, wid
   }
 };
 
-// 字符串转换
-export const transformStr = (str?: string) => {
-  if (typeof str !== 'string') return;
-  // 移除{{}}
-  let target = str?.replace(/\{\{|\}\}/g, '');
-  return target;
-};
-
-// 针对值进行表达式解析
-export const compileExpression = <V>(value: V, variables?: object, uneval?: boolean) => {
-  if (uneval) return value;
-  if (typeof value === 'string') {
-    const matchStr = matchExpression(value);
-    if (matchStr) {
-      // 引入变量
-      const curVariables = { ...variables };
-      const variableKeys = Object.keys(curVariables); // 变量名
-      const variableValues = Object.values(curVariables); // 变量
-      const target = transformStr(matchStr);
-      const codeStr = "return " + target;
-      // 函数最后一个参数为函数体，前面均为传入的变量名
-      const action = new Function(...variableKeys, codeStr);
-      const result = action(...variableValues);
-      return result;
-    } else {
-      return value;
-    }
-  } else {
-    return value;
-  }
-};
-
 // 目标嵌套其他组件
 export const withSide = (target?: React.ReactNode, customRender?: CustomRenderType, side?: React.ReactNode, context?: WidgetContextProps) => {
   const childs = typeof customRender === 'function' ? customRender(target, context) : target;
@@ -174,8 +171,8 @@ export const withSide = (target?: React.ReactNode, customRender?: CustomRenderTy
 
 export const renderWidgetItem = (
   formrender?: FormRenderProps['formrender'],
-  target?: CustomUnionType,
-  options?: WidgetContextProps['_options'],
+  target?: WidgetItem | ReactComponent<any> | React.ReactNode,
+  baseOptions?: WidgetContextProps['_options'],
 ) => {
   if (!formrender) return;
   if (target === undefined || target === null || typeof target === 'string' || typeof target === 'number') {
@@ -183,13 +180,24 @@ export const renderWidgetItem = (
   }
   // 判断是否为ReactElment
   if (React.isValidElement(target)) {
-    return React.cloneElement(target, { _options: options } as React.Attributes);
+    return React.cloneElement(target, { _options: baseOptions } as React.Attributes);
   }
   // 判断是否为ReactComponent
   if (isValidComponent(target)) {
-    return React.createElement(target as ReactComponent<unknown>, { _options: options } as React.Attributes);
+    return React.createElement(target as ReactComponent<unknown>, { _options: baseOptions } as React.Attributes);
   }
-  const mergeItem = mergeFormOptions(options, target as GenerateWidgetItem) || {};
+  const defineConfig = formrender?.config;
+  const generateWidgetItem = evalAttr(
+    target,
+    {
+      form: defineConfig?.form,
+      formrender,
+      formvalues: defineConfig?.form?.getFieldValue() || {},
+      ...defineConfig?.variables,
+    },
+    defineConfig?.parser
+  );
+  const mergeItem = mergeFormOptions(baseOptions, generateWidgetItem as GenerateWidgetItem) || {};
   const {
     hidden,
     readOnlyRender,
@@ -212,19 +220,14 @@ export const renderWidgetItem = (
   const readOnlyEle = typeof readOnlyRender === 'function' ? readOnlyRender(childContext) : readOnlyRender;
   const typeRenderEle = typeof typeRender === 'function' ? typeRender(childContext) : typeRender;
   const typeWidget = formrender.createFormElement(mergeItem?.readOnly === true ? readOnlyEle : (typeRenderEle || { type, props }), childContext);
-  const typeChildren = children instanceof Array ? children?.map((child, childIndex) => {
-    const childOptions = {
-      ...options,
-      index: childIndex,
-      path: joinFormPath(mergeItem?.path, 'children', childIndex)
-    };
-    return renderWidgetItem(formrender, child, childOptions);
-  }) : formrender.createFormElement(children, childContext);
+  const typeChildren = children instanceof Array
+    ? renderWidgetList(formrender, children, { ...baseOptions, path: joinFormPath(mergeItem?.path, 'children') })
+    : formrender.createFormElement(children, childContext);
   const curNode = React.isValidElement(typeWidget) && !isEmpty(typeChildren)
     ? React.cloneElement(
       typeWidget,
       {},
-      withSide(typeChildren, mergeItem?.renderList, insideEle, childContext)
+      withSide(typeChildren, defineConfig?.renderList, insideEle, childContext)
     )
     : (isEmpty(typeWidget) ? typeChildren : typeWidget);
   const result = isFormWidget ?
@@ -244,5 +247,22 @@ export const renderWidgetItem = (
         }) : curNode) as any
     )
     : curNode;
-  return withSide(result, mergeItem?.renderItem, outsideEle, childContext);
+  return withSide(result, defineConfig?.renderItem, outsideEle, childContext);
+};
+
+export const renderWidgetList = (
+  formrender?: FormRenderProps['formrender'],
+  widgetList?: WidgetList,
+  baseOptions?: WidgetContextProps['_options'],
+) => {
+  if (!formrender || !(widgetList instanceof Array)) return;
+  return widgetList.map((item, index) => {
+    const curPath = joinFormPath(baseOptions?.path, index);
+    const childOptions = {
+      ...baseOptions,
+      index,
+      path: curPath,
+    };
+    return renderWidgetItem(formrender, item, childOptions);
+  });
 };

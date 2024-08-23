@@ -1,5 +1,5 @@
 import { CustomUnionType, FormRenderProps, WidgetList } from "./typings";
-import { getItemByPath, setItemByPath, moveSameLevel, moveDiffLevel, getKeyValueByIndex, insertItemByIndex } from "./utils/utils";
+import { getItemByPath, setItemByPath, moveSameLevel, moveDiffLevel, getEntriesByIndex, insertItemByIndex } from "./utils/utils";
 import { createFormElement, getFormComponent, mergeFormOptions } from "./utils/transform";
 import { Form, joinFormPath } from "@simpleform/form";
 import { deepClone } from "./utils";
@@ -9,10 +9,7 @@ export type FormRenderListener<V> = (newValue?: V, oldValue?: V) => void;
 
 // 管理formrender过程中的数据
 export class SimpleFormRender {
-  public config?: {
-    variables?: FormRenderProps['variables'];
-    components?: FormRenderProps['components'];
-  };
+  public config?: FormRenderProps;
   private widgetList: WidgetList;
   private lastWidgetList: WidgetList | undefined;
   private widgetListListeners: FormRenderListener<WidgetList>[] = [];
@@ -34,8 +31,12 @@ export class SimpleFormRender {
   }
 
   // formrender的所有配置
-  public defineConfig(data?: SimpleFormRender['config']) {
-    this.config = mergeFormOptions(this.config, data);
+  public defineConfig(payload?: SimpleFormRender['config'] | ((config?: FormRenderProps) => Partial<FormRenderProps>)) {
+    if (typeof payload === 'function') {
+      this.config = payload(this.config);
+    } else {
+      this.config = mergeFormOptions(this.config, payload);
+    }
   }
 
   // 返回目标声明组件
@@ -73,10 +74,10 @@ export class SimpleFormRender {
   };
 
   // 设置指定路径的值
-  setItemByIndex = <V>(data?: unknown, index?: number, parent?: string) => {
+  setItemByIndex = (data?: unknown, index?: number, parent?: string) => {
     const oldData = this.getWidgetList();
     if (oldData) {
-      const keyValue = getKeyValueByIndex<V>(oldData, index, parent);
+      const keyValue = getEntriesByIndex(oldData, index, parent);
       const path = joinFormPath(parent, keyValue && keyValue[0]);
       const newData = setItemByPath(oldData, data, path);
       this.setWidgetList(newData);
@@ -84,7 +85,7 @@ export class SimpleFormRender {
   };
 
   // 插入值，默认末尾
-  insertItemByIndex = <V>(data?: V | Array<V>, index?: number, parent?: string) => {
+  insertItemByIndex = (data?: unknown, index?: number, parent?: string) => {
     const oldData = this.getWidgetList();
     if (oldData) {
       const newData = insertItemByIndex(oldData, data, index, parent);
@@ -110,10 +111,10 @@ export class SimpleFormRender {
   };
 
   // 获取指定index的项
-  getItemByIndex = <V>(index: number, parent?: string) => {
+  getItemByIndex = (index: number, parent?: string) => {
     const oldData = this.getWidgetList();
     if (oldData) {
-      const keyValue = getKeyValueByIndex<V>(oldData, index, parent);
+      const keyValue = getEntriesByIndex(oldData, index, parent);
       return keyValue && keyValue[1];
     }
   };
