@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SimpleForm } from './store';
-import { FormPathType, pickObject } from './utils/utils';
+import { FormPathType } from './utils/utils';
 
 export function useSimpleForm<T>(
   values?: T
@@ -29,7 +29,7 @@ export function useFormError(form?: SimpleForm, path?: string) {
   useEffect(() => {
     subscribe?.();
     return () => {
-      form && form.unsubscribeError(path);
+      form?.unsubscribeError(path);
     };
   }, [subscribe]);
 
@@ -42,13 +42,19 @@ export function useFormValues<V>(form: SimpleForm<V>, path?: FormPathType) {
   const keys = path instanceof Array ? path : path !== undefined && [path];
 
   const subscribe = useCallback(() => {
-    if (form?.subscribeGlobalForm) {
-      form?.subscribeGlobalForm((newVal) => {
-        const result = keys ? pickObject(newVal, keys) as Partial<V> : newVal;
-        setValues(result);
+    if (!form?.subscribeFormValue) return;
+    if (keys) {
+      keys.forEach((key) => {
+        form?.subscribeFormValue(key as string, (newVal) => {
+          setValues((old) => old instanceof Array ? [...old, newVal] : ({ ...old, [key]: newVal }));
+        });
+      });
+    } else {
+      form?.subscribeFormValue((newVal) => {
+        setValues(newVal as Partial<V>);
       });
     }
-  }, [form?.subscribeGlobalForm, JSON.stringify(path)]);
+  }, [form?.subscribeFormValue, JSON.stringify(path)]);
 
   useMemo(() => {
     subscribe?.();
@@ -57,7 +63,7 @@ export function useFormValues<V>(form: SimpleForm<V>, path?: FormPathType) {
   useEffect(() => {
     subscribe?.();
     return () => {
-      form && form.unsubscribeGlobalForm();
+      form?.unsubscribeFormValue();
     };
   }, [subscribe]);
 

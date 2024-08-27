@@ -20,31 +20,6 @@ export function formatFormKey(code?: unknown) {
   return code.toString().replace(/\]/, '').replace(/\[/, '');
 }
 
-// 提取对象中的部分属性
-export const pickObject = <T, K extends FormPathType = string>(obj: T | undefined, keys: Array<K> | ((key?: keyof T, value?: T[keyof T]) => boolean)) => {
-  if (obj === undefined || obj === null) return obj;
-  if (!isObject(obj) && !isArray(obj)) return;
-  const initial = {} as PathValue<T, K>;
-  if (keys instanceof Array) {
-    for (const k of keys) {
-      const changedKey = typeof k === 'string' || typeof k === 'number' ? k : joinFormPath(k);
-      const item = deepGet(obj, changedKey);
-      if (item !== undefined) {
-        initial[changedKey.toString()] = item;
-      }
-    }
-  } else {
-    const objKeys = Object.keys(obj) as Array<keyof T>;
-    for (const k of objKeys) {
-      const item = obj[k];
-      if (keys(k, item) && item !== undefined) {
-        initial[k as string] = item;
-      }
-    }
-  }
-  return initial;
-};
-
 // 根据路径获取目标对象中的单个值或多个值
 export function deepGet<T, Path extends FormPathType>(obj?: T, keys?: Path) {
   if (typeof obj !== 'object') return;
@@ -102,7 +77,7 @@ export function comparePrefix(prefix: FormPathType, path: FormPathType) {
   if (!parts?.length) return false;
   if (prefixParts?.length > parts?.length) return false;
   return prefixParts?.every((item, index) => {
-    return item == parts[index];
+    return item === parts[index];
   });
 }
 

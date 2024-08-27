@@ -6,7 +6,7 @@ import { isEmpty } from '../../utils/type';
 import SvgIcon from '../SvgIcon';
 import Tooltip from '../Tooltip';
 
-export type Layout = ('horizontal' | 'vertical') & string;
+export type Layout = 'horizontal' | 'vertical';
 export interface ItemProps {
   label?: React.ReactNode;
   inline?: boolean;

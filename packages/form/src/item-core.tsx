@@ -82,8 +82,9 @@ export const ItemCore = (props: ItemCoreProps) => {
   useEffect(() => {
     if (!currentPath || !form) return;
     // 订阅目标控件
-    form.subscribeFormItem(currentPath, (newValue) => {
+    form.subscribeFormItem(currentPath, (newValue, oldValue) => {
       setValue(newValue);
+      if (isEmpty(newValue) && isEmpty(oldValue)) return;
       onValuesChange && onValuesChange({ name: currentPath, value: newValue }, form?.getFieldValue());
     });
     return () => {

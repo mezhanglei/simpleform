@@ -46,9 +46,7 @@ export function Form(props: FormProps) {
       }
     });
     return () => {
-      Object.entries(watch || {})?.forEach(([key]) => {
-        form?.unsubscribeFormValue(key);
-      });
+      form?.unsubscribeFormValue();
     };
   }, [watch]);
 

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import './index.less';
-import { CommonFormProps, pickObject } from "../../../formrender";
+import { CommonFormProps } from "../../../formrender";
 import RequiredComponent from "./required";
 import MinOrMaxComponent from "./minOrMax";
 import PatternComponent from "./pattern";
@@ -63,9 +63,8 @@ const RulesGroup: React.FC<RulesGroupProps> = (props) => {
   };
 
   const getRules = (rulesMap?: Record<InputFormRuleKey, InputFormRule>, checked?: RulesKeyList) => {
-    const result = pickObject(rulesMap, checked || []);
-    const rules = Object.values(result || {});
-    return rules;
+    const rules = checked?.map((key) => rulesMap?.[key]).filter((item) => !!item);
+    return rules as InputFormRule[];
   };
 
   const setCheckedFromValue = (rules?: Array<InputFormRule>) => {

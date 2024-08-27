@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/editor
-[![](https://img.shields.io/badge/version-4.1.12-green)](https://www.npmjs.com/package/@simpleform/editor)
+[![](https://img.shields.io/badge/version-4.1.13-green)](https://www.npmjs.com/package/@simpleform/editor)
 
 > 基于`@simpleform/render`实现的表单设计器，支持自定义组件，模板导入导出，可视化设计等表单设计功能，二次开发非常简单。
 

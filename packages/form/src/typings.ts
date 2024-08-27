@@ -14,7 +14,9 @@ export type PathRest<Path> = Path extends `[${number}].${infer R}`
   ? FilterPath<R>
   : undefined;
 // 路径映射到目标值
-export type PathValue<T, Path> = PathHead<Path> extends keyof T
+export type PathValue<T, Path> = FilterPath<Path> extends undefined
+  ? T
+  : PathHead<Path> extends keyof T
   ? PathRest<Path> extends string
   ? PathValue<T[PathHead<Path>], PathRest<Path>>
   : T[PathHead<Path>]

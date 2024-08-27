@@ -24,6 +24,7 @@ export class SimpleForm<T = unknown> {
   private initialValues?: unknown;
   private values?: unknown;
   private lastValues?: unknown;
+  private debounceCache?: WeakMap<Function, unknown>;
   private formErrors: FormErrors = {};
   private fieldPropsMap: FormFieldsProps = {};
 
@@ -32,6 +33,7 @@ export class SimpleForm<T = unknown> {
     this.fieldPropsMap = {};
     this.formErrors = {};
     this.values = deepClone(values);
+    this.debounceCache = new WeakMap();
     this.getFieldValue = this.getFieldValue.bind(this);
     this.getLastValue = this.getLastValue.bind(this);
     this.setFieldValue = this.setFieldValue.bind(this);
@@ -46,6 +48,7 @@ export class SimpleForm<T = unknown> {
     this.setFieldProps = this.setFieldProps.bind(this);
     this.getBindProps = this.getBindProps.bind(this);
     this.bindChange = this.bindChange.bind(this);
+    this.debounceHandler = this.debounceHandler.bind(this);
 
     this.reset = this.reset.bind(this);
     this.validate = this.validate.bind(this);
@@ -58,14 +61,21 @@ export class SimpleForm<T = unknown> {
     this.subscribeFormItem = this.subscribeFormItem.bind(this);
     this.unsubscribeFormItem = this.unsubscribeFormItem.bind(this);
     this.notifyFormItem = this.notifyFormItem.bind(this);
+    this.notifyGlobalForm = this.notifyGlobalForm.bind(this);
 
     this.subscribeFormValue = this.subscribeFormValue.bind(this);
     this.unsubscribeFormValue = this.unsubscribeFormValue.bind(this);
     this.notifyFormValue = this.notifyFormValue.bind(this);
+  }
 
-    this.subscribeGlobalForm = this.subscribeGlobalForm.bind(this);
-    this.unsubscribeGlobalForm = this.unsubscribeGlobalForm.bind(this);
-    this.notifyGlobalForm = this.notifyGlobalForm.bind(this);
+  // 防抖执行函数（函数引用要保持不变）
+  private debounceHandler(func?: Function, ...args: unknown[]) {
+    if (typeof func !== 'function') return;
+    const lastTime = this.debounceCache?.get(func);
+    clearTimeout(lastTime as number);
+    this.debounceCache?.set(func, setTimeout(() => {
+      func?.(...args);
+    }, 16.7));
   }
 
   // 获取
@@ -145,7 +155,7 @@ export class SimpleForm<T = unknown> {
   // 初始值设置
   public setInitialValue(path: string, initialValue?: unknown) {
     const oldValue = this.getFieldValue(path);
-    if (isEmpty(oldValue) && initialValue === undefined) return;
+    if (isEmpty(oldValue) && isEmpty(initialValue)) return;
     this.initialValues = deepSet(this.initialValues, path, initialValue);
     // 旧表单值存储
     this.lastValues = this.values;
@@ -157,7 +167,6 @@ export class SimpleForm<T = unknown> {
   public notifyForm(path?: string) {
     this.notifyFormItem(path);
     this.notifyFormValue(path);
-    this.notifyGlobalForm();
   }
 
   // 获取初始值
@@ -310,13 +319,19 @@ export class SimpleForm<T = unknown> {
   }
 
   // 主动订阅路径上所有表单控件的变动(表单控件消失不会卸载)
-  public subscribeFormValue(path: string, listener: SimpleForm<T>['formValueListeners'][number]['onChange']) {
-    this.formValueListeners.push({
-      onChange: listener,
-      path: path
-    });
+  public subscribeFormValue(listener: FormListener<unknown>['onChange']): () => void
+  public subscribeFormValue(path: string, listener: FormListener<unknown>['onChange']): () => void
+  public subscribeFormValue(path: string | FormListener<unknown>['onChange'], listener?: FormListener<unknown>['onChange']) {
+    if (typeof path === 'string' && listener) {
+      this.formValueListeners.push({
+        onChange: listener,
+        path: path
+      });
+    } else if (typeof path === 'function') {
+      this.globalFormListeners.push(path);
+    }
     return () => {
-      this.unsubscribeFormValue(path);
+      this.unsubscribeFormValue(typeof path === 'string' ? path : undefined);
     };
   }
   // 卸载
@@ -328,7 +343,7 @@ export class SimpleForm<T = unknown> {
     }
   }
   // 同步路径上任意节点的变化
-  private notifyFormValue(path?: string) {
+  public notifyFormValue(path?: string) {
     if (path) {
       this.formValueListeners.forEach((listener) => {
         if (comparePrefix(listener?.path, path)) {
@@ -338,22 +353,10 @@ export class SimpleForm<T = unknown> {
     } else {
       this.formValueListeners.forEach((listener) => listener.onChange(this.getFieldValue(listener.path), this.getLastValue(listener.path)));
     }
+    this.debounceHandler(this.notifyGlobalForm);
   }
-
-  // 订阅整个表单值(表单控件消失不会卸载)
-  public subscribeGlobalForm(listener: SimpleForm<T>['globalFormListeners'][number]) {
-    this.globalFormListeners.push(listener);
-    return () => {
-      this.unsubscribeGlobalForm();
-    };
-  }
-  // 卸载
-  public unsubscribeGlobalForm() {
-    this.globalFormListeners = [];
-  }
-  // 同步
-  private notifyGlobalForm() {
-    this.globalFormListeners.forEach((onChange) => onChange(this.getFieldValue(), this.getLastValue()));
+  public notifyGlobalForm() {
+    this.globalFormListeners.forEach((listener) => listener?.(this.getFieldValue(), this.getLastValue()));
   }
 
   // 订阅表单错误的变动

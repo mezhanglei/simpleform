@@ -1,6 +1,6 @@
 {
   "name": "@simpleform/editor",
-  "version": "4.1.12",
+  "version": "4.1.13",
   "description": "editor for simple form",
   "author": "mezhanglei <496623925@qq.com>",
   "homepage": "https://github.com/mezhanglei/simpleform#readme",
@@ -47,7 +47,7 @@
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.1",
     "@codemirror/lang-json": "^6.0.1",
-    "@simpleform/render": "^4.1.25",
+    "@simpleform/render": "^4.1.26",
     "@szhsin/react-menu": "^4.1.0",
     "@types/file-saver": "^2.0.7",
     "@types/js-beautify": "^1.14.3",

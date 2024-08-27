@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FormRender from './FormRender';
+import FormRender, { Layout } from './FormRender';
 import { Checkbox, Radio } from 'antd';
 
 export default function Demo() {
@@ -19,7 +19,7 @@ export default function Demo() {
   }]
 
   const [forbid, setForbid] = useState<boolean>();
-  const [layout, setLayout] = useState('horizontal');
+  const [layout, setLayout] = useState<Layout>('horizontal');
 
   return (
     <div>
