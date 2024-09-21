@@ -5,12 +5,13 @@ import PlatContainer, { PlatContainerProps, PlatOptions } from './platContainer'
 import { Button, Radio } from 'antd';
 import { showExportJsonModal } from './exportJson';
 import { CloseOutlined } from '@ant-design/icons';
-import ModalWrapper, { ModalWrapperProps } from '../components/common/GlobalModal/modalWrapper';
-import { create } from '../components/common/GlobalModal/createPromise';
-import DefaultFormRender, { CustomOptions, FormDesignData, useSimpleForm } from '../formrender';
+import { ModalWrapper, ModalWrapperProps } from '../common';
+import FormRender, { useSimpleForm } from '@simpleform/render';
+import { EditorOptions, FormDesignData } from '../typings';
+import renderModal from '../utils/renderModal';
 export interface PreviewModalProps extends ModalWrapperProps {
   data?: FormDesignData;
-  context?: CustomOptions['context'];
+  editorContext?: EditorOptions['editorContext'];
   plat?: PlatContainerProps['plat'];
 }
 
@@ -23,15 +24,15 @@ export const PreviewModal = React.forwardRef<HTMLDivElement, PreviewModalProps>(
     onClose,
     data,
     plat,
-    context,
+    editorContext,
     ...rest
   } = props;
 
+  const renderConfig = editorContext?.state?.renderConfig;
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>();
   const [platType, setPlatType] = useState<PlatContainerProps['plat']>('pc');
   const form = useSimpleForm<FormDesignData>();
-  const FormRender = context?.state?.FormRender || DefaultFormRender;
 
   useEffect(() => {
     setModalOpen(open);
@@ -87,7 +88,8 @@ export const PreviewModal = React.forwardRef<HTMLDivElement, PreviewModalProps>(
       <div className={`${prefixCls}-body`}>
         <PlatContainer plat={platType}>
           <FormRender
-            options={{ props: { disabled: disabled } }}
+            {...renderConfig}
+            options={{ props: { ...(renderConfig?.options as any)?.props, disabled: disabled } }}
             form={form}
             widgetList={data}
           />
@@ -109,5 +111,5 @@ export const showPreviewModal = (props: Partial<PreviewModalProps>) => {
     open: true,
     ...props,
   };
-  return create(PreviewModal, { ...Props });
+  return renderModal(PreviewModal, { ...Props });
 };

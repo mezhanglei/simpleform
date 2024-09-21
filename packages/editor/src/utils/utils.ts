@@ -1,8 +1,8 @@
-import { deepMergeObject } from './object';
+import { deepMergeObject } from '.';
 import { nanoid } from 'nanoid';
-import { SimpleFormRender, getInitialValues, getPathEnd, CustomGenerateWidgetItem, CommonFormProps } from '../formrender';
+import { EditorGenerateWidgetItem, CommonFormProps } from '../typings';
+import { SimpleFormRender, getInitialValues, getPathEnd, } from '@simpleform/render';
 import { ConfigWidgetSetting, FormEditorState } from '../context';
-import React from 'react';
 
 export const defaultGetId = (key?: string) => {
   return typeof key == 'string' ? `${key.replace(/\./g, '')}_${nanoid(6)}` : '';
@@ -31,21 +31,21 @@ export const getSettingInitial = (setting?: ConfigWidgetSetting) => {
     const result = [...pre, ...cur];
     return result;
   }, []);
-  const initialValues = getInitialValues<CustomGenerateWidgetItem>(expandSetting);
+  const initialValues = getInitialValues<EditorGenerateWidgetItem>(expandSetting);
   return initialValues;
 };
 
 // 返回组件config信息
 export const getConfigItem = (type: string | undefined, editorConfig?: FormEditorState['editorConfig']) => {
   if (!type || !editorConfig) return;
-  const configItem = editorConfig[type] as CustomGenerateWidgetItem;
+  const configItem = editorConfig[type] as EditorGenerateWidgetItem;
   const { setting, ...rest } = configItem;
   const initialData = getSettingInitial(typeof setting === 'object' ? setting : {});
   return deepMergeObject(initialData, rest);
 };
 
 // 根据路径获取节点的值和属性
-export const getWidgetItem = <V = CustomGenerateWidgetItem>(formrender?: SimpleFormRender | null, path?: string) => {
+export const getWidgetItem = <V = EditorGenerateWidgetItem>(formrender?: SimpleFormRender | null, path?: string) => {
   if (!formrender) return;
   const item = formrender.getItemByPath(path) as (V | undefined);
   return item;
@@ -58,9 +58,9 @@ export const moveWidgetItem = (formrender?: SimpleFormRender | null, from?: { in
 };
 
 // 插入新节点
-export const insertWidgetItem = (formrender?: SimpleFormRender | null, data?: unknown, index?: number, parent?: string) => {
+export const insertWidgetItem = (formrender?: SimpleFormRender | null, data?: EditorGenerateWidgetItem, index?: number, parent?: string) => {
   if (!formrender || !data) return;
-  const newData = data;
+  const newData = data?.panel?.nonform ? data : Object.assign({ name: defaultGetId(data?.type) }, data);
   formrender?.insertItemByIndex(newData, index, parent);
 };
 
@@ -78,6 +78,6 @@ export const delWidgetItem = (formrender?: SimpleFormRender | null, path?: strin
 
 // 提取对象中公共的选项
 export const getCommonOptions = (_options?: CommonFormProps['_options']) => {
-  const { isEditor, formrender, form, context, props } = _options || {};
-  return { isEditor, formrender, form, context, props };
+  const { isEditor, formrender, form, editorContext, props } = _options || {};
+  return { isEditor, formrender, form, editorContext, props };
 };

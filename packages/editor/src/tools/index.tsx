@@ -3,23 +3,23 @@ import classnames from 'classnames';
 import './index.less';
 import { Button, Divider, Flex, Radio, Tooltip } from 'antd';
 import { FormEditorContextProps, useEditorContext } from '../context';
-import SvgIcon from '../components/common/SvgIcon';
+import { SvgIcon } from '../common';
 import { PlatOptions } from './platContainer';
 import { showPreviewModal } from './preview';
 import { showExportJsonModal } from './exportJson';
-import { setWidgetItem } from '../utils/utils';
+import { setWidgetItem } from '../utils';
 
 export interface EditorToolsProps {
   className?: string;
   style?: CSSProperties;
-  children?: (context: FormEditorContextProps) => React.ReactElement;
-  renderTools?: (context: FormEditorContextProps) => React.ReactElement;
+  children?: (editorContext: FormEditorContextProps) => React.ReactElement;
+  renderTools?: (editorContext: FormEditorContextProps) => React.ReactElement;
 }
 
 function EditorTools(props: EditorToolsProps) {
 
-  const context = useEditorContext();
-  const { platType = 'pc', widgetList, editor, historyRecord } = context?.state || {};
+  const editorContext = useEditorContext();
+  const { platType = 'pc', widgetList, editor, historyRecord } = editorContext?.state || {};
 
   const {
     style,
@@ -30,7 +30,7 @@ function EditorTools(props: EditorToolsProps) {
   } = props;
 
   const showPreview = () => {
-    showPreviewModal({ data: widgetList, plat: platType, context });
+    showPreviewModal({ data: widgetList, plat: platType, editorContext });
   };
 
   const clearEditor = () => {
@@ -65,7 +65,7 @@ function EditorTools(props: EditorToolsProps) {
 
   return (
     typeof children === 'function' ?
-      children(context)
+      children(editorContext)
       :
       <header
         className={cls}
@@ -90,14 +90,14 @@ function EditorTools(props: EditorToolsProps) {
             <Divider className="left-divid" type='vertical' />
             <Radio.Group
               options={PlatOptions}
-              onChange={(e) => context.dispatch((old) => ({ ...old, platType: e?.target?.value }))}
+              onChange={(e) => editorContext.dispatch((old) => ({ ...old, platType: e?.target?.value }))}
               value={platType}
               optionType="button"
               buttonStyle="solid"
             />
           </div>
           <div>
-            {renderTools ? renderTools(context) : null}
+            {renderTools ? renderTools(editorContext) : null}
             <Button type='link' onClick={showPreview}>预览</Button>
             <Button type='link' onClick={clearEditor}>清空</Button>
             <Button type='link' onClick={showExportJson}>生成JSON</Button>

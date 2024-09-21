@@ -1,7 +1,7 @@
 import { deepSet, Form, joinFormPath } from '@simpleform/form';
 import React from 'react';
 import { CustomRenderType, CustomUnionType, FormRenderProps, GenerateWidgetItem, ReactComponent, RegisteredComponents, WidgetContextProps, WidgetItem, WidgetList } from "../typings";
-import { isValidComponent } from "./ReactIs";
+import { cloneElement, createElement, isValidComponent, isValidElement } from "./framework";
 import { isEmpty, isObject } from './type';
 import serialize from 'serialize-javascript';
 
@@ -15,7 +15,7 @@ export const mergeFormOptions = <V>(
   Object.keys(newConfig || {}).forEach((key) => {
     const oldItem = oldConfig?.[key];
     const newItem = newConfig?.[key];
-    if (isObject(oldItem) && isObject(newItem) && !React.isValidElement(oldItem)) {
+    if (isObject(oldItem) && isObject(newItem) && !isValidElement(oldItem)) {
       cloneConfig[key] = { ...oldItem, ...newItem };
     } else if (typeof oldItem === 'function' && mergeFunNames.includes(key)) {
       cloneConfig[key] = (...args: unknown[]) => {
@@ -71,7 +71,7 @@ export const parseExpression = <V>(value: V, variables?: object) => {
 
 // 递归遍历转换嵌套对象的子属性
 export const traverseMapObject = (val, callback) => {
-  const isElement = React.isValidElement(val);
+  const isElement = isValidElement(val);
   if (Array.isArray(val)) {
     return val.map((item) => traverseMapObject(item, callback));
   } else if (isObject(val) && !isElement) {
@@ -101,7 +101,7 @@ export const traverseWidgetList = <R>(
 
 // 递归解析对象或数组中的每个属性
 export const evalAttr = <V>(val: V, variables?: object, parser?: FormRenderProps['parser']) => {
-  const isElement = React.isValidElement(val);
+  const isElement = isValidElement(val);
   if (isElement || typeof parser !== 'function') return val;
   return traverseMapObject(val, (target) => {
     const generateItem = parser(target, variables);
@@ -126,7 +126,7 @@ export const getFormComponent = (target?: any, widgets?: RegisteredComponents) =
   if (target === undefined || target === null) {
     return target;
   }
-  if (typeof target === 'string' || typeof target === 'number' || React.isValidElement(target as React.ReactNode)) {
+  if (typeof target === 'string' || typeof target === 'number' || isValidElement(target as React.ReactNode)) {
     return;
   }
   if (isValidComponent(target)) {
@@ -149,23 +149,23 @@ export const createFormElement = (target?: CustomUnionType, props?: unknown, wid
     return target;
   }
   // 判断是否为ReactElment
-  if (React.isValidElement(target)) {
-    return React.cloneElement(target, props as React.Attributes);
+  if (isValidElement(target)) {
+    return cloneElement(target, props as React.Attributes);
   }
   // 判断是否为声明组件
   const widgetItem = target as GenerateWidgetItem;
   const Com = getFormComponent(widgetItem, widgets);
   if (Com) {
     const mergeProps = Object.assign({}, props, widgetItem?.props) as React.Attributes;
-    return React.createElement(Com, mergeProps);
+    return createElement(Com, mergeProps);
   }
 };
 
 // 目标嵌套其他组件
 export const withSide = (target?: React.ReactNode, customRender?: CustomRenderType, side?: React.ReactNode, context?: WidgetContextProps) => {
   const childs = typeof customRender === 'function' ? customRender(target, context) : target;
-  const childsWithSide = React.isValidElement(side) ? React.cloneElement(side, {}, childs) : childs;
-  const cloneChilds = React.isValidElement(childsWithSide) ? React.cloneElement(childsWithSide, { key: context?._options?.path }) : childsWithSide;
+  const childsWithSide = isValidElement(side) ? cloneElement(side, {}, childs) : childs;
+  const cloneChilds = isValidElement(childsWithSide) ? cloneElement(childsWithSide, { key: context?._options?.path }) : childsWithSide;
   return cloneChilds;
 };
 
@@ -179,12 +179,12 @@ export const renderWidgetItem = (
     return target;
   }
   // 判断是否为ReactElment
-  if (React.isValidElement(target)) {
-    return React.cloneElement(target, { _options: baseOptions } as React.Attributes);
+  if (isValidElement(target)) {
+    return cloneElement(target, { _options: baseOptions } as React.Attributes);
   }
   // 判断是否为ReactComponent
   if (isValidComponent(target)) {
-    return React.createElement(target as ReactComponent<unknown>, { _options: baseOptions } as React.Attributes);
+    return createElement(target as ReactComponent<unknown>, { _options: baseOptions } as React.Attributes);
   }
   const defineConfig = formrender?.config;
   const generateWidgetItem = evalAttr(
@@ -223,22 +223,22 @@ export const renderWidgetItem = (
   const typeChildren = children instanceof Array
     ? renderWidgetList(formrender, children, { ...baseOptions, path: joinFormPath(mergeItem?.path, 'children') })
     : formrender.createFormElement(children, childContext);
-  const curNode = React.isValidElement(typeWidget) && !isEmpty(typeChildren)
-    ? React.cloneElement(
+  const curNode = isValidElement(typeWidget) && !isEmpty(typeChildren)
+    ? cloneElement(
       typeWidget,
       {},
       withSide(typeChildren, defineConfig?.renderList, insideEle, childContext)
     )
     : (isEmpty(typeWidget) ? typeChildren : typeWidget);
   const result = isFormWidget ?
-    React.createElement(Form.Item, {
+    createElement(Form.Item, {
       ...restItem,
       footer: formrender.createFormElement(restItem?.footer, childContext),
       suffix: formrender.createFormElement(restItem?.suffix, childContext),
       component: formrender.getFormComponent(restItem?.component),
-    },
-      (({ bindProps }) => React.isValidElement(curNode) ?
-        React.cloneElement(curNode, {
+    } as React.Attributes,
+      (({ bindProps }) => isValidElement(curNode) ?
+        cloneElement(curNode, {
           ...bindProps,
           [triggerName]: (...args) => {
             (curNode?.props as GenerateWidgetItem)?.[triggerName]?.(...args);

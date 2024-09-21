@@ -19,7 +19,7 @@ export default function Demo() {
       return Promise.reject(new Error('length is < 2'));
     }
   }
-
+  
   return (
     <div>
       <p>报错：<span style={{ color: 'red' }}>{formRes.error}</span></p>

@@ -2,7 +2,7 @@ import React, { useContext, CSSProperties, useMemo } from 'react';
 import { SimpleFormContext } from './context';
 import { useFormError } from './hooks';
 import { Item, ItemProps } from './components/Item';
-import { ItemCore, ItemCoreProps } from './item-core';
+import { ItemCore, ItemCoreProps } from './core';
 
 export type FormItemOptions<P = ItemProps> = Omit<P, 'children'> & ItemCoreProps & {
   component?: React.ComponentType<any> | React.ForwardRefExoticComponent<any> | null;

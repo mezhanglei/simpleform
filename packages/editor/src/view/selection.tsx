@@ -1,8 +1,8 @@
-import { getWidgetItem, insertWidgetItem } from '../utils/utils';
+import { getWidgetItem, insertWidgetItem } from '../utils';
 import React from 'react';
 import BaseSelection, { BaseSelectionProps } from './BaseSelection';
-import SvgIcon from '../components/common/SvgIcon';
-import { getParent } from '../formrender';
+import { SvgIcon } from '../common';
+import { getParent } from '@simpleform/render';
 
 const CommonSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((props, ref) => {
   const {
@@ -13,8 +13,8 @@ const CommonSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((pr
   const path = _options?.path;
   const index = _options?.index;
   const editor = _options?.formrender;
-  const context = _options?.context;
-  const { historyRecord } = context?.state || {};
+  const editorContext = _options?.editorContext;
+  const { historyRecord } = editorContext?.state || {};
 
   const copyItem = () => {
     const currentIndex = index || -1;

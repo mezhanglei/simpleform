@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, CreateAxiosDefaults } from "axios";
-import { trimParams } from "../object";
+import { trimParams } from "../";
 import { IE11OrLess } from "./brower";
 import { HTTP_STATUS, CancelPending, CustomConfig } from "./config";
 

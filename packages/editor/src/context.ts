@@ -1,26 +1,42 @@
 import React, { useContext, useRef, useState } from 'react';
-import { CustomWidgetItem, FormDesignData, SimpleFormRender, SimpleForm, ReactComponent } from './formrender';
+import { EditorWidgetItem, FormDesignData } from './typings';
+import {SimpleFormRender, SimpleForm, FormRenderProps} from '@simpleform/render';
 import { PlatType } from './tools/platContainer';
-import { useMethod } from './utils/hooks';
-import SimpleUndo from './utils/simple-undo';
+import { SimpleUndo } from './utils/index';
 
 // 配置属性类型
 export interface ConfigWidgetSetting {
   [title: string]: FormDesignData
 }
 
-// 表单编辑器的context
+// 编辑器中的数据
 export interface FormEditorState {
   editorForm?: SimpleForm;
   editor?: SimpleFormRender;
   settingForm?: SimpleForm | null;
-  FormRender?: ReactComponent<any>;
   selected?: { path?: string; setting?: ConfigWidgetSetting };
   widgetList?: FormDesignData;
-  editorConfig?: Record<string, CustomWidgetItem>;
+  editorConfig: Record<string, EditorWidgetItem>; // 编辑器配置
+  renderConfig?: FormRenderProps<any>; // 渲染器配置
   platType?: PlatType;
   historyRecord?: SimpleUndo;
-  onEvent?: (type: string, context?: FormEditorContextProps) => void;
+  onEvent?: (type: string, editorContext?: FormEditorContextProps) => void;
+}
+
+export function useMethod<T extends (...args: unknown[]) => unknown>(method: T) {
+  const { current } = useRef<{ method: T, func: T | undefined }>({
+    method,
+    func: undefined,
+  });
+  current.method = method;
+
+  // 只初始化一次
+  if (!current.func) {
+    // 返回给使用方的变量
+    current.func = ((...args: unknown[]) => current.method.call(current.method, ...args)) as T;
+  }
+
+  return current.func;
 }
 
 export interface FormEditorContextProps {
@@ -50,7 +66,7 @@ export function useEditorState(initialState: FormEditorState) {
 };
 
 // 编辑器的context
-export const FormEditorContext = React.createContext<FormEditorContextProps>({ state: {}, dispatch: () => { } });
+export const FormEditorContext = React.createContext<FormEditorContextProps>({ state: { editorConfig: {} }, dispatch: () => { } });
 
 // 消费context的值
 export function useEditorContext() {

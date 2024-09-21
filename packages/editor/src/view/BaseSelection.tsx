@@ -1,11 +1,10 @@
 import classnames from 'classnames';
 import React, { ReactNode, useState } from 'react';
 import './BaseSelection.less';
-import pickAttrs from '../utils/pickAttrs';
 import { FormEditorState } from '../context';
-import SvgIcon from '../components/common/SvgIcon';
-import { delWidgetItem } from '../utils/utils';
-import { CommonFormProps } from '../formrender';
+import { SvgIcon } from '../common';
+import { delWidgetItem, pickAttrs } from '../utils';
+import { CommonFormProps } from '../typings';
 
 export interface BaseSelectionProps extends CommonFormProps, Omit<React.HtmlHTMLAttributes<HTMLDivElement>, 'draggable' | 'onChange' | 'onSelect'> {
   hiddenDel?: boolean;
@@ -37,11 +36,11 @@ const BaseSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((prop
 
   const prefixCls = "editor-selection";
   const overCls = `${prefixCls}-over`;
-  const context = _options?.context;
+  const editorContext = _options?.editorContext;
   const path = _options?.path;
   const editor = _options?.formrender;
   const [isOver, setIsOver] = useState<boolean>(false);
-  const { selected, historyRecord, onEvent } = context?.state || {};
+  const { selected, historyRecord, onEvent } = editorContext?.state || {};
   const isSelected = path ? path === selected?.path : false;
 
   const nextSelected = {
@@ -49,12 +48,12 @@ const BaseSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((prop
   };
 
   const chooseItem = () => {
-    onEvent && onEvent('select', context);
+    onEvent && onEvent('select', editorContext);
     if (onSelectHandler) {
       onSelectHandler(nextSelected);
       return;
     }
-    context?.dispatch && context?.dispatch((old) => ({
+    editorContext?.dispatch && editorContext?.dispatch((old) => ({
       ...old,
       selected: nextSelected
     }));
@@ -62,7 +61,7 @@ const BaseSelection = React.forwardRef<HTMLDivElement, BaseSelectionProps>((prop
 
   const deleteColumn = (e) => {
     e.stopPropagation();
-    context?.dispatch && context?.dispatch((old) => ({ ...old, selected: {} }));
+    editorContext?.dispatch && editorContext?.dispatch((old) => ({ ...old, selected: {} }));
     delWidgetItem(editor, path);
     historyRecord?.save();
   };

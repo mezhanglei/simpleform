@@ -8,7 +8,7 @@ import { FormEditorContextProps, useEditorContext } from '../context';
 export interface EditorSettingProps {
   className?: string
   style?: CSSProperties
-  children?: (context: FormEditorContextProps) => React.ReactElement;
+  children?: (editorContext: FormEditorContextProps) => React.ReactElement;
 }
 const prefixCls = `simple-form-setting`;
 function EditorSetting(props: EditorSettingProps) {
@@ -24,13 +24,13 @@ function EditorSetting(props: EditorSettingProps) {
     component: ComponentSetting
   }];
 
-  const context = useEditorContext();
+  const editorContext = useEditorContext();
 
   const cls = classnames(prefixCls, className);
 
   return (
     typeof children === 'function' ?
-      children(context)
+      children(editorContext)
       :
       <div className={cls} style={style}>
         <Tabs className='setting-tabs'>

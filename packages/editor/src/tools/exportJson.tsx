@@ -1,13 +1,11 @@
 import classnames from 'classnames';
 import React, { useEffect, useState } from 'react';
 import { Button } from 'antd';
-import { convertToString, copyToClipboard } from '../utils/string';
-import { saveAsFile } from '../utils/file';
+import { saveAsFile, convertToString, copyToClipboard } from '../utils';
 import js_beautify from 'js-beautify';
-import ModalWrapper, { ModalWrapperProps } from '../components/common/GlobalModal/modalWrapper';
-import { create } from '../components/common/GlobalModal/createPromise';
-import { EditorCodeMirror } from '../components/common/CodeMirror';
+import { EditorCodeMirror, ModalWrapper, ModalWrapperProps } from '../common/index';
 import './exportJson.less';
+import renderModal from '../utils/renderModal';
 
 export interface ExportJsonModalProps extends ModalWrapperProps {
   data?: object;
@@ -96,5 +94,5 @@ export const showExportJsonModal = (props: Partial<ExportJsonModalProps>) => {
     open: true,
     ...props,
   };
-  return create(ExportJsonModal, { ...Props });
+  return renderModal(ExportJsonModal, { ...Props });
 };

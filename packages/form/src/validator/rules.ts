@@ -52,11 +52,11 @@ const min = <T>(ruleValue: T, value?: unknown) => {
 
 // 导出校验方法
 export const configValidator = {
-  'required': required,
-  'pattern': pattern,
-  'whitespace': whitespace,
-  'max': max,
-  'min': min
+  required,
+  pattern,
+  whitespace,
+  max,
+  min
 };
 
 export type ConfigValidator = typeof configValidator;

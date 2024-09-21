@@ -797,3 +797,4 @@ class TableUtils<V = unknown> {
 }
 
 export default TableUtils;
+export * from './util';

@@ -5,15 +5,29 @@ import BaseDnd from './view/BaseDnd';
 import EditorSetting from './setting';
 import EditorTools from './tools';
 import EditorProvider from './provider';
-import FormRender from './formrender';
-import EditorConfig from './config';
+import '@simpleform/render/lib/css/main.css';
+import FormRender from '@simpleform/render';
 
-export { EditorConfig, EditorPanel, EditorView, EditorSetting, EditorTools, EditorProvider, FormRender, BaseSelection, BaseDnd };
+export {
+  EditorPanel,
+  EditorView,
+  EditorSetting,
+  EditorTools,
+  EditorProvider,
+  BaseSelection,
+  BaseDnd,
+  FormRender
+};
+
+export * from './view/BaseSelection';
+export * from './view/BaseDnd';
+
+export * from '@simpleform/render';
+export * from './common';
 export * from './panel';
 export * from './view';
 export * from './setting';
 export * from './tools';
 export * from './provider';
-export * from './utils/utils';
-export * from './formrender';
-export * from './config';
+export * from './utils';
+export * from './typings';

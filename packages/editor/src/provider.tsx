@@ -1,7 +1,6 @@
 import React from 'react';
-import { useSimpleFormRender, useSimpleForm } from './formrender';
+import { useSimpleFormRender, useSimpleForm } from '@simpleform/render';
 import { FormEditorContext, FormEditorState, useEditorState } from './context';
-import EditorConfig from './config';
 
 export interface EditorProviderProps extends FormEditorState {
   children?: React.ReactNode;
@@ -12,7 +11,6 @@ function EditorProvider(props: EditorProviderProps) {
 
   const {
     children,
-    editorConfig,
     editor = curEditor,
     editorForm = curEditorForm,
     ...rest
@@ -21,7 +19,6 @@ function EditorProvider(props: EditorProviderProps) {
   const [state, dispatch] = useEditorState({
     editor: editor,
     editorForm: editorForm,
-    editorConfig: { ...EditorConfig, ...editorConfig },
     selected: {},
     widgetList: [],
     ...rest

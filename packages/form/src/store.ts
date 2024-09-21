@@ -1,7 +1,7 @@
 import { deepGet, deepSet, getValuePropName, comparePrefix } from './utils/utils';
 import { deepClone } from './utils/object';
 import { handleRules, isCanTrigger } from './validator';
-import { getRulesTriggers, getTriggers } from './item-core';
+import { getRulesTriggers, mergeTriggers } from './core';
 import { isEmpty, isObject } from './utils/type';
 import { FormItemProps } from './form-item';
 import { PathValue } from './typings';
@@ -104,16 +104,12 @@ export class SimpleForm<T = unknown> {
   getBindProps<V>(path?: string, newValue?: V) {
     if (!path) return;
     const props = this.getFieldProps(path);
-    const currentValue = this.getFieldValue(path);
+    const currentValue = newValue !== undefined ? newValue : this.getFieldValue(path);
     const { valueProp, valueSetter, trigger, validateTrigger, rules, nonform } = props || {};
     const valuePropName = getValuePropName(valueProp) || "";
-    const triggers = getTriggers(trigger, validateTrigger, getRulesTriggers(rules));
+    const triggers = mergeTriggers(trigger, validateTrigger, getRulesTriggers(rules));
     const childValue = typeof valueSetter === 'function' ? valueSetter(currentValue) : (valueSetter ? undefined : currentValue);
     const bindProps = { [valuePropName]: childValue } as Record<string, unknown>;
-    if (newValue !== undefined) {
-      const newChildValue = typeof valueSetter === 'function' ? valueSetter(newValue) : (valueSetter ? undefined : newValue);
-      bindProps[valuePropName] = newChildValue;
-    }
     triggers.forEach((eventName) => {
       bindProps[eventName] = (...args) => {
         this.bindChange(path, eventName, ...args);
@@ -123,7 +119,7 @@ export class SimpleForm<T = unknown> {
   }
 
   // 设置表单域
-  public setFieldProps<V>(path: string, field?: V) {
+  public setFieldProps<V>(path?: string, field?: V) {
     if (!path) return;
     const lastField = this.fieldPropsMap[path];
     if (field === undefined) {

@@ -4,7 +4,7 @@ import './index.less';
 import pickAttrs from '../../utils/pickAttrs';
 import { isEmpty } from '../../utils/type';
 import SvgIcon from '../SvgIcon';
-import Tooltip from '../Tooltip';
+import { Tooltip } from 'react-tooltip';
 
 export type Layout = 'horizontal' | 'vertical';
 export interface ItemProps {

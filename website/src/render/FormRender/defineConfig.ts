@@ -13,9 +13,10 @@ import {
   TreeSelect,
 } from 'antd';
 import dayjs from 'dayjs';
+import { CustomFormRenderProps } from '@simpleform/editor';
 
 // 渲染引擎配置项
-export default {
+const defineConfig = {
   // 组件内的变量
   variables: {
     dayjs
@@ -49,4 +50,6 @@ export default {
   options: {
     props: { autoComplete: 'off' }
   }
-};
+} as CustomFormRenderProps;
+
+export default defineConfig;

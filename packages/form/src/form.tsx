@@ -31,20 +31,24 @@ export function Form(props: FormProps) {
 
   useEffect(() => {
     if (!form || !watch) return;
-    Object.entries(watch)?.forEach(([key, watcher]) => {
-      // 函数形式
-      if (typeof watcher === 'function') {
-        form?.subscribeFormValue(key, watcher);
-        // 对象形式
-      } else if (isObject(watcher)) {
-        if (typeof watcher.handler === 'function') {
-          form?.subscribeFormValue(key, watcher.handler);
+    if (typeof watch === 'function') {
+      form?.subscribeFormValue(watch);
+    } else {
+      Object.entries(watch)?.forEach(([key, watcher]) => {
+        // 函数形式
+        if (typeof watcher === 'function') {
+          form?.subscribeFormValue(key, watcher);
+          // 对象形式
+        } else if (isObject(watcher)) {
+          if (typeof watcher.handler === 'function') {
+            form?.subscribeFormValue(key, watcher.handler);
+          }
+          if (watcher.immediate) {
+            watcher.handler(form?.getFieldValue(key), form?.getLastValue(key));
+          }
         }
-        if (watcher.immediate) {
-          watcher.handler(form?.getFieldValue(key), form?.getLastValue(key));
-        }
-      }
-    });
+      });
+    }
     return () => {
       form?.unsubscribeFormValue();
     };

@@ -1,9 +1,9 @@
 import React, { CSSProperties, useEffect, useMemo } from 'react';
 import classnames from 'classnames';
-import { CustomFormRenderProps, Form, FormChildren, joinFormPath, useSimpleForm } from '../formrender';
-import { getWidgetItem, setWidgetItem } from '../utils/utils';
+import { Form, FormChildren, FormRenderProps, joinFormPath, useSimpleForm } from '@simpleform/render';
+import { getWidgetItem, setWidgetItem } from '../utils';
 import './component.less';
-import CustomCollapse from '../components/common/Collapse';
+import { Collapse } from '../common';
 import { useEditorContext } from '../context';
 
 export interface SelectedSettingProps {
@@ -19,8 +19,9 @@ const SelectedSetting = React.forwardRef<HTMLDivElement, SelectedSettingProps>((
     className,
   } = props;
 
-  const context = useEditorContext();
-  const { selected, editor, editorForm, editorConfig } = context?.state || {};
+  const editorContext = useEditorContext();
+  const renderConfig = editorContext?.state?.renderConfig;
+  const { selected, editor, editorForm, editorConfig } = editorContext?.state || {};
   const selectedPath = selected?.path;
   const form = useSimpleForm();
   const cls = classnames(prefixCls, className);
@@ -33,7 +34,7 @@ const SelectedSetting = React.forwardRef<HTMLDivElement, SelectedSettingProps>((
   }, [editor, selectedPath, editorConfig]);
 
   useEffect(() => {
-    context?.dispatch((old) => ({ ...old, settingForm: form }));
+    editorContext?.dispatch((old) => ({ ...old, settingForm: form }));
   }, []);
 
   useEffect(() => {
@@ -46,7 +47,7 @@ const SelectedSetting = React.forwardRef<HTMLDivElement, SelectedSettingProps>((
     }, 50);
   }, [selectedPath]);
 
-  const onFieldsChange: CustomFormRenderProps['onFieldsChange'] = ({ name, value }) => {
+  const onFieldsChange: FormRenderProps['onFieldsChange'] = ({ name, value }) => {
     const curPath = joinFormPath(selectedPath, name);
     setWidgetItem(editor, value, curPath);
     // 同步编辑区域初始值展示
@@ -61,9 +62,9 @@ const SelectedSetting = React.forwardRef<HTMLDivElement, SelectedSettingProps>((
     return (
       Object.entries(configSetting)?.map(([name, data]) => {
         return (
-          <CustomCollapse header={name} key={name} isOpened>
-            <FormChildren widgetList={data} options={{ context: context }} />
-          </CustomCollapse>
+          <Collapse header={name} key={name} isOpened>
+            <FormChildren {...renderConfig} widgetList={data} options={{ ...renderConfig?.options, editorContext }} />
+          </Collapse>
         );
       })
     );
@@ -71,7 +72,7 @@ const SelectedSetting = React.forwardRef<HTMLDivElement, SelectedSettingProps>((
 
   return (
     <div ref={ref} className={cls} style={style}>
-      <Form layout="vertical" form={form} onFieldsChange={onFieldsChange}>
+      <Form layout="vertical" form={form} compact onFieldsChange={onFieldsChange}>
         {renderCommonList()}
       </Form>
     </div>

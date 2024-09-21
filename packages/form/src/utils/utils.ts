@@ -1,5 +1,5 @@
 import { PathValue } from "../typings";
-import { ItemCoreProps } from "../item-core";
+import { ItemCoreProps } from "../core";
 import { isArray, isEmpty, isObject } from "./type";
 import { deepClone } from "./object";
 
@@ -9,7 +9,7 @@ export function pathToArr(path?: FormPathType) {
   if (path instanceof Array) return path;
   if (typeof path === 'number') return [path];
   const regex = /([^\.\[\]]+)|(\[\d+\])/g;
-  const parts = typeof path === 'string' ? path.match(regex) : [];
+  const parts = typeof path === 'string' ? path.match(regex) as string[] : [];
   return parts || [];
 }
 
@@ -96,7 +96,7 @@ export function getValueFromEvent<V extends unknown>(...args) {
 }
 
 // 是否携带中括号
-export const isWithBracket = (code?: unknown) => {
+export const isWithBracket = <T>(code?: T) => {
   return typeof code === 'string' && /^\[\d+\]$/.test(code);
 };
 

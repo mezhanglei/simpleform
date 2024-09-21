@@ -18,6 +18,7 @@ export default function FormChildren(props: FormChildrenProps) {
     variables,
     onRenderChange,
     renderList,
+    components = {},
     widgetList: propWidgetList,
     parser = parseExpression,
     form = formContext?.form,
@@ -29,6 +30,7 @@ export default function FormChildren(props: FormChildrenProps) {
     parser,
     formrender,
     form,
+    components,
     variables: curVariables,
   });
 

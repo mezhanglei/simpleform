@@ -1,10 +1,10 @@
 import React, { CSSProperties } from 'react';
 import classnames from 'classnames';
 import './index.less';
-import { defaultGetId, getConfigItem, getListIndex, getWidgetItem, insertWidgetItem } from '../utils/utils';
+import { getConfigItem, getListIndex, getWidgetItem, insertWidgetItem } from '../utils';
 import { ReactSortable } from "react-sortablejs";
 import { FormEditorContextProps, useEditorContext } from '../context';
-import { getParent } from '../formrender';
+import { getParent } from '@simpleform/render';
 import { message, Tag } from 'antd';
 
 const defaultPanelData = {
@@ -34,7 +34,7 @@ export interface EditorPanelProps {
   className?: string
   style?: CSSProperties
   panelData?: Record<string, string[]>; // 组件面板配置
-  children?: (context: FormEditorContextProps) => React.ReactElement;
+  children?: (editorContext: FormEditorContextProps) => React.ReactElement;
 }
 
 const prefixCls = `simple-form-panel`;
@@ -46,11 +46,11 @@ function EditorPanel(props: EditorPanelProps) {
     children
   } = props;
 
-  const context = useEditorContext();
-  const { selected, editor, editorConfig, historyRecord } = context?.state;
+  const editorContext = useEditorContext();
+  const { selected, editor, editorConfig, historyRecord } = editorContext?.state;
   const cls = classnames(prefixCls, className);
 
-  const onChange = (key: string) => {
+  const onSelect = (key: string) => {
     const newIndex = getListIndex(editor, selected?.path) + 1; // 插入位置序号
     const item = getWidgetItem(editor, selected?.path);
     // 如果选中的是容器不允许点击插入
@@ -59,14 +59,13 @@ function EditorPanel(props: EditorPanelProps) {
       return;
     };
     const configItem = getConfigItem(key, editorConfig); // 插入新组件
-    const newItem = configItem?.panel?.nonform ? configItem : Object.assign({ name: defaultGetId(configItem?.type) }, configItem);
-    insertWidgetItem(editor, newItem, newIndex, getParent(selected?.path));
+    insertWidgetItem(editor, configItem, newIndex, getParent(selected?.path));
     historyRecord?.save();
   };
 
   return (
     typeof children == 'function' ?
-      children(context)
+      children(editorContext)
       :
       <div className={cls} style={style}>
         {
@@ -91,7 +90,7 @@ function EditorPanel(props: EditorPanelProps) {
                     list.map((key) => {
                       const data = editorConfig?.[key] || {};
                       const panel = typeof data?.panel === 'object' ? data?.panel : {};
-                      return <Tag className="component-tag" key={key} data-type={key} data-group='panel' onClick={(e) => onChange?.(key)}>{panel.label}</Tag>;
+                      return <Tag className="component-tag" key={key} data-type={key} data-group='panel' onClick={(e) => onSelect?.(key)}>{panel.label}</Tag>;
                     })
                   }
                 </ReactSortable>

@@ -5,11 +5,11 @@ import { useEditorContext } from '../context';
 
 // 根节点的拖放区域
 const RootDnd: React.FC<ControlDndProps> = (props) => {
-  const context = useEditorContext();
+  const editorContext = useEditorContext();
   return <BaseDnd
     {...props}
-    dndList={context?.state?.widgetList || []}
-    _options={{ ...props._options, context }}
+    dndList={editorContext?.state?.widgetList || []}
+    _options={{ ...props._options, editorContext }}
   />;
 };
 

@@ -1,7 +1,8 @@
 import { ReactSortable, ReactSortableProps } from "react-sortablejs";
 import React, { CSSProperties } from 'react';
-import { defaultGetId, getConfigItem, insertWidgetItem, moveWidgetItem } from '../utils/utils';
-import { getParent, joinFormPath, CommonFormProps } from '../formrender';
+import { getConfigItem, insertWidgetItem, moveWidgetItem } from '../utils';
+import { CommonFormProps } from '../typings';
+import { getParent, joinFormPath, } from '@simpleform/render';
 import './BaseDnd.less';
 
 export interface ControlDndProps extends CommonFormProps, Omit<Partial<ReactSortableProps<any>>, 'onChange'> {
@@ -14,9 +15,9 @@ export interface ControlDndProps extends CommonFormProps, Omit<Partial<ReactSort
 // 控件的拖放区域组件
 const BaseDnd = React.forwardRef<ReactSortable<any>, ControlDndProps>((props, ref) => {
   const { children, _options, dndPath, dndList = [], setList = () => { }, ...rest } = props;
-  const context = _options?.context;
+  const editorContext = _options?.editorContext;
   const formrender = _options?.formrender;
-  const { editorConfig, historyRecord } = context?.state || {};
+  const { editorConfig, historyRecord } = editorContext?.state || {};
 
   const onUpdate: ControlDndProps['onUpdate'] = (params) => {
     const newIndex = params?.oldIndex;
@@ -24,7 +25,7 @@ const BaseDnd = React.forwardRef<ReactSortable<any>, ControlDndProps>((props, re
     const dropIndex = params?.newIndex;
     const dropParent = dndPath;
     moveWidgetItem(formrender, { index: newIndex, parent: dropParent }, { index: dropIndex, parent: dropParent });
-    context?.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: joinFormPath(dropParent, dropIndex) }) }));
+    editorContext?.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: joinFormPath(dropParent, dropIndex) }) }));
     historyRecord?.save();
     console.log(params, '同域拖放');
   };
@@ -35,16 +36,15 @@ const BaseDnd = React.forwardRef<ReactSortable<any>, ControlDndProps>((props, re
     const isPanel = from?.dataset?.group === 'panel';
     // 从侧边栏插入进来
     if (isPanel) {
-      const fromId = from?.dataset?.type;
+      const fromType = from?.dataset?.type;
       const dropIndex = params?.newIndex;
       const dropParent = dndPath;
-      const configItem = getConfigItem(fromId, editorConfig);
-      const newItem = configItem?.panel?.nonform ? configItem : Object.assign({ name: defaultGetId(fromId) }, configItem);
-      insertWidgetItem(formrender, newItem, dropIndex, dropParent);
-      context?.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: joinFormPath(dropParent, dropIndex) }) }));
+      const configItem = getConfigItem(fromType, editorConfig);
+      insertWidgetItem(formrender, configItem, dropIndex, dropParent);
+      editorContext?.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: joinFormPath(dropParent, dropIndex) }) }));
     } else {
       const fromPath = from?.dataset?.path;
-      if(!fromPath) {
+      if (!fromPath) {
         console.error('未设置data-path属性');
         return;
       }
@@ -54,7 +54,7 @@ const BaseDnd = React.forwardRef<ReactSortable<any>, ControlDndProps>((props, re
       const dropIndex = params?.newIndex;
       const dropParent = dndPath;
       moveWidgetItem(formrender, { index: fromIndex, parent: fromParent }, { index: dropIndex, parent: dropParent });
-      context?.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: joinFormPath(dropParent, dropIndex) }) }));
+      editorContext?.dispatch((old) => ({ ...old, selected: Object.assign(old?.selected, { path: joinFormPath(dropParent, dropIndex) }) }));
     }
     historyRecord?.save();
   };

@@ -1,6 +1,6 @@
 {
   "name": "@simpleform/render",
-  "version": "4.1.26",
+  "version": "4.1.27",
   "description": "dynamic rendering core of simple form",
   "author": "mezhanglei <496623925@qq.com>",
   "homepage": "https://github.com/mezhanglei/simpleform#readme",
@@ -45,7 +45,7 @@
     "react-router-dom": "^6.19.0"
   },
   "dependencies": {
-    "@simpleform/form": "^2.1.14",
+    "@simpleform/form": "^2.1.15",
     "classnames": "^2.3.2",
     "copy-anything": "^3.0.5",
     "serialize-javascript": "^6.0.2"

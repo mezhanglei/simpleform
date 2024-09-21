@@ -1,5 +1,5 @@
 import CreateRequest, { CreateRequestParams } from './createRequest';
-import { HTTP_CODE, HTTP_CODE_MAP, HTTP_STATUS, HTTP_STATUS_MAP } from './config';
+import { HTTP_CODE, HTTP_CODE_MAP, HTTP_STATUS_MAP } from './config';
 import { message } from 'antd';
 
 // 请求体结构
@@ -26,9 +26,6 @@ const createRequest = (props?: CreateRequestParams) => {
     },
     // 处理状态码
     handleStatus: (status, msg) => {
-      if (status == HTTP_STATUS.AUTH) {
-        // loginOut();
-      }
       const msgRes = msg || HTTP_STATUS_MAP[status];
       msgRes && message.info(msgRes);
     },

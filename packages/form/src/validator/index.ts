@@ -1,4 +1,4 @@
-import { ItemCoreProps } from "../item-core";
+import { ItemCoreProps } from "../core";
 import { configValidator, ConfigValidatorKeys } from "./rules";
 export type FormRule = {
   required?: boolean;

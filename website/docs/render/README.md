@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-4.1.26-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.1.27-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
 
@@ -169,7 +169,7 @@ const widgetList = [{
 - `onRenderChange`: `(newValue: WidgetList) => void;` `widgetList`更改时回调函数
 - `formrender`: `FormRender`通过`useSimpleFormRender()`创建的实例，负责表单界面渲染，选填.
 - `form`: `Form`。通过`useSimpleForm()`创建，负责表单值的管理，选填.
-- `parser`: `<V>(value?: unknown, variables?: object) => V` 字符串表达式解析函数，默认方法为`parseExpression`, 传`null`则表示不解析表达式.
+- `parser`: `<V>(node?: unknown, variables?: object) => V` 字符串表达式解析函数，默认方法为`parseExpression`, 传`null`则表示不解析表达式.
 :::warning
 `>=4.1.25`新增`parser`和`wrapper`, 并且移除`uneval`.
 :::

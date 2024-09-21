@@ -3,8 +3,8 @@ import classnames from 'classnames';
 import './index.less';
 import pickAttrs from '@simpleform/form/src/utils/pickAttrs';
 import { isEmpty } from '@simpleform/form/src/utils/type';
-import Tooltip from '@simpleform/form/src/components/Tooltip';
 import SvgIcon from '@simpleform/form/src/components/SvgIcon';
+import { Tooltip } from 'antd';
 
 export type Layout = ('horizontal' | 'vertical');
 export interface ItemProps {
