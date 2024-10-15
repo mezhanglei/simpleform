@@ -17,6 +17,7 @@
   "workspaces": [
     "packages/form",
     "packages/render",
+    "packages/rule",
     "packages/editor"
   ],
   "devDependencies": {

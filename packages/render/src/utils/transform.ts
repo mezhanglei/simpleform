@@ -1,4 +1,4 @@
-import { deepSet, Form, joinFormPath } from '@simpleform/form';
+import { deepSet, Form, joinFormPath, isValidFormName } from '@simpleform/form';
 import React from 'react';
 import { CustomRenderType, CustomUnionType, FormRenderProps, GenerateWidgetItem, ReactComponent, RegisteredComponents, WidgetContextProps, WidgetItem, WidgetList } from "../typings";
 import { cloneElement, createElement, isValidComponent, isValidElement } from "./framework";
@@ -114,7 +114,7 @@ export const getInitialValues = <V>(widgetList?: WidgetList) => {
   if (!(widgetList instanceof Array)) return;
   let initialValues = {} as V;
   traverseWidgetList(widgetList, (item) => {
-    if (item?.initialValue !== undefined && item?.name) {
+    if (item?.initialValue !== undefined && isValidFormName(item?.name)) {
       initialValues = (deepSet(initialValues, item.name, item?.initialValue) || {}) as V;
     }
   });
@@ -187,12 +187,13 @@ export const renderWidgetItem = (
     return createElement(target as ReactComponent<unknown>, { _options: baseOptions } as React.Attributes);
   }
   const defineConfig = formrender?.config;
+  const curForm = defineConfig?.form || baseOptions?.form;
   const generateWidgetItem = evalAttr(
     target,
     {
-      form: defineConfig?.form,
+      form: curForm,
       formrender,
-      formvalues: defineConfig?.form?.getFieldValue() || {},
+      formvalues: curForm?.getFieldValue() || {},
       ...defineConfig?.variables,
     },
     defineConfig?.parser
@@ -214,7 +215,7 @@ export const renderWidgetItem = (
     _options: mergeItem
   };
   if (hidden === true) return;
-  const isFormWidget = mergeItem?.name ? true : false;
+  const isFormWidget = isValidFormName(mergeItem?.name) ? true : false;
   const insideEle = formrender.createFormElement(inside, childContext);
   const outsideEle = formrender.createFormElement(outside, childContext);
   const readOnlyEle = typeof readOnlyRender === 'function' ? readOnlyRender(childContext) : readOnlyRender;

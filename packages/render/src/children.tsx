@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { FormChildrenProps } from './typings';
 import { SimpleFormContext } from '@simpleform/form';
 import '@simpleform/form/lib/css/main.css';
-import { useSimpleFormRender } from './hooks';
-import { SimpleFormRender } from './store';
+import { useSimpleFormRender, useWidgetList } from './hooks';
 import { parseExpression, renderWidgetList, withSide, mergeFormOptions } from './utils/transform';
 import { deepClone } from './utils';
 
@@ -41,20 +40,7 @@ export default function FormChildren(props: FormChildrenProps) {
     form,
   };
 
-  const [widgetList, setWidgetList] = useState<SimpleFormRender['widgetList']>([]);
-
-  // 从SimpleFormRender中订阅更新widgetList
-  useEffect(() => {
-    if (formrender.subscribeWidgetList) {
-      formrender.subscribeWidgetList((newValue, oldValue) => {
-        setWidgetList(newValue || []);
-        onRenderChange?.(newValue, oldValue);
-      });
-    }
-    return () => {
-      formrender?.unsubscribeWidgetList();
-    };
-  }, [formrender.subscribeWidgetList, onRenderChange]);
+  const [widgetList, setWidgetList] = useWidgetList(formrender, onRenderChange);
 
   // 从props中同步widgetList, 不触发subscribeWidgetList监听
   useEffect(() => {
@@ -67,7 +53,7 @@ export default function FormChildren(props: FormChildrenProps) {
   const childs = renderWidgetList(formrender, widgetList, mergeFormOptions(_baseOptions, {
     // 监听表单值，重新渲染
     onValuesChange: () => {
-      setWidgetList(old => [...old]);
+      setWidgetList(old => [...(old || [])]);
     },
   }));
 
