@@ -33,19 +33,19 @@ alert("111")
 
 const script1 = 'customVar1 + "--" + customVar2 + "---"';
 
-var initFunc = function (interpreter, globalObject) {
+var initFunc = function (context, globalObject) {
   // Object
   var object = { log: window.console.log };
-  interpreter.setProperty(globalObject, 'console', interpreter.nativeToPseudo(object));
+  context.setProperty(globalObject, 'console', context.nativeToPseudo(object));
   // Func(同步/异步)
   var fun = function alert(text) {
     return window.alert(text);
   };
-  interpreter.setProperty(globalObject, 'alert', interpreter.nativeToPseudo(fun));
+  context.setProperty(globalObject, 'alert', context.nativeToPseudo(fun));
   // interpreter.setProperty(globalObject, 'alert', interpreter.createAsyncFunction(fun));
   // Other
-  interpreter.setProperty(globalObject, 'customVar1', 'customVar1');
-  interpreter.setProperty(globalObject, 'customVar2', 'customVar2');
+  context.setProperty(globalObject, 'customVar1', 'customVar1');
+  context.setProperty(globalObject, 'customVar2', 'customVar2');
 };
 
 // 使用 Babel 转译代码
