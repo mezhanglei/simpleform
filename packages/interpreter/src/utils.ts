@@ -121,7 +121,7 @@ function legalArrayLength(x) {
 // 在原型链中查找属性
 function getPropInPrototypeChain(obj, name) {
   while (obj !== null) {
-    if (name in obj.properties) {
+    if (obj.properties && name in obj.properties) {
       return obj.properties[name];
     }
     obj = obj.proto;
@@ -147,9 +147,8 @@ function isInherit(child, constructor) {
       childProto = childProto.proto;
     }
     return false;
-  }
-  // 原生js基础类型
-  if (['number', 'boolean', 'string'].includes(typeof child)) {
+  } else {
+    // 原子类型
     return (constructor.nativeFunc.name).toLowerCase() === typeof child;
   }
 };

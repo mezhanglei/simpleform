@@ -106,6 +106,30 @@ const placeholderGet_ =
 const placeholderSet_ =
   function () { throw Error('Placeholder setter'); };
 
+// 伪JS全局变量/方法
+const GLOBAL_TYPE = {
+  Function: 'Function',
+  Object: 'Object',
+  Array: 'Array',
+  String: 'String',
+  Boolean: 'Boolean',
+  Number: 'Number',
+  Date: 'Date',
+  RegExp: 'RegExp',
+  Error: 'Error',
+  Math: 'Math',
+  JSON: 'JSON'
+};
+
+const ERROR_TYPES = {
+  'EvalError': EvalError,
+  'RangeError': RangeError,
+  'ReferenceError': ReferenceError,
+  'SyntaxError': SyntaxError,
+  'TypeError': TypeError,
+  'URIError': URIError,
+};
+
 export const Constants = {
   Completion,
   Status,
@@ -123,4 +147,6 @@ export const Constants = {
   WORKER_CODE,
   placeholderGet_,
   placeholderSet_,
+  GLOBAL_TYPE,
+  ERROR_TYPES,
 };
