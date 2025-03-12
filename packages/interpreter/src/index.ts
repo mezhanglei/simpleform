@@ -4,9 +4,11 @@ import {
   traverseAstDeclar,
   getStepFunctions,
   isStrict,
-  isInherit,
+} from './utils/node';
+import {
+  isa,
   bindClassPrototype,
-} from './utils';
+} from './utils/object';
 import { Constants } from './constants';
 import {
   StateConstructor,
@@ -14,7 +16,6 @@ import {
 import Context from './context';
 import polyfills from './polyfills';
 
-export * from './utils';
 export * from './context';
 
 globalThis.acorn = acorn;
@@ -670,12 +671,12 @@ Interpreter.prototype['stepBinaryExpression'] = function (stack, state) {
       value = this.context.hasProperty(rightValue, leftValue);
       break;
     case 'instanceof':
-      if (!isInherit(rightValue, this.context.FUNCTION)) {
+      if (!isa(rightValue, this.context.FUNCTION)) {
         this.context.throwException(this.context.TYPE_ERROR,
           "'instanceof' expects an object, not '" + rightValue + "'");
       }
       value = (leftValue instanceof Interpreter.Object) ?
-        isInherit(leftValue, rightValue) : false;
+        isa(leftValue, rightValue) : false;
       break;
     default:
       throw SyntaxError('Unknown binary operator: ' + node.operator);

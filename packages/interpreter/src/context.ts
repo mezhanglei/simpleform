@@ -1,16 +1,22 @@
 import * as acorn from 'acorn';
 import {
+  legalArrayLength,
+  legalArrayIndex,
+} from './utils/array';
+import {
   assignProperty,
+  isa,
+  bindClassPrototype,
+  placeholderGet_,
+  placeholderSet_,
+} from './utils/object';
+import {
   cloneASTNode,
   stripLocations_,
   traverseAstDeclar,
   getStepFunctions,
   isStrict,
-  legalArrayLength,
-  legalArrayIndex,
-  isInherit,
-  bindClassPrototype,
-} from './utils';
+} from './utils/node';
 import { Constants } from './constants';
 import { AcornProgram, InterpreterOtionFun } from './typings';
 import {
@@ -114,7 +120,6 @@ Context.prototype.createSpecialScope = function (parentScope, opt_object) {
 Context.prototype.initGlobal = function (initFunc) {
   this.globalScope = this.createScope();
   this.OBJECT_PROTO = new Context.Object(null);
-  this.FUNCTION_PROTO = new Context.Object(this.OBJECT_PROTO);
   const globalObject = this.globalScope.object;
   // Unable to set globalObject's parent prior (OBJECT did not exist).
   // Note that in a browser this would be `Window`, whereas in Node.js it would
@@ -244,6 +249,7 @@ Context.prototype.functionCodeNumber_ = 0;
  * @param {!Context.Object} globalObject Global object.
  */
 Context.prototype.initFunction = function (globalObject) {
+  this.FUNCTION_PROTO = new Context.Object(this.OBJECT_PROTO);
   var thisInterpreter = this;
   var wrapper;
   var identifierRegexp = /^[A-Za-z_$][\w$]*$/;
@@ -290,9 +296,6 @@ Context.prototype.initFunction = function (globalObject) {
       'anonymous');
   };
   this.FUNCTION = this.createNativeFunction(wrapper, true);
-
-  this.setProperty(globalObject, 'Function', this.FUNCTION,
-    Context.NONENUMERABLE_DESCRIPTOR);
   // Throw away the created prototype and use the root prototype.
   this.setProperty(this.FUNCTION, 'prototype', this.FUNCTION_PROTO,
     Context.NONENUMERABLE_DESCRIPTOR);
@@ -362,6 +365,8 @@ Context.prototype.initFunction = function (globalObject) {
   this.setNativeFunctionPrototype(this.FUNCTION, 'valueOf', wrapper);
   this.setProperty(this.FUNCTION, 'valueOf',
     this.createNativeFunction(wrapper, false),
+    Context.NONENUMERABLE_DESCRIPTOR);
+  this.setProperty(globalObject, 'Function', this.FUNCTION,
     Context.NONENUMERABLE_DESCRIPTOR);
 };
 
@@ -686,7 +691,7 @@ Context.prototype.initString = function (globalObject) {
     limit = limit ? Number(limit) : undefined;
     // Example of catastrophic split RegExp:
     // 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaac'.split(/^(a+)+b/)
-    if (isInherit(separator, thisInterpreter.REGEXP)) {
+    if (isa(separator, thisInterpreter.REGEXP)) {
       separator = separator.data;
       thisInterpreter.maybeThrowRegExp(separator, callback);
       if (thisInterpreter['REGEXP_MODE'] === 2) {
@@ -725,7 +730,7 @@ Context.prototype.initString = function (globalObject) {
 
   wrapper = function match(regexp, callback) {
     var string = String(this);
-    regexp = isInherit(regexp, thisInterpreter.REGEXP) ?
+    regexp = isa(regexp, thisInterpreter.REGEXP) ?
       regexp.data : new RegExp(regexp);
     // Example of catastrophic match RegExp:
     // 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaac'.match(/^(a+)+b/)
@@ -762,7 +767,7 @@ Context.prototype.initString = function (globalObject) {
 
   wrapper = function search(regexp, callback) {
     var string = String(this);
-    if (isInherit(regexp, thisInterpreter.REGEXP)) {
+    if (isa(regexp, thisInterpreter.REGEXP)) {
       regexp = regexp.data;
     } else {
       regexp = new RegExp(regexp);
@@ -805,7 +810,7 @@ Context.prototype.initString = function (globalObject) {
     newSubstr = String(newSubstr);
     // Example of catastrophic replace RegExp:
     // 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaac'.replace(/^(a+)+b/, '')
-    if (isInherit(substr, thisInterpreter.REGEXP)) {
+    if (isa(substr, thisInterpreter.REGEXP)) {
       substr = substr.data;
       thisInterpreter.maybeThrowRegExp(substr, callback);
       if (thisInterpreter['REGEXP_MODE'] === 2) {
@@ -1043,7 +1048,7 @@ Context.prototype.initRegExp = function (globalObject) {
     } else {
       // Called as `RegExp()`.
       if (flags === undefined &&
-        isInherit(pattern, thisInterpreter.REGEXP)) {
+        isa(pattern, thisInterpreter.REGEXP)) {
         // Regexp(/foo/) returns the same obj.
         return pattern;
       }
@@ -1661,23 +1666,23 @@ Context.prototype.pseudoToNative = function (pseudoObj, opt_cycles) {
   }
   cycles.pseudo.push(pseudoObj);
 
-  if (isInherit(pseudoObj, this.REGEXP)) { // Regular expression.
+  if (isa(pseudoObj, this.REGEXP)) { // Regular expression.
     var nativeRegExp = new RegExp(pseudoObj.data.source, pseudoObj.data.flags);
     nativeRegExp.lastIndex = pseudoObj.data.lastIndex;
     cycles.native.push(nativeRegExp);
     return nativeRegExp;
   }
 
-  if (isInherit(pseudoObj, this.DATE)) { // Date.
+  if (isa(pseudoObj, this.DATE)) { // Date.
     var nativeDate = new Date(pseudoObj.data.valueOf());
     cycles.native.push(nativeDate);
     return nativeDate;
   }
 
   // Boxed primitives.
-  if (isInherit(pseudoObj, this.NUMBER) ||
-    isInherit(pseudoObj, this.STRING) ||
-    isInherit(pseudoObj, this.BOOLEAN)) {
+  if (isa(pseudoObj, this.NUMBER) ||
+    isa(pseudoObj, this.STRING) ||
+    isa(pseudoObj, this.BOOLEAN)) {
     var nativeBox = Object(pseudoObj.data);
     cycles.native.push(nativeBox);
     return nativeBox;
@@ -1687,7 +1692,7 @@ Context.prototype.pseudoToNative = function (pseudoObj, opt_cycles) {
   // idea for the JS-Context to be able to create native JS functions.
   // Still, if that floats your boat, this is where you'd add it.  Good luck.
 
-  var nativeObj = isInherit(pseudoObj, this.ARRAY) ? [] : {};
+  var nativeObj = isa(pseudoObj, this.ARRAY) ? [] : {};
   cycles.native.push(nativeObj);
   var val;
   for (var key in pseudoObj.properties) {
@@ -1739,13 +1744,13 @@ Context.prototype.getProperty = function (obj, name, emitGetter?) {
   }
   if (name === 'length') {
     // Special cases for magic length property.
-    if (isInherit(obj, this.STRING)) {
+    if (isa(obj, this.STRING)) {
       return String(obj).length;
     }
   } else if (name.charCodeAt(0) < 0x40) {
     // Might have numbers in there?
     // Special cases for string array indexing
-    if (isInherit(obj, this.STRING)) {
+    if (isa(obj, this.STRING)) {
       var n = legalArrayIndex(name);
       if (!isNaN(n) && n < String(obj).length) {
         return String(obj)[n];
@@ -1776,10 +1781,10 @@ Context.prototype.hasProperty = function (obj, name) {
     throw TypeError('Primitive data type has no properties');
   }
   name = String(name);
-  if (name === 'length' && isInherit(obj, this.STRING)) {
+  if (name === 'length' && isa(obj, this.STRING)) {
     return true;
   }
-  if (isInherit(obj, this.STRING)) {
+  if (isa(obj, this.STRING)) {
     var n = legalArrayIndex(name);
     if (!isNaN(n) && n < String(obj).length) {
       return true;
@@ -1821,7 +1826,7 @@ Context.prototype.setProperty = function (obj, name, value, opt_descriptor, emit
     }
     return;
   }
-  if (isInherit(obj, this.STRING)) {
+  if (isa(obj, this.STRING)) {
     const n = legalArrayIndex(name);
     if (name === 'length' || (!isNaN(n) && n < String(obj).length)) {
       // Can't set length or letters on String objects.
@@ -1876,11 +1881,11 @@ Context.prototype.setProperty = function (obj, name, value, opt_descriptor, emit
     var descriptor = {};
     if ('get' in opt_descriptor && opt_descriptor['get']) {
       obj.getter[name] = opt_descriptor['get'];
-      descriptor['get'] = Constants.placeholderGet_;
+      descriptor['get'] = placeholderGet_;
     }
     if ('set' in opt_descriptor && opt_descriptor['set']) {
       obj.setter[name] = opt_descriptor['set'];
-      descriptor['set'] = Constants.placeholderSet_;
+      descriptor['set'] = placeholderSet_;
     }
     if ('configurable' in opt_descriptor) {
       descriptor['configurable'] = opt_descriptor['configurable'];
@@ -2071,7 +2076,7 @@ Context.prototype.unwind = function (type, value, label) {
 
   // Unhandled completion.  Throw a real error.
   var realError;
-  if (isInherit(value, this.ERROR)) {
+  if (isa(value, this.ERROR)) {
     var errorTable = {
       'EvalError': EvalError,
       'RangeError': RangeError,
