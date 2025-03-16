@@ -2,7 +2,7 @@ import { deepGet, deepSet, getValuePropName, comparePrefix, FormPathType, isVali
 import { deepClone } from './utils/object';
 import { handleRules, isCanTrigger } from './validator';
 import { getRulesTriggers, mergeTriggers } from './core';
-import { isEmpty, isObject } from './utils/type';
+import { isArray, isEmpty, isObject } from './utils/type';
 import { FormItemProps } from './form-item';
 import { GetMapValueType, PathValue } from './typings';
 
@@ -171,7 +171,7 @@ export class SimpleForm<T = unknown> {
       this.notifyForm(path);
     };
 
-    if (isObject(args?.[0])) {
+    if (isObject(args?.[0]) || isArray(args?.[0])) {
       Promise.all(Object.keys(args[0]).map((n) => setFormItemValue(n, args[0]?.[n], args[1])));
     } else {
       setFormItemValue(...args);

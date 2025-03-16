@@ -68,6 +68,7 @@ export const handleRules = async (rules?: FormRule[], value?: unknown, eventName
 export const isCanTrigger = (eventName?: ItemCoreProps['trigger'], validateTrigger?: ItemCoreProps['validateTrigger']) => {
   // 默认允许触发
   if (eventName === undefined) return true;
+  if (typeof eventName === 'boolean') return eventName;
   if (validateTrigger === undefined) return true;
   if (typeof validateTrigger === 'string') {
     return validateTrigger === eventName;

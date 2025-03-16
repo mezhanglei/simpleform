@@ -97,7 +97,9 @@ export const ItemCore = (props: ItemCoreProps) => {
     if (!isValidFormName(currentPath) || !form) return;
     // 回填初始值
     const initValue = initialValue === undefined ? deepGet(initialValues, currentPath) : initialValue;
-    form.setInitialValue(currentPath, initValue);
+    if (initValue !== undefined) {
+      form.setInitialValue(currentPath, initValue);
+    }
     onFieldsMounted && onFieldsMounted({ name: currentPath, value: initValue }, form?.getFieldValue());
     return () => {
       // 清除该表单域的props(在设置值的前面)
@@ -111,8 +113,21 @@ export const ItemCore = (props: ItemCoreProps) => {
   const bindChildren = (children: ItemCoreProps['children']) => {
     if (typeof children === 'function') {
       const bindProps = form && form.getBindProps(currentPath, value) || {};
-      return children({ className: errorClassName, form: form, bindProps: bindProps });
+      return children({ className: errorClassName, form, bindProps });
     } else {
+      const len = React.Children.count(children);
+      if (len === 1 && React.isValidElement(children)) {
+        const bindProps = form && form.getBindProps(currentPath, value) || {};
+        return React.cloneElement(children, {
+          ...bindProps,
+          [trigger]: (...args) => {
+            children?.props?.[trigger]?.(...args);
+            bindProps?.[trigger]?.(...args);
+          },
+          className: errorClassName,
+          form,
+        });
+      }
       return children;
     }
   };

@@ -101,10 +101,38 @@ const WORKER_CODE = [
   "close();",
   "};"];
 
-const placeholderGet_ =
-  function () { throw Error('Placeholder getter'); };
-const placeholderSet_ =
-  function () { throw Error('Placeholder setter'); };
+// 伪JS全局变量/方法
+const GLOBAL_TYPE = {
+  Function: 'Function',
+  Object: 'Object',
+  Array: 'Array',
+  String: 'String',
+  Boolean: 'Boolean',
+  Number: 'Number',
+  Date: 'Date',
+  RegExp: 'RegExp',
+  Error: 'Error',
+  Math: 'Math',
+  JSON: 'JSON'
+};
+
+const ERROR_KEYS = {
+  'EvalError': 'EvalError',
+  'RangeError': 'RangeError',
+  'ReferenceError': 'ReferenceError',
+  'SyntaxError': 'SyntaxError',
+  'TypeError': 'TypeError',
+  'URIError': 'URIError',
+};
+
+const ERROR_TYPES = {
+  [ERROR_KEYS.EvalError]: EvalError,
+  [ERROR_KEYS.RangeError]: RangeError,
+  [ERROR_KEYS.ReferenceError]: ReferenceError,
+  [ERROR_KEYS.SyntaxError]: SyntaxError,
+  [ERROR_KEYS.TypeError]: TypeError,
+  [ERROR_KEYS.URIError]: URIError,
+};
 
 export const Constants = {
   Completion,
@@ -121,6 +149,7 @@ export const Constants = {
   REGEXP_TIMEOUT,
   vm,
   WORKER_CODE,
-  placeholderGet_,
-  placeholderSet_,
+  GLOBAL_TYPE,
+  ERROR_KEYS,
+  ERROR_TYPES,
 };

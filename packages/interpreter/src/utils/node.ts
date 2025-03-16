@@ -1,23 +1,4 @@
-// 绑定类中的方法
-const bindClassPrototype = (Factory, instance) => {
-  const attrs = Object.getOwnPropertyDescriptors(Factory?.prototype);
-  for (const key in attrs) {
-    const attr = instance[key];
-    if (typeof attr === 'function' && key !== 'constructor') {
-      instance[key] = instance[key].bind(instance);
-    }
-  }
-};
-
-// 增加属性
-function assignProperty<V>(obj, ...args) {
-  args?.forEach((item) => {
-    for (const name in item) {
-      obj[name] = item[name] instanceof Array ? item[name].slice() : item[name];
-    }
-  });
-  return obj as V;
-}
+import { assignProperty } from "./object";
 
 const stripLocations_ = function (node, start, end) {
   if (!node) return;
@@ -105,55 +86,6 @@ function traverseAstDeclar(node, callback) {
   return variableCache;
 }
 
-function legalArrayIndex(x) {
-  const n = x >>> 0;
-  // Array index cannot be 2^32-1, otherwise length would be 2^32.
-  // 0xffffffff is 2^32-1.
-  return (String(n) === String(x) && n !== 0xffffffff) ? n : NaN;
-};
-
-function legalArrayLength(x) {
-  const n = x >>> 0;
-  // Array length must be between 0 and 2^32-1 (inclusive).
-  return (n === Number(x)) ? n : NaN;
-};
-
-// 在原型链中查找属性
-function getPropInPrototypeChain(obj, name) {
-  while (obj !== null) {
-    if (name in obj.properties) {
-      return obj.properties[name];
-    }
-    obj = obj.proto;
-  }
-}
-
-// Is an object of a certain class?
-function isInherit(child, constructor) {
-  if (child === null || child === undefined || !constructor) {
-    return false;
-  }
-  const prototype = constructor.properties['prototype'];
-  if (child === prototype) {
-    return true;
-  }
-  // 伪类型
-  if (typeof child === 'object') {
-    let childProto = child?.proto;
-    while (childProto) {
-      if (childProto === prototype) {
-        return true;
-      }
-      childProto = childProto.proto;
-    }
-    return false;
-  }
-  // 原生js基础类型
-  if (['number', 'boolean', 'string'].includes(typeof child)) {
-    return (constructor.nativeFunc.name).toLowerCase() === typeof child;
-  }
-};
-
 // 克隆ast节点
 function cloneASTNode(ast) {
   if (!ast) return;
@@ -193,14 +125,8 @@ function isStrict(node, parentScope?) {
 }
 
 export {
-  bindClassPrototype,
-  assignProperty,
   traverseAstDeclar,
-  legalArrayIndex,
-  legalArrayLength,
-  getPropInPrototypeChain,
   stripLocations_,
-  isInherit,
   cloneASTNode,
   getStepFunctions,
   isStrict,
