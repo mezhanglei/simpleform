@@ -1,25 +1,43 @@
 
-import { Constants } from "./constants";
-import { isArray, isString } from "./utils/type";
-import { AcornNode } from "./typings";
-import { legalArrayIndex, legalArrayLength } from "./utils/array";
-import { throwException } from "./utils/error";
+import { Constants } from "../constants";
+import { legalArrayIndex, legalArrayLength } from "../utils/array";
+import { throwException } from "../utils/error";
 import {
   bindClassPrototype,
   getPropInPrototypeChain,
-  isa,
   placeholderGet_,
   placeholderSet_
-} from "./utils/object";
+} from "../utils/object";
+import ScopeConstructor from "./Scope";
+import StateConstructor from "./State";
+import Context from "../Context";
 
-// 对象构造函数
+// 类型检查
+export const typeChecker = Object.fromEntries(Object.values(Constants.GLOBAL_TYPE).map((key) => {
+  return [`is${key}`, (val) => {
+    if (val instanceof ObjectConstructor) {
+      return val.properties.name === key;
+    }
+  }];
+}));
+
+interface NativeFunc extends Function {
+  id?: number;
+}
+
+// 对象构造函数 TODO getterStep_和setterStep_
 class ObjectConstructor {
   static currentInterpreter_: unknown = null;
   static toStringCycles_: ObjectConstructor[] = [];
 
   getter: { [key: string]: () => any };
   setter: { [key: string]: (value: any) => void };
-  properties: { length: number; name?: string; message?: string };
+  properties: {
+    length: number;
+    name?: string;
+    message?: string;
+    prototype?: ObjectConstructor;
+  };
   proto: ObjectConstructor | null;
   class: string = 'Object';
   data: Date | RegExp | boolean | number | string | null = null; // 值
@@ -27,8 +45,9 @@ class ObjectConstructor {
   illegalConstructor?: boolean;
   parentScope?: ScopeConstructor;
   node?: StateConstructor['done'];
-  nativeFunc?: Function;
+  nativeFunc?: NativeFunc;
   asyncFunc?: Function;
+  eval?: boolean;
 
   constructor(proto) {
     this.getter = Object.create(null);
@@ -114,10 +133,10 @@ class ObjectConstructor {
       throw TypeError('Primitive data type has no properties');
     }
     name = String(name);
-    if (name === 'length' && isString(obj)) {
+    if (name === 'length' && typeChecker.isString(obj)) {
       return true;
     }
-    if (isString(obj)) {
+    if (typeChecker.isString(obj)) {
       const n = legalArrayIndex(name);
       if (!isNaN(n) && n < String(obj).length) {
         return true;
@@ -131,28 +150,25 @@ class ObjectConstructor {
     }
     return false;
   };
-  getProperty(name: string, script) {
-    if (script.getterStep_) {
-      throw Error('Getter not supported in that context');
-    }
+  getProperty(name: string, stateStack: Context['stateStack']) {
     name = String(name);
     let obj: ObjectConstructor | null = this;
     if (obj === undefined || obj === null) {
       throwException(Constants.ERROR_KEYS.TypeError,
-        "Cannot read property '" + name + "' of " + obj, script);
+        "Cannot read property '" + name + "' of " + obj, stateStack);
     }
     if (typeof obj === 'object' && !(obj instanceof ObjectConstructor)) {
       throw TypeError('Expecting native value or pseudo object');
     }
     if (name === 'length') {
       // Special cases for magic length property.
-      if (isString(obj)) {
+      if (typeChecker.isString(obj)) {
         return String(obj).length;
       }
     } else if (name.charCodeAt(0) < 0x40) {
       // Might have numbers in there?
       // Special cases for string array indexing
-      if (isString(obj)) {
+      if (typeChecker.isString(obj)) {
         const n = legalArrayIndex(name);
         if (!isNaN(n) && n < String(obj).length) {
           return String(obj)[n];
@@ -163,7 +179,6 @@ class ObjectConstructor {
       if (obj.properties && name in obj.properties) {
         const getter = obj.getter[name];
         if (getter) {
-          script.getterStep_ = true;
           return getter;
         }
         return obj.properties[name];
@@ -172,25 +187,21 @@ class ObjectConstructor {
     }
     return undefined;
   }
-  setProperty(name, value, opt_descriptor, script) {
+  setProperty(name, value, opt_descriptor, stateStack?: Context['stateStack']) {
     const obj = this;
-    if (script?.setterStep_) {
-      // Getter from previous call to setProperty was not handled.
-      throw Error('Setter not supported in that context');
-    }
-    const strict = !script?.stateStack || script?.getScope()?.strict;
-    if (isString(obj)) {
+    const strict = !stateStack || stateStack[stateStack.length - 1]?.scope?.strict;
+    if (typeChecker.isString(obj)) {
       const n = legalArrayIndex(name);
       if (name === 'length' || (!isNaN(n) && n < String(obj).length)) {
         // Can't set length or letters on String objects.
         if (strict) {
           throwException(Constants.ERROR_KEYS.TypeError, "Cannot assign to read only " +
-            "property '" + name + "' of String '" + obj.data + "'", script);
+            "property '" + name + "' of String '" + obj.data + "'", stateStack);
         }
         return;
       }
     }
-    if (isArray(obj)) {
+    if (typeChecker.isArray(obj)) {
       // Arrays have a magic length variable that is bound to the elements.
       const len = obj.properties.length;
       if (name === 'length') {
@@ -199,7 +210,7 @@ class ObjectConstructor {
         }
         const maxLen = legalArrayLength(opt_descriptor && 'value' in opt_descriptor ? opt_descriptor['value'] : value);
         if (isNaN(maxLen)) {
-          throwException(Constants.ERROR_KEYS.RangeError, 'Invalid array length', script);
+          throwException(Constants.ERROR_KEYS.RangeError, 'Invalid array length', stateStack);
         }
         if (maxLen < len) {
           for (let key in obj.properties) {
@@ -220,7 +231,7 @@ class ObjectConstructor {
     if (obj.preventExtensions && !(name in obj.properties)) {
       if (strict) {
         throwException(Constants.ERROR_KEYS.TypeError, "Can't add property '" + name +
-          "', object is not extensible", script);
+          "', object is not extensible", stateStack);
       }
       return;
     }
@@ -228,7 +239,7 @@ class ObjectConstructor {
       if (opt_descriptor && ('get' in opt_descriptor || 'set' in opt_descriptor) &&
         ('value' in opt_descriptor || 'writable' in opt_descriptor)) {
         throwException(Constants.ERROR_KEYS.TypeError, 'Invalid property descriptor. ' +
-          'Cannot both specify accessors and a value or writable attribute', script);
+          'Cannot both specify accessors and a value or writable attribute', stateStack);
       }
       // Define the property.
       const descriptor = {};
@@ -263,7 +274,7 @@ class ObjectConstructor {
       try {
         Object.defineProperty(obj.properties, name, descriptor);
       } catch (e) {
-        throwException(Constants.ERROR_KEYS.TypeError, 'Cannot redefine property: ' + name, script);
+        throwException(Constants.ERROR_KEYS.TypeError, 'Cannot redefine property: ' + name, stateStack);
       }
       // Now that the definition has suceeded, clean up any obsolete get/set funcs.
       if ('get' in opt_descriptor && !opt_descriptor['get']) {
@@ -288,13 +299,12 @@ class ObjectConstructor {
         }
       }
       if (defObj.setter && defObj.setter[name]) {
-        script.setterStep_ = true;
         return defObj.setter[name];
       }
       if (defObj.getter && defObj.getter[name]) {
         if (strict) {
           throwException(Constants.ERROR_KEYS.TypeError, "Cannot set property '" + name +
-            "' of object '" + obj + "' which only has a getter", script);
+            "' of object '" + obj + "' which only has a getter", stateStack);
         }
       } else {
         // No setter, simple assignment.
@@ -303,7 +313,7 @@ class ObjectConstructor {
         } catch (_e) {
           if (strict) {
             throwException(Constants.ERROR_KEYS.TypeError, "Cannot assign to read only " +
-              "property '" + name + "' of object '" + obj + "'", script);
+              "property '" + name + "' of object '" + obj + "'", stateStack);
           }
         }
       }
@@ -311,53 +321,4 @@ class ObjectConstructor {
   }
 };
 
-// 作用域构造函数
-class ScopeConstructor {
-  parentScope: ObjectConstructor;
-  strict: boolean;
-  object: ObjectConstructor;
-  constructor(parentScope, strict, object) {
-    this.parentScope = parentScope; // 父级作用域
-    this.strict = strict; // 是否严格模式
-    this.object = object; // 作用域对象
-  }
-};
-
-// state构造函数
-class StateConstructor {
-  node: AcornNode;
-  scope: ScopeConstructor;
-  done?: boolean;
-  constructor(node, scope) {
-    this.node = node;
-    this.scope = scope;
-  }
-};
-
-// 异步任务Task构造函数
-class TaskConstructor {
-  static pid = 0;
-  functionRef: unknown;
-  argsArray: unknown;
-  scope: StateConstructor['scope'];
-  node: StateConstructor['node'];
-  interval: number;
-  pid: number;
-  time: number;
-  constructor(functionRef, argsArray, scope, node, interval) {
-    this.functionRef = functionRef; // 异步函数引用
-    this.argsArray = argsArray; // 异步函数的入参
-    this.scope = scope;
-    this.node = node;
-    this.interval = interval;
-    this.pid = ++TaskConstructor.pid;
-    this.time = 0;
-  }
-};
-
-export {
-  ObjectConstructor,
-  ScopeConstructor,
-  StateConstructor,
-  TaskConstructor,
-};
+export default ObjectConstructor;

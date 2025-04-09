@@ -9,6 +9,18 @@ const bindClassPrototype = (Factory, instance) => {
   }
 };
 
+// 装饰器添加静态类型
+const addStaticProperties = <P extends Record<string, any>>(properties: P) => {
+  return function (constructor) {
+    // 类型增加静态属性
+    for (const propertyName in properties) {
+      (constructor)[propertyName] = properties[propertyName];
+    }
+    type ConstructorWithStatic = typeof constructor & P;
+    return constructor as ConstructorWithStatic;
+  };
+};
+
 // 增加属性
 function assignProperty<V>(obj, ...args) {
   args?.forEach((item) => {
@@ -61,6 +73,7 @@ const placeholderSet_ =
 
 export {
   bindClassPrototype,
+  addStaticProperties,
   assignProperty,
   isa,
   getPropInPrototypeChain,

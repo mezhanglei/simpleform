@@ -1,4 +1,5 @@
 import { assignProperty } from "./object";
+import * as acorn from 'acorn';
 
 const stripLocations_ = function (node, start, end) {
   if (!node) return;
@@ -91,7 +92,7 @@ function cloneASTNode(ast) {
   if (!ast) return;
   const nodeConstructor = ast.constructor;
   const newNode = new nodeConstructor({ 'options': {} });
-  return assignProperty(newNode, ast);
+  return assignProperty(newNode, ast) as acorn.Program;
 }
 
 // 遍历所有的step开头的函数
@@ -124,10 +125,23 @@ function isStrict(node, parentScope?) {
   return strict;
 }
 
+function parse_(code, sourceFile, options?: acorn.Options) {
+  const curOptions = assignProperty<acorn.Options>({}, options, { sourceFile });
+  return typeof code === 'string' ? acorn.parse(code, curOptions) : cloneASTNode(code);
+}
+
+function createNode(options: acorn.Options) {
+  const ast = parse_('', 'code', options);
+  const NodeConstructor = ast?.constructor as any;
+  return new NodeConstructor({ 'options': {} });
+};
+
 export {
   traverseAstDeclar,
   stripLocations_,
   cloneASTNode,
   getStepFunctions,
   isStrict,
+  parse_,
+  createNode,
 };

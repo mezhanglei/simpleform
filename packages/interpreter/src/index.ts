@@ -4,19 +4,19 @@ import {
   traverseAstDeclar,
   getStepFunctions,
   isStrict,
+  parse_,
+  createNode,
 } from './utils/node';
 import {
   isa,
   bindClassPrototype,
 } from './utils/object';
 import { Constants } from './constants';
-import {
-  StateConstructor,
-} from './constructor';
-import Context from './context';
-import polyfills from './polyfills';
+import StateConstructor from './constructor/State';
+import Context from './Context';
+import Script from './Script';
 
-export * from './context';
+export * from './Context';
 
 globalThis.acorn = acorn;
 /**
@@ -41,13 +41,13 @@ globalThis.acorn = acorn;
  */
 class Interpreter {
   static Status = Constants.Status;
-  static STEP_ERROR = Constants.STEP_ERROR;
   static SCOPE_REFERENCE = Constants.SCOPE_REFERENCE;
   static Context = Context;
   static Object = Context.Object;
   static State = StateConstructor;
 
   context: Context;
+  script: Script;
   POLYFILL_TIMEOUT = 1000;
   appendCodeNumber_ = 0;
   evalCodeNumber_ = 0;
@@ -58,157 +58,25 @@ class Interpreter {
     bindClassPrototype(Interpreter, this);
     if (typeof args?.[0] === 'string' || args?.[0]?.type === 'Program') {
       // 默认js-interpreter
-      this.context = new Interpreter.Context(args[1], this);
-      this.initPolyfill();
-      this.initCode(args[0]);
+      this.context = new Interpreter.Context(args[1]);
+      this.script = new Script(args[0], { stepFunction: this.stepFunction });
+      this.script.runInContext(this.context);
     } else {
       // 对象入参
-      this.context = new Interpreter.Context(args[0]?.initFunc, this);
-      this.initPolyfill();
-      this.initCode(args[0]?.code);
+      this.context = new Interpreter.Context(args[0]?.initFunc);
+      this.script = new Script(args[0]?.code, { stepFunction: this.stepFunction });
+      this.script.runInContext(this.context);
     }
   }
-};
 
-/**
- * set polyfill after initGlobal
- * @param {string|!Object} code Raw JavaScript text or AST.
- */
-Interpreter.prototype.initPolyfill = function () {
-  const ast = this.context.parse_(polyfills.join('\n'), 'polyfills');
-  stripLocations_(ast, undefined, undefined);
-  const state = new Interpreter.State(ast, this.context.globalScope);
-  state.done = false;
-  this.setStateStack(state.node ? [state] : []);
-  this.run();
-};
-
-/**
- * init code to the interpreter.
- * @param {string|!Object} code Raw JavaScript text or AST.
- */
-Interpreter.prototype.initCode = function (code) {
-  if (!code) return;
-  this.paused_ = false;
-  this.value = undefined;
-  const ast = this.context.parse_(code, 'code');
-  this.ast = ast;
-  this.context.globalScope.isStrict = isStrict(ast);
-  this.populateScope_(ast, this.context.globalScope);
-  const state = new Interpreter.State(ast, this.context.globalScope);
-  state.done = false;
-  // 执行栈
-  this.setStateStack(state.node ? [state] : []);
-};
-
-/**
- * Add more code to the interpreter.
- * @param {string|!Object} code Raw JavaScript text or AST.
- */
-Interpreter.prototype.appendCode = function (code) {
-  const state = this.stateStack?.[0];
-  if (!state || state.node.type !== 'Program') {
-    throw Error('Expecting original AST to start with a Program node');
+  get value() {
+    return this.script?.value;
   }
-  const ast = typeof code === 'string' ? this.context.parse_(code, 'appendCode' + (this.appendCodeNumber_++)) : code;
-  if (!ast || ast.type !== 'Program') {
-    throw Error('Expecting new AST to start with a Program node');
+
+  stepFunction(stack, state) {
+    const node = state.node;
+    return this.stepFunctions_[node.type](stack, state);
   }
-  this.populateScope_(ast, state.scope);
-  // Append the new program to the old one.
-  Array.prototype.push.apply(state.node.body, ast.body);
-  // state.node.body.variableCache_ = null;
-  state.done = false;
-};
-
-/**
- * Execute one step of the interpreter.
- * @returns {boolean} True if a step was executed, false if no more instructions.
- */
-Interpreter.prototype.step = function () {
-  var stack = this.stateStack;
-  var endTime;
-  do {
-    var state = stack[stack.length - 1];
-    if (this.paused_) {
-      // Blocked by an asynchronous function.
-      return true;
-    } else if (!state || (state.node.type === 'Program' && state.done)) {
-      if (!this.context.tasks.length) {
-        // Main program complete and no queued tasks.  We're done!
-        return false;
-      }
-      state = this.context.nextTask_((task) => {
-        var state = new Interpreter.State(task.node, task.scope);
-        if (task.functionRef) {
-          // setTimeout/setInterval with a function reference.
-          state.doneCallee_ = 2;
-          state.funcThis_ = this.context.globalScope.object;
-          state.func_ = task.functionRef;
-          state.doneArgs_ = true;
-          state.arguments_ = task.argsArray;
-        }
-        return state;
-      });
-      if (!state) {
-        // Main program complete, queued tasks, but nothing to run right now.
-        return true;
-      }
-      // Found a queued task, execute it.
-    }
-    var node = state.node;
-    // Record the interpreter in a global property so calls to toString/valueOf
-    // can execute in the proper context.
-    var oldInterpreterValue = Interpreter.Object.currentInterpreter_;
-    Interpreter.Object.currentInterpreter_ = this;
-    try {
-      var nextState = this.stepFunctions_[node.type](stack, state);
-    } catch (e) {
-      // Eat any step errors.  They have been thrown on the stack.
-      if (e !== Interpreter.STEP_ERROR) {
-        // This is a real error, either in the JS-Interpreter, or an uncaught
-        // error in the interpreted code.  Rethrow.
-        if (this.value !== e) {
-          // Uh oh.  Internal error in the JS-Interpreter.
-          this.value = undefined;
-        }
-        throw e;
-      }
-    } finally {
-      // Restore to previous value (probably null, maybe nested toString calls).
-      Interpreter.Object.currentInterpreter_ = oldInterpreterValue;
-    }
-    if (nextState) {
-      stack.push(nextState);
-    }
-    if (this.getterStep_) {
-      // Getter from this step was not handled.
-      this.value = undefined;
-      throw Error('Getter not supported in this context');
-    }
-    if (this.setterStep_) {
-      // Setter from this step was not handled.
-      this.value = undefined;
-      throw Error('Setter not supported in this context');
-    }
-    // This may be polyfill code.  Keep executing until we arrive at user code.
-    if (!endTime && !node.end) {
-      // Ideally this would be defined at the top of the function, but that
-      // wastes time if the step isn't a polyfill.
-      endTime = Date.now() + this['POLYFILL_TIMEOUT'];
-    }
-  } while (!node.end && endTime > Date.now());
-  return true;
-};
-
-/**
- * Execute the interpreter to program completion.  Vulnerable to infinite loops.
- * @returns {boolean} True if a execution is asynchronously blocked,
- *     false if no more instructions.
- */
-Interpreter.prototype.run = function () {
-  while (!this.paused_ && this.step()) { }
-  return this.paused_;
 };
 
 /**
@@ -227,10 +95,9 @@ Interpreter.prototype.createGetter_ = function (func, left) {
   // Normally `this` will be specified as the object component (o.x).
   // Sometimes `this` is explicitly provided (o).
   var funcThis = Array.isArray(left) ? left[0] : left;
-  var node = this.context.createNode();
+  var node = createNode(Context.PARSE_OPTIONS);
   node.type = 'CallExpression';
-  var state = new Interpreter.State(node,
-    this.stateStack[this.stateStack.length - 1].scope);
+  var state = new Interpreter.State(node, this.context.getScope());
   state.doneCallee_ = 2;
   state.funcThis_ = funcThis;
   state.func_ = func;
@@ -248,18 +115,19 @@ Interpreter.prototype.createGetter_ = function (func, left) {
  * @private
  */
 Interpreter.prototype.createSetter_ = function (func, left, value) {
+  const globalScope = this.context.globalScope;
   if (!this.setterStep_) {
     throw Error('Unexpected call to createSetter');
   }
   // Clear the setter flag.
   this.setterStep_ = false;
+
   // Normally `this` will be specified as the object component (o.x).
   // Sometimes `this` is implicitly the global object (x).
-  var funcThis = Array.isArray(left) ? left[0] : this.context.globalObject;
-  var node = this.context.createNode();
+  var funcThis = Array.isArray(left) ? left[0] : globalScope?.object;
+  var node = createNode(Context.PARSE_OPTIONS);
   node.type = 'CallExpression';
-  var state = new Interpreter.State(node,
-    this.stateStack[this.stateStack.length - 1].scope);
+  var state = new Interpreter.State(node, this.context.getScope());
   state.doneCallee_ = 2;
   state.funcThis_ = funcThis;
   state.func_ = func;
@@ -293,10 +161,10 @@ Interpreter.prototype.setProperty = function (obj, name, value, opt_descriptor,)
  * @returns {Interpreter.Status} One of DONE, STEP, TASK, or ASYNC.
  */
 Interpreter.prototype.getStatus = function () {
-  if (this.paused_) {
+  if (this.script.paused_) {
     return Interpreter.Status['ASYNC'];
   }
-  var stack = this.stateStack;
+  var stack = this.context.getStateStack();
   var state = stack[stack.length - 1];
   if (state && (state.node.type !== 'Program' || !state.done)) {
     // There's a step ready to execute.
@@ -314,22 +182,6 @@ Interpreter.prototype.getStatus = function () {
   return Interpreter.Status['DONE'];
 };
 
-Interpreter.prototype.getState = function () {
-  var state = this.stateStack && this.stateStack[this.stateStack.length - 1];
-  return state;
-};
-
-/**
- * Returns the current scope from the stateStack.
- */
-Interpreter.prototype.getScope = function () {
-  var scope = this.stateStack[this.stateStack.length - 1].scope;
-  if (!scope) {
-    throw Error('No scope found');
-  }
-  return scope;
-};
-
 /**
  * Retrieves a value from the scope chain.
  * @param {string} name Name of variable.
@@ -338,7 +190,8 @@ Interpreter.prototype.getScope = function () {
  *   (rather than being the value of the property).
  */
 Interpreter.prototype.getValueFromScope = function (name) {
-  var scope = this.getScope();
+  const state = this.context.getState();
+  var scope = state.scope;
   while (scope && scope !== this.context.globalScope) {
     if (name in scope.object.properties) {
       return scope.object.properties[name];
@@ -351,7 +204,7 @@ Interpreter.prototype.getValueFromScope = function (name) {
     return this.getProperty(scope.object, name);
   }
   // Typeof operator is unique: it can safely look at non-defined variables.
-  var prevNode = this.stateStack[this.stateStack.length - 1].node;
+  var prevNode = state.node;
   if (prevNode.type === 'UnaryExpression' &&
     prevNode.operator === 'typeof') {
     return undefined;
@@ -367,7 +220,7 @@ Interpreter.prototype.getValueFromScope = function (name) {
  *     needs to be called, otherwise undefined.
  */
 Interpreter.prototype.setValueToScope = function (name, value) {
-  var scope = this.getScope();
+  var scope = this.context.getScope();
   var strict = scope.strict;
   while (scope && scope !== this.context.globalScope) {
     if (name in scope.object.properties) {
@@ -506,23 +359,6 @@ Interpreter.prototype.boxThis_ = function (value) {
     return box;
   }
   return value;
-};
-
-/**
- * Return the state stack.
- * @returns {!Array<!Interpreter.State>} State stack.
- */
-Interpreter.prototype.getStateStack = function () {
-  return this.stateStack;
-};
-
-/**
- * Replace the state stack with a new one.
- * @param {!Array<!Interpreter.State>} newStack New state stack.
- */
-Interpreter.prototype.setStateStack = function (newStack) {
-  this.stateStack = newStack;
-  this.context.stateStack = newStack;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -809,13 +645,13 @@ Interpreter.prototype['stepCallExpression'] = function (stack, state) {
         state.value = code;
       } else {
         try {
-          var ast = this.context.parse_(String(code),
-            'eval' + (this.evalCodeNumber_++));
+          var ast = parse_(String(code),
+            'eval' + (this.evalCodeNumber_++), Constants.PARSE_OPTIONS);
         } catch (e) {
           // Acorn threw a SyntaxError.  Rethrow as a trappable error.
           this.context.throwException(this.context.SYNTAX_ERROR, 'Invalid code: ' + e.message);
         }
-        var evalNode = this.context.createNode();
+        var evalNode = createNode(Context.PARSE_OPTIONS);
         evalNode.type = 'EvalProgram_';
         evalNode.body = ast.body;
         stripLocations_(evalNode, node.start, node.end);
@@ -826,7 +662,7 @@ Interpreter.prototype['stepCallExpression'] = function (stack, state) {
           scope = this.context.createScope(ast, scope);
         }
         this.populateScope_(ast, scope);
-        this.value = undefined; // Default value if no code.
+        this.script.value = undefined; // Default value if no code.
         return new Interpreter.State(evalNode, scope);
       }
     } else if (func.nativeFunc) {
@@ -838,14 +674,14 @@ Interpreter.prototype['stepCallExpression'] = function (stack, state) {
       var thisInterpreter = this;
       var callback = function (value) {
         state.value = value;
-        thisInterpreter.paused_ = false;
+        thisInterpreter.script.paused_ = false;
       };
       // Force the argument lengths to match, then append the callback.
       var argLength = func.asyncFunc.length - 1;
       var argsWithCallback = state.arguments_.concat(
         new Array(argLength)).slice(0, argLength);
       argsWithCallback.push(callback);
-      this.paused_ = true;
+      this.script.paused_ = true;
       if (!state.scope.strict) {
         state.funcThis_ = this.boxThis_(state.funcThis_);
       }
@@ -900,7 +736,7 @@ Interpreter.prototype['stepConditionalExpression'] =
         return new Interpreter.State(node.alternate, state.scope);
       }
       // eval('1;if(false){2}') -> undefined
-      this.value = undefined;
+      this.script.value = undefined;
     }
     stack.pop();
     if (node.type === 'ConditionalExpression') {
@@ -966,19 +802,19 @@ Interpreter.prototype['stepEvalProgram_'] = function (stack, state) {
     return new Interpreter.State(expression, state.scope);
   }
   stack.pop();
-  stack[stack.length - 1].value = this.value;
+  stack[stack.length - 1].value = this.script.value;
 };
 
 // 表达式语句节点：独立作为一条语句的表达式
 Interpreter.prototype['stepExpressionStatement'] = function (stack, state) {
   const node = state.node;
   if (!state.done_) {
-    this.value = undefined;
+    this.script.value = undefined;
     state.done_ = true;
     return new Interpreter.State(node.expression, state.scope);
   }
   stack.pop();
-  this.value = state.node.directive ? undefined : state.value;
+  this.script.value = state.node.directive ? undefined : state.value;
 };
 
 // for...in 循环语句

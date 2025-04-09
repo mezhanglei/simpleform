@@ -17,7 +17,7 @@ const Status = {
 const PARSE_OPTIONS = {
   locations: true,
   ecmaVersion: 6, // Needed in the event a version > 0.5.0 of Acorn is used.
-};
+} as const;
 // Property descriptor of readonly properties.
 const READONLY_DESCRIPTOR = {
   'configurable': true,
@@ -101,21 +101,6 @@ const WORKER_CODE = [
   "close();",
   "};"];
 
-// 伪JS全局变量/方法
-const GLOBAL_TYPE = {
-  Function: 'Function',
-  Object: 'Object',
-  Array: 'Array',
-  String: 'String',
-  Boolean: 'Boolean',
-  Number: 'Number',
-  Date: 'Date',
-  RegExp: 'RegExp',
-  Error: 'Error',
-  Math: 'Math',
-  JSON: 'JSON'
-};
-
 const ERROR_KEYS = {
   'EvalError': 'EvalError',
   'RangeError': 'RangeError',
@@ -132,6 +117,21 @@ const ERROR_TYPES = {
   [ERROR_KEYS.SyntaxError]: SyntaxError,
   [ERROR_KEYS.TypeError]: TypeError,
   [ERROR_KEYS.URIError]: URIError,
+};
+
+// 伪JS全局变量/方法
+const GLOBAL_TYPE = {
+  Function: 'Function',
+  Object: 'Object',
+  Array: 'Array',
+  String: 'String',
+  Boolean: 'Boolean',
+  Number: 'Number',
+  Date: 'Date',
+  RegExp: 'RegExp',
+  Error: 'Error',
+  Math: 'Math',
+  JSON: 'JSON'
 };
 
 export const Constants = {

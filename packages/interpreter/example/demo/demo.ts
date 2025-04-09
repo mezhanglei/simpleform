@@ -54,7 +54,7 @@ var initFunc = function (context, globalObject) {
 // }).code;
 // console.log(transpiledCode, '转换');
 var myInterpreter = new Interpreter(script, initFunc);
-myInterpreter.run();
+// myInterpreter.run();
 // var myInterpreter = new Interpreter({ init: initFunc });
 // myInterpreter.run(transpiledCode);
 console.log(myInterpreter.value, '如果是表达式则返回值');

@@ -16,15 +16,16 @@ import {
   traverseAstDeclar,
   getStepFunctions,
   isStrict,
+  parse_,
+  createNode,
 } from './utils/node';
 import { Constants } from './constants';
 import { AcornProgram, InterpreterOtionFun } from './typings';
-import {
-  ObjectConstructor,
-  ScopeConstructor,
-  StateConstructor,
-  TaskConstructor
-} from './constructor';
+import ObjectConstructor from './constructor/Object';
+import ScopeConstructor from './constructor/Scope';
+import StateConstructor from './constructor/State';
+import TaskConstructor from './constructor/Task';
+import { throwException } from './utils/error';
 
 globalThis.acorn = acorn;
 class Context {
@@ -34,7 +35,6 @@ class Context {
   static NONENUMERABLE_DESCRIPTOR = Constants.NONENUMERABLE_DESCRIPTOR;
   static READONLY_NONENUMERABLE_DESCRIPTOR = Constants.READONLY_NONENUMERABLE_DESCRIPTOR;
   static NONCONFIGURABLE_READONLY_NONENUMERABLE_DESCRIPTOR = Constants.NONCONFIGURABLE_READONLY_NONENUMERABLE_DESCRIPTOR;
-  static VARIABLE_DESCRIPTOR = Constants.VARIABLE_DESCRIPTOR;
   static VALUE_IN_DESCRIPTOR = Constants.VALUE_IN_DESCRIPTOR;
   static REGEXP_TIMEOUT = Constants.REGEXP_TIMEOUT;
   static vm = Constants.vm;
@@ -43,54 +43,146 @@ class Context {
   static Object = ObjectConstructor;
   static Scope = ScopeConstructor;
   static Task = TaskConstructor;
+  static State = StateConstructor;
 
   globalScope?: ScopeConstructor;
   OBJECT_PROTO?: ObjectConstructor;
-  _stateStack?: StateConstructor[];
-  tasks: TaskConstructor[];
+  FUNCTION_PROTO?: ObjectConstructor;
   functionCounter_: number;
   REGEXP_MODE = 2;
   REGEXP_THREAD_TIMEOUT = 1000;
+  functionCodeNumber_ = 0;
+  initFunc: Function;
+  FUNCTION?: ObjectConstructor;
+  stateStack: StateConstructor[]; // 调用栈
+  tasks: TaskConstructor[]; // 任务队列
   taskCodeNumber_ = 0;
-  constructor(initFunc, script) {
-    this.tasks = [];
+  constructor(initFunc) {
+    this.initFunc = initFunc;
     this.functionCounter_ = 0;
+    this.stateStack = [];
+    this.tasks = [];
     bindClassPrototype(Context, this);
-    this.initGlobal(script, initFunc);
+    this.initGlobal();
   }
 
-  get stateStack() {
-    return this._stateStack;
+  setStateStack(newStack) {
+    this.stateStack = newStack;
   }
 
-  set stateStack(val) {
-    this._stateStack = val;
+  getStateStack() {
+    return this.stateStack;
   }
 
-  createScope(node?, parentScope = null) {
-    const strict = isStrict(node, parentScope);
-    const object = new Context.Object(null);
-    const scope = new Context.Scope(parentScope, strict, object);
+  getState() {
+    const state = this.stateStack && this.stateStack[this.stateStack.length - 1];
+    return state;
+  }
+
+  getScope() {
+    const state = this.getState();
+    const scope = state?.scope;
+    // if (!scope) {
+    //   throw Error('No scope found');
+    // }
     return scope;
+  }
+
+  // 添加任务
+  scheduleTask_(task, delay) {
+    task.time = Date.now() + delay;
+    // For optimum efficiency we could do a binary search and inject the task
+    // at the right spot.  But 'push' & 'sort' is just two lines of code.
+    this.tasks.push(task);
+    this.tasks.sort(function (a, b) { return a.time - b.time; });
+  }
+
+  // 删除任务
+  deleteTask_(pid) {
+    for (let i = 0; i < this.tasks.length; i++) {
+      if (this.tasks[i].pid == pid) {
+        this.tasks.splice(i, 1);
+        break;
+      }
+    }
   };
 
-  initGlobal(script, initFunc) {
+  // 下一个任务
+  nextTask_() {
+    const globalScope = this.globalScope;
+    const task = this.tasks[0];
+    if (!task || task.time > Date.now()) {
+      return null;
+    }
+    // Found a task that's due to run.
+    this.tasks.shift();
+    if (task.interval >= 0) {
+      this.scheduleTask_(task, task.interval);
+    }
+    const state = new Context.State(task.node, task.scope);
+    if (task.functionRef) {
+      // setTimeout/setInterval with a function reference.
+      state.doneCallee_ = 2;
+      state.funcThis_ = globalScope?.object;
+      state.func_ = task.functionRef;
+      state.doneArgs_ = true;
+      state.arguments_ = task.argsArray;
+    }
+    return state;
+  }
+
+  // 创建任务
+  createTask_(isInterval: boolean, args: IArguments) {
+    const globalScope = this.globalScope;
+    const parentState = this.getState();
+    const argsArray = Array.from(args);
+    const exec = argsArray.shift();
+    const delay = Math.max(Number(argsArray.shift() || 0), 0);
+    const node = createNode(Context.PARSE_OPTIONS);
+    let scope, functionRef, ast;
+
+    if ((exec instanceof Context.Object) && exec.class === 'Function') {
+      // setTimeout/setInterval with a function reference.
+      functionRef = exec;
+      node.type = 'CallExpression';
+      scope = parentState?.scope;
+    } else {
+      // setTimeout/setInterval with code string.
+      try {
+        ast = parse_(String(exec), 'taskCode' + (this.taskCodeNumber_++), Context.PARSE_OPTIONS);
+      } catch (e) {
+        // Acorn threw a SyntaxError.  Rethrow as a trappable error.
+        throwException(Constants.ERROR_KEYS.SyntaxError, 'Invalid code: ' + e?.message);
+      }
+      node.type = 'EvalProgram_';
+      node.body = ast.body;
+      // Change highlighting to encompass the string.
+      const execNode = parentState?.node?.arguments[0];
+      const execStart = execNode ? execNode.start : undefined;
+      const execEnd = execNode ? execNode.end : undefined;
+      stripLocations_(node, execStart, execEnd);
+      scope = globalScope;
+      argsArray.length = 0;
+    }
+
+    const task = new Context.Task(functionRef, argsArray, scope, node, isInterval ? delay : -1);
+    this.scheduleTask_(task, delay);
+    return task.pid;
+  };
+
+  initGlobal() {
     this.globalScope = this.createScope();
     this.OBJECT_PROTO = new Context.Object(null);
     const globalObject = this.globalScope.object;
     globalObject.proto = this.OBJECT_PROTO;
+    const thisInterpreter = this;
     // Initialize uneditable global properties.
-    this.setProperty(globalObject, 'NaN', NaN,
-      Context.NONCONFIGURABLE_READONLY_NONENUMERABLE_DESCRIPTOR);
-    this.setProperty(globalObject, 'Infinity', Infinity,
-      Context.NONCONFIGURABLE_READONLY_NONENUMERABLE_DESCRIPTOR);
-    this.setProperty(globalObject, 'undefined', undefined,
-      Context.NONCONFIGURABLE_READONLY_NONENUMERABLE_DESCRIPTOR);
-    this.setProperty(globalObject, 'window', globalObject,
-      Context.READONLY_DESCRIPTOR);
-    this.setProperty(globalObject, 'this', globalObject,
-      Context.NONCONFIGURABLE_READONLY_NONENUMERABLE_DESCRIPTOR);
-    this.setProperty(globalObject, 'self', globalObject); // Editable.
+    globalObject.setProperty('NaN', NaN, Context.NONCONFIGURABLE_READONLY_NONENUMERABLE_DESCRIPTOR);
+    globalObject.setProperty('Infinity', Infinity, Context.NONCONFIGURABLE_READONLY_NONENUMERABLE_DESCRIPTOR);
+    globalObject.setProperty('undefined', undefined, Context.NONCONFIGURABLE_READONLY_NONENUMERABLE_DESCRIPTOR);
+    globalObject.setProperty('window', globalObject, Context.READONLY_DESCRIPTOR);
+    globalObject.setProperty('this', globalObject, Context.NONCONFIGURABLE_READONLY_NONENUMERABLE_DESCRIPTOR);
+    globalObject.setProperty('self', globalObject, undefined);
 
     // Initialize global objects.
     this.initFunction(globalObject);
@@ -106,257 +198,274 @@ class Context {
     this.initJSON(globalObject);
 
     // Initialize global functions.
-    var thisInterpreter = this;
-    var wrapper;
-    var func = this.createNativeFunction(
+    // eval函数
+    const func = this.createNativeFunction(
       function (_x) { throw EvalError("Can't happen"); }, false);
     func.eval = true;
-    this.setProperty(globalObject, 'eval', func,
-      Context.NONENUMERABLE_DESCRIPTOR);
+    globalObject.setProperty('eval', func, Context.NONENUMERABLE_DESCRIPTOR);
 
-    this.setProperty(globalObject, 'parseInt',
-      this.createNativeFunction(parseInt, false),
-      Context.NONENUMERABLE_DESCRIPTOR);
-    this.setProperty(globalObject, 'parseFloat',
-      this.createNativeFunction(parseFloat, false),
-      Context.NONENUMERABLE_DESCRIPTOR);
+    // 转换判断
+    [
+      ['parseInt', parseInt],
+      ['parseFloat', parseFloat],
+      ['isNaN', isNaN],
+      ['isFinite', isFinite]
+    ].forEach(([name, val]) => {
+      globalObject.setProperty(name, this.createNativeFunction(val, false), Context.NONENUMERABLE_DESCRIPTOR);
+    });
 
-    this.setProperty(globalObject, 'isNaN',
-      this.createNativeFunction(isNaN, false),
-      Context.NONENUMERABLE_DESCRIPTOR);
-
-    this.setProperty(globalObject, 'isFinite',
-      this.createNativeFunction(isFinite, false),
-      Context.NONENUMERABLE_DESCRIPTOR);
-
-    var strFunctions = [
-      [escape, 'escape'], [unescape, 'unescape'],
-      [decodeURI, 'decodeURI'], [decodeURIComponent, 'decodeURIComponent'],
-      [encodeURI, 'encodeURI'], [encodeURIComponent, 'encodeURIComponent']
-    ];
-    for (var i = 0; i < strFunctions.length; i++) {
-      wrapper = (function (nativeFunc) {
-        return function (str) {
-          try {
-            return nativeFunc(str);
-          } catch (e) {
-            // decodeURI('%xy') will throw an error.  Catch and rethrow.
-            thisInterpreter.throwException(thisInterpreter.URI_ERROR, e.message);
-          }
-        };
-      })(strFunctions[i][0]);
-      this.setProperty(globalObject, strFunctions[i][1],
-        this.createNativeFunction(wrapper, false),
+    // 编码转码
+    [
+      ['escape', escape,], ['unescape', unescape,],
+      ['decodeURI', decodeURI,], ['decodeURIComponent', decodeURIComponent,],
+      ['encodeURI', encodeURI,], ['encodeURIComponent', encodeURIComponent,]
+    ].forEach(([name, func]) => {
+      globalObject.setProperty(name,
+        this.createNativeFunction((function (nativeFunc: Function) {
+          return function (str) {
+            try {
+              return nativeFunc(str);
+            } catch (e) {
+              // decodeURI('%xy') will throw an error.  Catch and rethrow.
+              throwException(Constants.ERROR_KEYS.URIError, e?.message);
+            }
+          };
+        })(func as Function), false),
         Context.NONENUMERABLE_DESCRIPTOR);
-    }
+    });
 
-    wrapper = function setTimeout(var_args) {
-      return thisInterpreter.createTask_(false, arguments);
-    };
-    this.setProperty(globalObject, 'setTimeout',
-      this.createNativeFunction(wrapper, false),
+    // 异步函数
+    globalObject.setProperty('setTimeout',
+      this.createNativeFunction(function setTimeout(var_args) {
+        return thisInterpreter?.createTask_(false, arguments);
+      }, false),
       Context.NONENUMERABLE_DESCRIPTOR);
-
-    wrapper = function setInterval(var_args) {
-      return thisInterpreter.createTask_(true, arguments);
-    };
-    this.setProperty(globalObject, 'setInterval',
-      this.createNativeFunction(wrapper, false),
+    globalObject.setProperty('setInterval',
+      this.createNativeFunction(function setInterval(var_args) {
+        return thisInterpreter?.createTask_(true, arguments);
+      }, false),
       Context.NONENUMERABLE_DESCRIPTOR);
-
-    wrapper = function clearTimeout(pid) {
-      thisInterpreter.deleteTask_(pid);
-    };
-    this.setProperty(globalObject, 'clearTimeout',
-      this.createNativeFunction(wrapper, false),
+    globalObject.setProperty('clearTimeout',
+      this.createNativeFunction(function clearTimeout(pid) {
+        thisInterpreter?.deleteTask_(pid);
+      }, false),
       Context.NONENUMERABLE_DESCRIPTOR);
-
-    wrapper = function clearInterval(pid) {
-      thisInterpreter.deleteTask_(pid);
-    };
-    this.setProperty(globalObject, 'clearInterval',
-      this.createNativeFunction(wrapper, false),
+    globalObject.setProperty('clearInterval',
+      this.createNativeFunction(function clearInterval(pid) {
+        thisInterpreter?.deleteTask_(pid);
+      }, false),
       Context.NONENUMERABLE_DESCRIPTOR);
-
-    // Preserve public properties from being pruned/renamed by JS compilers.
-    // Add others as needed.
-    this['OBJECT'] = this.OBJECT; this['OBJECT_PROTO'] = this.OBJECT_PROTO;
-    this['FUNCTION'] = this.FUNCTION; this['FUNCTION_PROTO'] = this.FUNCTION_PROTO;
-    this['ARRAY'] = this.ARRAY; this['ARRAY_PROTO'] = this.ARRAY_PROTO;
-    this['REGEXP'] = this.REGEXP; this['REGEXP_PROTO'] = this.REGEXP_PROTO;
-    this['DATE'] = this.DATE; this['DATE_PROTO'] = this.DATE_PROTO;
-    // Run any user-provided initialization.
-    if (initFunc) {
-      initFunc(this, this.globalScope.object);
+    if (this.initFunc) {
+      this.initFunc(this, this.globalScope.object);
     }
   };
-};
 
-/**
- * Parse JavaScript code into an AST using Acorn.
- * @param {string} code Raw JavaScript text.
- * @param {string} sourceFile Name of filename (for stack trace).
- * @returns {!Object} AST.
- * @private
- */
-Context.prototype.parse_ = function (code, sourceFile) {
-  const options = assignProperty<acorn.Options>({}, Context.PARSE_OPTIONS, { sourceFile });
-  return typeof code === 'string' ? Context.nativeGlobal.acorn.parse(code, options) : cloneASTNode(code);
-};
+  createScope(node?, parentScope = null) {
+    const strict = isStrict(node, parentScope);
+    const object = new Context.Object(null);
+    const scope = new Context.Scope(parentScope, strict, object);
+    return scope;
+  };
 
-/**
- * create new node
- */
-Context.prototype.createNode = function () {
-  const ast = Context.nativeGlobal.acorn.parse('');
-  const nodeConstructor = ast?.constructor;
-  return new nodeConstructor({ 'options': {} });
-};
+  createFunctionBase_(argumentLength: number, isConstructor: boolean) {
+    const func = new Context.Object(this.FUNCTION_PROTO);
+    const stack = this.getStateStack();
+    if (isConstructor) {
+      const proto = new Context.Object(this.OBJECT_PROTO);
+      func.setProperty('prototype', proto, Constants.NONENUMERABLE_DESCRIPTOR, stack);
+      proto.setProperty('constructor', func, Constants.NONENUMERABLE_DESCRIPTOR, stack);
+    } else {
+      func.illegalConstructor = true;
+    }
+    func.setProperty('length', argumentLength, Constants.READONLY_NONENUMERABLE_DESCRIPTOR, stack);
+    func.class = 'Function';
+    // When making changes to this function, check to see if those changes also
+    // need to be made to the creation of FUNCTION_PROTO in initFunction.
+    return func;
+  };
 
-/**
+  createNativeFunction(nativeFunc, isConstructor) {
+    const func = this.createFunctionBase_(nativeFunc.length, isConstructor);
+    func.nativeFunc = nativeFunc;
+    nativeFunc.id = this.functionCounter_++;
+    const stack = this.getStateStack();
+    func.setProperty('name', nativeFunc.name, Constants.READONLY_NONENUMERABLE_DESCRIPTOR, stack);
+    return func;
+  };
+
+  // 设置函数原型
+  setNativeFunctionPrototype(obj: ObjectConstructor, name: string, wrapper) {
+    const stack = this.getStateStack();
+    obj.properties['prototype']?.setProperty(
+      name,
+      this.createNativeFunction(wrapper, false),
+      Constants.NONENUMERABLE_DESCRIPTOR,
+      stack
+    );
+  };
+
+  // 设置函数属性
+  setNativeFunctionProperty(obj: ObjectConstructor, name: string, wrapper) {
+    const stack = this.getStateStack();
+    obj?.setProperty(name, this.createNativeFunction(wrapper, false), Context.NONENUMERABLE_DESCRIPTOR, stack);
+  };
+
+  createAsyncFunction(asyncFunc) {
+    const func = this.createFunctionBase_(asyncFunc.length, true);
+    func.asyncFunc = asyncFunc;
+    asyncFunc.id = this.functionCounter_++;
+    const stack = this.getStateStack();
+    func.setProperty('name', asyncFunc.name, Constants.READONLY_NONENUMERABLE_DESCRIPTOR, stack);
+    return func;
+  };
+
+  setAsyncFunctionPrototype(obj: ObjectConstructor, name, wrapper) {
+    const stack = this.getStateStack();
+    obj.properties['prototype']?.setProperty(
+      name,
+      this.createAsyncFunction(wrapper),
+      Constants.NONENUMERABLE_DESCRIPTOR, stack);
+  };
+
+  /**
  * Create a new special scope dictionary. Similar to createScope(), but
  * doesn't assume that the scope is for a function body.
  * This is used for 'catch' clauses, 'with' statements,
  * and named function expressions.
  */
-Context.prototype.createSpecialScope = function (parentScope, opt_object) {
-  if (!parentScope) {
-    throw Error('parentScope required');
-  }
-  var object = opt_object || new Context.Object(null);
-  return new Context.Scope(parentScope, parentScope.strict, object);
-};
-
-/**
- * Number of functions created by the interpreter.
- * @private
- */
-Context.prototype.functionCodeNumber_ = 0;
-
-/**
- * Initialize the Function class.
- * @param {!Context.Object} globalObject Global object.
- */
-Context.prototype.initFunction = function (globalObject) {
-  this.FUNCTION_PROTO = new Context.Object(this.OBJECT_PROTO);
-  var thisInterpreter = this;
-  var wrapper;
-  var identifierRegexp = /^[A-Za-z_$][\w$]*$/;
-  // Function constructor.
-  wrapper = function Function(var_args) {
-    if (arguments.length) {
-      var code = String(arguments[arguments.length - 1]);
-    } else {
-      var code = '';
+  createSpecialScope(parentScope, opt_object) {
+    if (!parentScope) {
+      throw Error('parentScope required');
     }
-    var argsStr = Array.prototype.slice.call(arguments, 0, -1).join(',').trim();
-    if (argsStr) {
-      var args = argsStr.split(/\s*,\s*/);
-      for (var i = 0; i < args.length; i++) {
-        var name = args[i];
-        if (!identifierRegexp.test(name)) {
-          thisInterpreter.throwException(thisInterpreter.SYNTAX_ERROR,
-            'Invalid function argument: ' + name);
+    const object = opt_object || new Context.Object(null);
+    return new Context.Scope(parentScope, parentScope.strict, object);
+  };
+
+  /**
+ * Create a new interpreted function.
+ */
+  createFunction(node, scope, opt_name?) {
+    const func = this.createFunctionBase_(node.params.length, true);
+    func.parentScope = scope;
+    func.node = node;
+    // Choose a name for this function.
+    // function foo() {}             -> 'foo'
+    // var bar = function() {};      -> 'bar'
+    // var bar = function foo() {};  -> 'foo'
+    // foo.bar = function() {};      -> ''
+    // var bar = new Function('');   -> 'anonymous'
+    const name = node.id ? String(node.id.name) : (opt_name || '');
+    const stack = this.getStateStack();
+    func.setProperty('name', name, Context.READONLY_NONENUMERABLE_DESCRIPTOR, stack);
+    return func;
+  };
+
+  initFunction(globalObject: ObjectConstructor) {
+    this.FUNCTION_PROTO = new Context.Object(this.OBJECT_PROTO);
+    const thisInterpreter = this;
+    const stack = this.getStateStack();
+    var wrapper;
+    const identifierRegexp = /^[A-Za-z_$][\w$]*$/;
+    // Function constructor.
+    this.FUNCTION = this.createNativeFunction(function Function(var_args) {
+      const code = arguments.length ? String(arguments[arguments.length - 1]) : '';
+      let argsStr = Array.prototype.slice.call(arguments, 0, -1).join(',').trim();
+      if (argsStr) {
+        const args = argsStr.split(/\s*,\s*/);
+        for (let i = 0; i < args.length; i++) {
+          const name = args[i];
+          if (!identifierRegexp.test(name)) {
+            throwException(Constants.ERROR_KEYS.SyntaxError, 'Invalid function argument: ' + name, stack);
+          }
+        }
+        argsStr = args.join(', ');
+      }
+      // Acorn needs to parse code in the context of a function or else `return`
+      // statements will be syntax errors.
+      let ast;
+      try {
+        ast = parse_('(function(' + argsStr + ') {' + code + '})',
+          'function' + (thisInterpreter.functionCodeNumber_++), Constants.PARSE_OPTIONS);
+      } catch (e) {
+        // Acorn threw a SyntaxError.  Rethrow as a trappable error.
+        throwException(Constants.ERROR_KEYS.SyntaxError,
+          'Invalid code: ' + e?.message, stack);
+      }
+      if (ast.body.length !== 1) {
+        // Function('a', 'return a + 6;}; {alert(1);');
+        throwException(Constants.ERROR_KEYS.SyntaxError,
+          'Invalid code in function body', stack);
+      }
+      const node = ast.body[0].expression;
+      // Note that if this constructor is called as `new Function()` the function
+      // object created by stepCallExpression and assigned to `this` is discarded.
+      // Interestingly, the scope for constructed functions is the global scope,
+      // even if they were constructed in some other scope.
+      return thisInterpreter.createFunction(node, thisInterpreter.globalScope,
+        'anonymous');
+    }, true);
+
+    // Throw away the created prototype and use the root prototype.
+    this.FUNCTION.setProperty('prototype', this.FUNCTION_PROTO, Context.NONENUMERABLE_DESCRIPTOR, stack);
+    // Configure Function.prototype.
+    this.FUNCTION_PROTO.setProperty('constructor', this.FUNCTION, Context.NONENUMERABLE_DESCRIPTOR, stack);
+    this.FUNCTION_PROTO.setProperty('length', 0, Context.READONLY_NONENUMERABLE_DESCRIPTOR, stack);
+    this.FUNCTION_PROTO.nativeFunc = function () { };
+    this.FUNCTION_PROTO.nativeFunc.id = this.functionCounter_++;
+    this.FUNCTION_PROTO.illegalConstructor = true;
+    this.FUNCTION_PROTO.class = 'Function';
+
+    this.setNativeFunctionPrototype(this.FUNCTION, 'apply', function apply_(func, thisArg, args) {
+      const state = thisInterpreter.getState();
+      if (!state) return;
+      // Rewrite the current CallExpression state to apply a different function.
+      // Note: 'func' is provided by the polyfill as a non-standard argument.
+      state.func_ = func;
+      // Assign the `this` object.
+      state.funcThis_ = thisArg;
+      // Bind any provided arguments.
+      state.arguments_ = [];
+      if (args !== null && args !== undefined) {
+        if (args instanceof Context.Object) {
+          // Convert the pseudo array of args into a native array.
+          // The pseudo array's properties object happens to be array-like.
+          state.arguments_ = Array.from(args.properties);
+        } else {
+          throwException(Constants.ERROR_KEYS.TypeError, 'CreateListFromArrayLike called on non-object', stack);
         }
       }
-      argsStr = args.join(', ');
-    }
-    // Acorn needs to parse code in the context of a function or else `return`
-    // statements will be syntax errors.
-    try {
-      var ast = thisInterpreter.parse_('(function(' + argsStr + ') {' + code + '})',
-        'function' + (thisInterpreter.functionCodeNumber_++));
-    } catch (e) {
-      // Acorn threw a SyntaxError.  Rethrow as a trappable error.
-      thisInterpreter.throwException(thisInterpreter.SYNTAX_ERROR,
-        'Invalid code: ' + e.message);
-    }
-    if (ast.body.length !== 1) {
-      // Function('a', 'return a + 6;}; {alert(1);');
-      thisInterpreter.throwException(thisInterpreter.SYNTAX_ERROR,
-        'Invalid code in function body');
-    }
-    var node = ast.body[0].expression;
-    // Note that if this constructor is called as `new Function()` the function
-    // object created by stepCallExpression and assigned to `this` is discarded.
-    // Interestingly, the scope for constructed functions is the global scope,
-    // even if they were constructed in some other scope.
-    return thisInterpreter.createFunction(node, thisInterpreter.globalScope,
-      'anonymous');
-  };
-  this.FUNCTION = this.createNativeFunction(wrapper, true);
-  // Throw away the created prototype and use the root prototype.
-  this.setProperty(this.FUNCTION, 'prototype', this.FUNCTION_PROTO,
-    Context.NONENUMERABLE_DESCRIPTOR);
+      state.doneExec_ = false;
+    });
 
-  // Configure Function.prototype.
-  this.setProperty(this.FUNCTION_PROTO, 'constructor', this.FUNCTION,
-    Context.NONENUMERABLE_DESCRIPTOR);
-  this.FUNCTION_PROTO.nativeFunc = function () { };
-  this.FUNCTION_PROTO.nativeFunc.id = this.functionCounter_++;
-  this.FUNCTION_PROTO.illegalConstructor = true;
-  this.setProperty(this.FUNCTION_PROTO, 'length', 0,
-    Context.READONLY_NONENUMERABLE_DESCRIPTOR);
-  this.FUNCTION_PROTO.class = 'Function';
-
-  wrapper = function apply_(func, thisArg, args) {
-    var state =
-      thisInterpreter._stateStack[thisInterpreter._stateStack.length - 1];
-    // Rewrite the current CallExpression state to apply a different function.
-    // Note: 'func' is provided by the polyfill as a non-standard argument.
-    state.func_ = func;
-    // Assign the `this` object.
-    state.funcThis_ = thisArg;
-    // Bind any provided arguments.
-    state.arguments_ = [];
-    if (args !== null && args !== undefined) {
-      if (args instanceof Context.Object) {
-        // Convert the pseudo array of args into a native array.
-        // The pseudo array's properties object happens to be array-like.
-        state.arguments_ = Array.from(args.properties);
-      } else {
-        thisInterpreter.throwException(thisInterpreter.TYPE_ERROR,
-          'CreateListFromArrayLike called on non-object');
+    this.setNativeFunctionPrototype(this.FUNCTION, 'call', function call(thisArg /*, var_args */) {
+      const state = thisInterpreter.getState();
+      if (!state) return;
+      // Rewrite the current CallExpression state to call a different function.
+      state.func_ = this;
+      // Assign the `this` object.
+      state.funcThis_ = thisArg;
+      // Bind any provided arguments.
+      state.arguments_ = [];
+      for (let i = 1; i < arguments.length; i++) {
+        state.arguments_.push(arguments[i]);
       }
-    }
-    state.doneExec_ = false;
-  };
-  this.setNativeFunctionPrototype(this.FUNCTION, 'apply', wrapper);
+      state.doneExec_ = false;
+    });
 
-  wrapper = function call(thisArg /*, var_args */) {
-    var state =
-      thisInterpreter._stateStack[thisInterpreter._stateStack.length - 1];
-    // Rewrite the current CallExpression state to call a different function.
-    state.func_ = this;
-    // Assign the `this` object.
-    state.funcThis_ = thisArg;
-    // Bind any provided arguments.
-    state.arguments_ = [];
-    for (var i = 1; i < arguments.length; i++) {
-      state.arguments_.push(arguments[i]);
-    }
-    state.doneExec_ = false;
+    // Function has no parent to inherit from, so it needs its own mandatory
+    // toString and valueOf functions.
+    wrapper = function toString() {
+      return String(this);
+    };
+    this.setNativeFunctionPrototype(this.FUNCTION, 'toString', wrapper);
+    this.setNativeFunctionProperty(this.FUNCTION, 'toString', wrapper);
+    wrapper = function valueOf() {
+      return this.valueOf();
+    };
+    this.setNativeFunctionPrototype(this.FUNCTION, 'valueOf', wrapper);
+    this.setNativeFunctionProperty(this.FUNCTION, 'valueOf', wrapper);
+    globalObject.setProperty('Function', this.FUNCTION, Context.NONENUMERABLE_DESCRIPTOR, stack);
   };
-  this.setNativeFunctionPrototype(this.FUNCTION, 'call', wrapper);
-
-  // Function has no parent to inherit from, so it needs its own mandatory
-  // toString and valueOf functions.
-  wrapper = function toString() {
-    return String(this);
-  };
-  this.setNativeFunctionPrototype(this.FUNCTION, 'toString', wrapper);
-  this.setProperty(this.FUNCTION, 'toString',
-    this.createNativeFunction(wrapper, false),
-    Context.NONENUMERABLE_DESCRIPTOR);
-  wrapper = function valueOf() {
-    return this.valueOf();
-  };
-  this.setNativeFunctionPrototype(this.FUNCTION, 'valueOf', wrapper);
-  this.setProperty(this.FUNCTION, 'valueOf',
-    this.createNativeFunction(wrapper, false),
-    Context.NONENUMERABLE_DESCRIPTOR);
-  this.setProperty(globalObject, 'Function', this.FUNCTION,
-    Context.NONENUMERABLE_DESCRIPTOR);
 };
 
 /**
@@ -1316,8 +1425,9 @@ Context.prototype.populateError = function (pseudoError, opt_message) {
       Context.NONENUMERABLE_DESCRIPTOR);
   }
   var tracebackData = [];
-  for (var i = this._stateStack.length - 1; i >= 0; i--) {
-    var state = this._stateStack[i];
+  const stack = this.getStateStack();
+  for (var i = stack.length - 1; i >= 0; i--) {
+    var state = stack[i];
     var node = state.node;
     if (node.type === 'CallExpression') {
       var func = state.func_;
@@ -1459,81 +1569,62 @@ Context.prototype.createArray = function () {
   return array;
 };
 
-/**
- * Create a new function object (could become interpreted or native or async).
- * @param {number} argumentLength Number of arguments.
- * @param {boolean} isConstructor True if function can be used with 'new'.
- * @returns {!Context.Object} New function.
- * @private
- */
-Context.prototype.createFunctionBase_ = function (argumentLength,
-  isConstructor) {
-  var func = new Context.Object(this.FUNCTION_PROTO);
-  if (isConstructor) {
-    var proto = new Context.Object(this.OBJECT_PROTO);
-    this.setProperty(func, 'prototype', proto,
-      Context.NONENUMERABLE_DESCRIPTOR);
-    this.setProperty(proto, 'constructor', func,
-      Context.NONENUMERABLE_DESCRIPTOR);
-  } else {
-    func.illegalConstructor = true;
-  }
-  this.setProperty(func, 'length', argumentLength,
-    Context.READONLY_NONENUMERABLE_DESCRIPTOR);
-  func.class = 'Function';
-  // When making changes to this function, check to see if those changes also
-  // need to be made to the creation of FUNCTION_PROTO in initFunction.
-  return func;
-};
+// /**
+//  * Create a new function object (could become interpreted or native or async).
+//  * @param {number} argumentLength Number of arguments.
+//  * @param {boolean} isConstructor True if function can be used with 'new'.
+//  * @returns {!Context.Object} New function.
+//  * @private
+//  */
+// Context.prototype.createFunctionBase_ = function (argumentLength,
+//   isConstructor) {
+//   var func = new Context.Object(this.FUNCTION_PROTO);
+//   if (isConstructor) {
+//     var proto = new Context.Object(this.OBJECT_PROTO);
+//     this.setProperty(func, 'prototype', proto,
+//       Context.NONENUMERABLE_DESCRIPTOR);
+//     this.setProperty(proto, 'constructor', func,
+//       Context.NONENUMERABLE_DESCRIPTOR);
+//   } else {
+//     func.illegalConstructor = true;
+//   }
+//   this.setProperty(func, 'length', argumentLength,
+//     Context.READONLY_NONENUMERABLE_DESCRIPTOR);
+//   func.class = 'Function';
+//   // When making changes to this function, check to see if those changes also
+//   // need to be made to the creation of FUNCTION_PROTO in initFunction.
+//   return func;
+// };
 
-/**
- * Create a new interpreted function.
- */
-Context.prototype.createFunction = function (node, scope, opt_name) {
-  var func = this.createFunctionBase_(node.params.length, true);
-  func.parentScope = scope;
-  func.node = node;
-  // Choose a name for this function.
-  // function foo() {}             -> 'foo'
-  // var bar = function() {};      -> 'bar'
-  // var bar = function foo() {};  -> 'foo'
-  // foo.bar = function() {};      -> ''
-  // var bar = new Function('');   -> 'anonymous'
-  var name = node.id ? String(node.id.name) : (opt_name || '');
-  this.setProperty(func, 'name', name,
-    Context.READONLY_NONENUMERABLE_DESCRIPTOR);
-  return func;
-};
+// /**
+//  * Create a new native function.
+//  * @param {!Function} nativeFunc JavaScript function.
+//  * @param {boolean} isConstructor True if function can be used with 'new'.
+//  * @returns {!Context.Object} New function.
+//  */
+// Context.prototype.createNativeFunction = function (nativeFunc,
+//   isConstructor) {
+//   var func = this.createFunctionBase_(nativeFunc.length, isConstructor);
+//   func.nativeFunc = nativeFunc;
+//   nativeFunc.id = this.functionCounter_++;
+//   this.setProperty(func, 'name', nativeFunc.name,
+//     Context.READONLY_NONENUMERABLE_DESCRIPTOR);
+//   return func;
+// };
 
-/**
- * Create a new native function.
- * @param {!Function} nativeFunc JavaScript function.
- * @param {boolean} isConstructor True if function can be used with 'new'.
- * @returns {!Context.Object} New function.
- */
-Context.prototype.createNativeFunction = function (nativeFunc,
-  isConstructor) {
-  var func = this.createFunctionBase_(nativeFunc.length, isConstructor);
-  func.nativeFunc = nativeFunc;
-  nativeFunc.id = this.functionCounter_++;
-  this.setProperty(func, 'name', nativeFunc.name,
-    Context.READONLY_NONENUMERABLE_DESCRIPTOR);
-  return func;
-};
-
-/**
- * Create a new native asynchronous function.
- * @param {!Function} asyncFunc JavaScript function.
- * @returns {!Context.Object} New function.
- */
-Context.prototype.createAsyncFunction = function (asyncFunc) {
-  var func = this.createFunctionBase_(asyncFunc.length, true);
-  func.asyncFunc = asyncFunc;
-  asyncFunc.id = this.functionCounter_++;
-  this.setProperty(func, 'name', asyncFunc.name,
-    Context.READONLY_NONENUMERABLE_DESCRIPTOR);
-  return func;
-};
+// /**
+//  * Create a new native asynchronous function.
+//  * @param {!Function} asyncFunc JavaScript function.
+//  * @returns {!Context.Object} New function.
+//  */
+// Context.prototype.createAsyncFunction = function (asyncFunc) {
+//   var func = this.createFunctionBase_(asyncFunc.length, true);
+//   func.asyncFunc = asyncFunc;
+//   asyncFunc.id = this.functionCounter_++;
+//   this.setProperty(func, 'name', asyncFunc.name,
+//     Context.READONLY_NONENUMERABLE_DESCRIPTOR);
+//   return func;
+// };
 
 /**
  * Converts from a native JavaScript object or value to a JS-Context object.
@@ -1800,7 +1891,8 @@ Context.prototype.hasProperty = function (obj, name) {
  */
 Context.prototype.setProperty = function (obj, name, value, opt_descriptor, emitSetter?) {
   name = String(name);
-  const strict = !this._stateStack || this._stateStack[this._stateStack.length - 1].scope;
+  const stack = this.getStateStack();
+  const strict = !stack || stack[stack.length - 1]?.scope?.strict;
   if (obj === undefined || obj === null) {
     this.throwException(this.TYPE_ERROR,
       "Cannot set property '" + name + "' of " + obj);
@@ -1946,40 +2038,41 @@ Context.prototype.setProperty = function (obj, name, value, opt_descriptor, emit
   }
 };
 
-/**
- * Convenience method for adding a native function as a non-enumerable property
- * onto an object's prototype.
- * @param {!Context.Object} obj Data object.
- * @param {Context.Value} name Name of property.
- * @param {!Function} wrapper Function object.
- */
-Context.prototype.setNativeFunctionPrototype =
-  function (obj, name, wrapper) {
-    this.setProperty(obj.properties['prototype'], name,
-      this.createNativeFunction(wrapper, false),
-      Context.NONENUMERABLE_DESCRIPTOR);
-  };
+// /**
+//  * Convenience method for adding a native function as a non-enumerable property
+//  * onto an object's prototype.
+//  * @param {!Context.Object} obj Data object.
+//  * @param {Context.Value} name Name of property.
+//  * @param {!Function} wrapper Function object.
+//  */
+// Context.prototype.setNativeFunctionPrototype =
+//   function (obj, name, wrapper) {
+//     this.setProperty(obj.properties['prototype'], name,
+//       this.createNativeFunction(wrapper, false),
+//       Context.NONENUMERABLE_DESCRIPTOR);
+//   };
 
-/**
- * Convenience method for adding an async function as a non-enumerable property
- * onto an object's prototype.
- * @param {!Context.Object} obj Data object.
- * @param {Context.Value} name Name of property.
- * @param {!Function} wrapper Function object.
- */
-Context.prototype.setAsyncFunctionPrototype =
-  function (obj, name, wrapper) {
-    this.setProperty(obj.properties['prototype'], name,
-      this.createAsyncFunction(wrapper),
-      Context.NONENUMERABLE_DESCRIPTOR);
-  };
+// /**
+//  * Convenience method for adding an async function as a non-enumerable property
+//  * onto an object's prototype.
+//  * @param {!Context.Object} obj Data object.
+//  * @param {Context.Value} name Name of property.
+//  * @param {!Function} wrapper Function object.
+//  */
+// Context.prototype.setAsyncFunctionPrototype =
+//   function (obj, name, wrapper) {
+//     this.setProperty(obj.properties['prototype'], name,
+//       this.createAsyncFunction(wrapper),
+//       Context.NONENUMERABLE_DESCRIPTOR);
+//   };
 
 /**
  * Is the current state directly being called with as a construction with 'new'.
  * @returns {boolean} True if 'new foo()', false if 'foo()'.
  */
 Context.prototype.calledWithNew = function () {
-  return this._stateStack[this._stateStack.length - 1].isConstructor;
+  const state = this.getState();
+  return state?.isConstructor;
 };
 
 /**
@@ -2022,7 +2115,7 @@ Context.prototype.unwind = function (type, value, label) {
     throw TypeError('Should not unwind for NORMAL completions');
   }
 
-  loop: for (var stack = this._stateStack; stack.length > 0; stack.pop()) {
+  loop: for (var stack = this.getStateStack(); stack.length > 0; stack.pop()) {
     var state = stack[stack.length - 1];
     switch (state.node.type) {
       case 'TryStatement':
@@ -2044,7 +2137,6 @@ Context.prototype.unwind = function (type, value, label) {
           // this can happen if a setTimeout/setInterval task returns.
           return;
         }
-        // Don't pop the _stateStack.
         // Leave the root scope on the tree in case the program is appended to.
         state.done = true;
         break loop;
@@ -2089,95 +2181,6 @@ Context.prototype.unwind = function (type, value, label) {
 };
 
 /**
- * Create a new queued task.
- * @param {boolean} isInterval True if setInterval, false if setTimeout.
- * @param {!Arguments} args Arguments from setInterval and setTimeout.
- *     [code, delay]
- *     [functionRef, delay, param1, param2, param3, ...]
- * @returns {number} PID of new task.
- * @private
- */
-Context.prototype.createTask_ = function (isInterval, args) {
-  var parentState = this._stateStack[this._stateStack.length - 1];
-  var argsArray = Array.from(args);
-  var exec = argsArray.shift();
-  var delay = Math.max(Number(argsArray.shift() || 0), 0);
-  var node = this.createNode();
-  var scope, functionRef, ast;
-
-  if ((exec instanceof Context.Object) && exec.class === 'Function') {
-    // setTimeout/setInterval with a function reference.
-    functionRef = exec;
-    node.type = 'CallExpression';
-    scope = parentState.scope;
-  } else {
-    // setTimeout/setInterval with code string.
-    try {
-      ast = this.parse_(String(exec), 'taskCode' + (this.taskCodeNumber_++));
-    } catch (e) {
-      // Acorn threw a SyntaxError.  Rethrow as a trappable error.
-      this.throwException(this.SYNTAX_ERROR, 'Invalid code: ' + e.message);
-    }
-    node.type = 'EvalProgram_';
-    node.body = ast.body;
-    // Change highlighting to encompass the string.
-    var execNode = parentState.node.arguments[0];
-    var execStart = execNode ? execNode.start : undefined;
-    var execEnd = execNode ? execNode.end : undefined;
-    stripLocations_(node, execStart, execEnd);
-    scope = this.globalScope;
-    argsArray.length = 0;
-  }
-
-  var task = new Context.Task(functionRef, argsArray, scope, node,
-    isInterval ? delay : -1);
-  this.scheduleTask_(task, delay);
-  return task.pid;
-};
-
-/**
- * Schedule a task to execute at some time in the future.
- */
-Context.prototype.scheduleTask_ = function (task, delay) {
-  task.time = Date.now() + delay;
-  // For optimum efficiency we could do a binary search and inject the task
-  // at the right spot.  But 'push' & 'sort' is just two lines of code.
-  this.tasks.push(task);
-  this.tasks.sort(function (a, b) { return a.time - b.time; });
-};
-
-/**
- * Delete a queued task.
- * @param {number} pid PID of task to delete.
- * @private
- */
-Context.prototype.deleteTask_ = function (pid) {
-  for (var i = 0; i < this.tasks.length; i++) {
-    if (this.tasks[i].pid == pid) {
-      this.tasks.splice(i, 1);
-      break;
-    }
-  }
-};
-
-/**
- * Find the next queued task that's due to run.
- * @private
- */
-Context.prototype.nextTask_ = function (cb) {
-  var task = this.tasks[0];
-  if (!task || task.time > Date.now()) {
-    return null;
-  }
-  // Found a task that's due to run.
-  this.tasks.shift();
-  if (task.interval >= 0) {
-    this.scheduleTask_(task, task.interval);
-  }
-  return cb(task);
-};
-
-/**
  * Return the global scope object.
  */
 Context.prototype.getGlobalScope = function () {
@@ -2189,7 +2192,8 @@ Context.prototype.getGlobalScope = function () {
  */
 Context.prototype.setGlobalScope = function (newScope) {
   this.globalScope = newScope;
-  this._stateStack[0].scope = newScope;
+  const stack = this.getStateStack();
+  stack[0].scope = newScope;
 };
 
 export default Context;

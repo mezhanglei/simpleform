@@ -97,7 +97,7 @@ export const ItemCore = (props: ItemCoreProps) => {
     if (!isValidFormName(currentPath) || !form) return;
     // 回填初始值
     const initValue = initialValue === undefined ? deepGet(initialValues, currentPath) : initialValue;
-    if (initValue !== undefined) {
+    if (!isEmpty(initValue)) {
       form.setInitialValue(currentPath, initValue);
     }
     onFieldsMounted && onFieldsMounted({ name: currentPath, value: initValue }, form?.getFieldValue());

@@ -1,13 +1,14 @@
 import { Constants } from "../constants";
 import { AcornSourceLocation } from "../typings";
+import Context from "../Context";
 
 // 抛出错误
-function throwException(errorName: string, opt_message: string, script) {
+function throwException(errorName: string, opt_message: string, stateStack?: Context['stateStack']) {
   const name = String(errorName);
   const message = String(opt_message);
   const errorConstructor = Constants.ERROR_TYPES[name] || Error;
   const realError = errorConstructor(message);
-  realError.stack = getStackError(errorName, opt_message, script);
+  realError.stack = getStackError(errorName, opt_message, stateStack);
   // // Overwrite the previous (more or less random) interpreter return value.
   // // Replace it with the error.
   // this.value = realError;
@@ -15,9 +16,9 @@ function throwException(errorName: string, opt_message: string, script) {
 }
 
 // 返回调用栈的信息
-const getStackError = (name: string, opt_message: string, script?) => {
+const getStackError = (name: string, opt_message: string, stateStack?: Context['stateStack']) => {
   const tracebackData: Array<{ datumName?: string; datumLoc: AcornSourceLocation }> = [];
-  const stack = script?.stateStack || [];
+  const stack = stateStack || [];
   for (let i = stack.length - 1; i >= 0; i--) {
     const state = stack[i];
     const node = state.node;
