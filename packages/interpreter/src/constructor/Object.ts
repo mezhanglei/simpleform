@@ -43,11 +43,11 @@ class ObjectConstructor {
   data: Date | RegExp | boolean | number | string | null = null; // 值
   preventExtensions?: boolean;
   illegalConstructor?: boolean;
-  parentScope?: ScopeConstructor;
-  node?: StateConstructor['done'];
-  nativeFunc?: NativeFunc;
-  asyncFunc?: Function;
-  eval?: boolean;
+  parentScope?: ScopeConstructor; // 父作用域
+  node?: StateConstructor['node']; // ast节点
+  nativeFunc?: NativeFunc; // 原生函数
+  asyncFunc?: Function; // 原生异步函数
+  eval?: boolean; // 是否为eval函数
 
   constructor(proto) {
     this.getter = Object.create(null);
@@ -150,7 +150,7 @@ class ObjectConstructor {
     }
     return false;
   };
-  getProperty(name: string, stateStack: Context['stateStack']) {
+  getProperty(name: string, stateStack?: Context['stateStack']) {
     name = String(name);
     let obj: ObjectConstructor | null = this;
     if (obj === undefined || obj === null) {

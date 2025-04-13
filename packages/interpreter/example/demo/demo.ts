@@ -15,6 +15,7 @@ const script = `
  console.log("Sum:", sum);
  console.log("Random Value:", randomValue);
  console.log("Current Year:", currentYear);
+ console.log("toString:", sum.toString());
 alert("111")
  // 条件语句
  if (sum > 7) {

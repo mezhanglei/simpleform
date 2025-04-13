@@ -26,6 +26,9 @@ import ScopeConstructor from './constructor/Scope';
 import StateConstructor from './constructor/State';
 import TaskConstructor from './constructor/Task';
 import { throwException } from './utils/error';
+import initFunction from './JSValue/Function';
+import { createScope } from './utils/scope';
+import GlobalObject from './JSValue/globalObject';
 
 globalThis.acorn = acorn;
 class Context {
@@ -45,13 +48,10 @@ class Context {
   static Task = TaskConstructor;
   static State = StateConstructor;
 
-  globalScope?: ScopeConstructor;
+  globalScope?: ScopeConstructor<GlobalObject>;
   OBJECT_PROTO?: ObjectConstructor;
-  FUNCTION_PROTO?: ObjectConstructor;
-  functionCounter_: number;
   REGEXP_MODE = 2;
   REGEXP_THREAD_TIMEOUT = 1000;
-  functionCodeNumber_ = 0;
   initFunc: Function;
   FUNCTION?: ObjectConstructor;
   stateStack: StateConstructor[]; // 调用栈
@@ -59,7 +59,6 @@ class Context {
   taskCodeNumber_ = 0;
   constructor(initFunc) {
     this.initFunc = initFunc;
-    this.functionCounter_ = 0;
     this.stateStack = [];
     this.tasks = [];
     bindClassPrototype(Context, this);
@@ -171,10 +170,12 @@ class Context {
   };
 
   initGlobal() {
-    this.globalScope = this.createScope();
-    this.OBJECT_PROTO = new Context.Object(null);
-    const globalObject = this.globalScope.object;
-    globalObject.proto = this.OBJECT_PROTO;
+    this.globalScope = createScope();
+    const globalObject = new GlobalObject(null);
+    this.globalScope.object = globalObject;
+    this.OBJECT_PROTO = globalObject.proto;
+    // this.OBJECT_PROTO = new Context.Object(null);
+    // globalObject.proto = this.OBJECT_PROTO;
     const thisInterpreter = this;
     // Initialize uneditable global properties.
     globalObject.setProperty('NaN', NaN, Context.NONCONFIGURABLE_READONLY_NONENUMERABLE_DESCRIPTOR);
@@ -185,7 +186,7 @@ class Context {
     globalObject.setProperty('self', globalObject, undefined);
 
     // Initialize global objects.
-    this.initFunction(globalObject);
+    this.FUNCTION = initFunction(globalObject, this);
     this.initObject(globalObject);
     this.initArray(globalObject);
     this.initString(globalObject);
@@ -199,7 +200,7 @@ class Context {
 
     // Initialize global functions.
     // eval函数
-    const func = this.createNativeFunction(
+    const func = globalObject.createNativeFunction(
       function (_x) { throw EvalError("Can't happen"); }, false);
     func.eval = true;
     globalObject.setProperty('eval', func, Context.NONENUMERABLE_DESCRIPTOR);
@@ -211,7 +212,7 @@ class Context {
       ['isNaN', isNaN],
       ['isFinite', isFinite]
     ].forEach(([name, val]) => {
-      globalObject.setProperty(name, this.createNativeFunction(val, false), Context.NONENUMERABLE_DESCRIPTOR);
+      globalObject.setProperty(name, globalObject.createNativeFunction(val, false), Context.NONENUMERABLE_DESCRIPTOR);
     });
 
     // 编码转码
@@ -221,7 +222,7 @@ class Context {
       ['encodeURI', encodeURI,], ['encodeURIComponent', encodeURIComponent,]
     ].forEach(([name, func]) => {
       globalObject.setProperty(name,
-        this.createNativeFunction((function (nativeFunc: Function) {
+        globalObject.createNativeFunction((function (nativeFunc: Function) {
           return function (str) {
             try {
               return nativeFunc(str);
@@ -236,235 +237,28 @@ class Context {
 
     // 异步函数
     globalObject.setProperty('setTimeout',
-      this.createNativeFunction(function setTimeout(var_args) {
+      globalObject.createNativeFunction(function setTimeout(var_args) {
         return thisInterpreter?.createTask_(false, arguments);
       }, false),
       Context.NONENUMERABLE_DESCRIPTOR);
     globalObject.setProperty('setInterval',
-      this.createNativeFunction(function setInterval(var_args) {
+      globalObject.createNativeFunction(function setInterval(var_args) {
         return thisInterpreter?.createTask_(true, arguments);
       }, false),
       Context.NONENUMERABLE_DESCRIPTOR);
     globalObject.setProperty('clearTimeout',
-      this.createNativeFunction(function clearTimeout(pid) {
+      globalObject.createNativeFunction(function clearTimeout(pid) {
         thisInterpreter?.deleteTask_(pid);
       }, false),
       Context.NONENUMERABLE_DESCRIPTOR);
     globalObject.setProperty('clearInterval',
-      this.createNativeFunction(function clearInterval(pid) {
+      globalObject.createNativeFunction(function clearInterval(pid) {
         thisInterpreter?.deleteTask_(pid);
       }, false),
       Context.NONENUMERABLE_DESCRIPTOR);
     if (this.initFunc) {
       this.initFunc(this, this.globalScope.object);
     }
-  };
-
-  createScope(node?, parentScope = null) {
-    const strict = isStrict(node, parentScope);
-    const object = new Context.Object(null);
-    const scope = new Context.Scope(parentScope, strict, object);
-    return scope;
-  };
-
-  createFunctionBase_(argumentLength: number, isConstructor: boolean) {
-    const func = new Context.Object(this.FUNCTION_PROTO);
-    const stack = this.getStateStack();
-    if (isConstructor) {
-      const proto = new Context.Object(this.OBJECT_PROTO);
-      func.setProperty('prototype', proto, Constants.NONENUMERABLE_DESCRIPTOR, stack);
-      proto.setProperty('constructor', func, Constants.NONENUMERABLE_DESCRIPTOR, stack);
-    } else {
-      func.illegalConstructor = true;
-    }
-    func.setProperty('length', argumentLength, Constants.READONLY_NONENUMERABLE_DESCRIPTOR, stack);
-    func.class = 'Function';
-    // When making changes to this function, check to see if those changes also
-    // need to be made to the creation of FUNCTION_PROTO in initFunction.
-    return func;
-  };
-
-  createNativeFunction(nativeFunc, isConstructor) {
-    const func = this.createFunctionBase_(nativeFunc.length, isConstructor);
-    func.nativeFunc = nativeFunc;
-    nativeFunc.id = this.functionCounter_++;
-    const stack = this.getStateStack();
-    func.setProperty('name', nativeFunc.name, Constants.READONLY_NONENUMERABLE_DESCRIPTOR, stack);
-    return func;
-  };
-
-  // 设置函数原型
-  setNativeFunctionPrototype(obj: ObjectConstructor, name: string, wrapper) {
-    const stack = this.getStateStack();
-    obj.properties['prototype']?.setProperty(
-      name,
-      this.createNativeFunction(wrapper, false),
-      Constants.NONENUMERABLE_DESCRIPTOR,
-      stack
-    );
-  };
-
-  // 设置函数属性
-  setNativeFunctionProperty(obj: ObjectConstructor, name: string, wrapper) {
-    const stack = this.getStateStack();
-    obj?.setProperty(name, this.createNativeFunction(wrapper, false), Context.NONENUMERABLE_DESCRIPTOR, stack);
-  };
-
-  createAsyncFunction(asyncFunc) {
-    const func = this.createFunctionBase_(asyncFunc.length, true);
-    func.asyncFunc = asyncFunc;
-    asyncFunc.id = this.functionCounter_++;
-    const stack = this.getStateStack();
-    func.setProperty('name', asyncFunc.name, Constants.READONLY_NONENUMERABLE_DESCRIPTOR, stack);
-    return func;
-  };
-
-  setAsyncFunctionPrototype(obj: ObjectConstructor, name, wrapper) {
-    const stack = this.getStateStack();
-    obj.properties['prototype']?.setProperty(
-      name,
-      this.createAsyncFunction(wrapper),
-      Constants.NONENUMERABLE_DESCRIPTOR, stack);
-  };
-
-  /**
- * Create a new special scope dictionary. Similar to createScope(), but
- * doesn't assume that the scope is for a function body.
- * This is used for 'catch' clauses, 'with' statements,
- * and named function expressions.
- */
-  createSpecialScope(parentScope, opt_object) {
-    if (!parentScope) {
-      throw Error('parentScope required');
-    }
-    const object = opt_object || new Context.Object(null);
-    return new Context.Scope(parentScope, parentScope.strict, object);
-  };
-
-  /**
- * Create a new interpreted function.
- */
-  createFunction(node, scope, opt_name?) {
-    const func = this.createFunctionBase_(node.params.length, true);
-    func.parentScope = scope;
-    func.node = node;
-    // Choose a name for this function.
-    // function foo() {}             -> 'foo'
-    // var bar = function() {};      -> 'bar'
-    // var bar = function foo() {};  -> 'foo'
-    // foo.bar = function() {};      -> ''
-    // var bar = new Function('');   -> 'anonymous'
-    const name = node.id ? String(node.id.name) : (opt_name || '');
-    const stack = this.getStateStack();
-    func.setProperty('name', name, Context.READONLY_NONENUMERABLE_DESCRIPTOR, stack);
-    return func;
-  };
-
-  initFunction(globalObject: ObjectConstructor) {
-    this.FUNCTION_PROTO = new Context.Object(this.OBJECT_PROTO);
-    const thisInterpreter = this;
-    const stack = this.getStateStack();
-    var wrapper;
-    const identifierRegexp = /^[A-Za-z_$][\w$]*$/;
-    // Function constructor.
-    this.FUNCTION = this.createNativeFunction(function Function(var_args) {
-      const code = arguments.length ? String(arguments[arguments.length - 1]) : '';
-      let argsStr = Array.prototype.slice.call(arguments, 0, -1).join(',').trim();
-      if (argsStr) {
-        const args = argsStr.split(/\s*,\s*/);
-        for (let i = 0; i < args.length; i++) {
-          const name = args[i];
-          if (!identifierRegexp.test(name)) {
-            throwException(Constants.ERROR_KEYS.SyntaxError, 'Invalid function argument: ' + name, stack);
-          }
-        }
-        argsStr = args.join(', ');
-      }
-      // Acorn needs to parse code in the context of a function or else `return`
-      // statements will be syntax errors.
-      let ast;
-      try {
-        ast = parse_('(function(' + argsStr + ') {' + code + '})',
-          'function' + (thisInterpreter.functionCodeNumber_++), Constants.PARSE_OPTIONS);
-      } catch (e) {
-        // Acorn threw a SyntaxError.  Rethrow as a trappable error.
-        throwException(Constants.ERROR_KEYS.SyntaxError,
-          'Invalid code: ' + e?.message, stack);
-      }
-      if (ast.body.length !== 1) {
-        // Function('a', 'return a + 6;}; {alert(1);');
-        throwException(Constants.ERROR_KEYS.SyntaxError,
-          'Invalid code in function body', stack);
-      }
-      const node = ast.body[0].expression;
-      // Note that if this constructor is called as `new Function()` the function
-      // object created by stepCallExpression and assigned to `this` is discarded.
-      // Interestingly, the scope for constructed functions is the global scope,
-      // even if they were constructed in some other scope.
-      return thisInterpreter.createFunction(node, thisInterpreter.globalScope,
-        'anonymous');
-    }, true);
-
-    // Throw away the created prototype and use the root prototype.
-    this.FUNCTION.setProperty('prototype', this.FUNCTION_PROTO, Context.NONENUMERABLE_DESCRIPTOR, stack);
-    // Configure Function.prototype.
-    this.FUNCTION_PROTO.setProperty('constructor', this.FUNCTION, Context.NONENUMERABLE_DESCRIPTOR, stack);
-    this.FUNCTION_PROTO.setProperty('length', 0, Context.READONLY_NONENUMERABLE_DESCRIPTOR, stack);
-    this.FUNCTION_PROTO.nativeFunc = function () { };
-    this.FUNCTION_PROTO.nativeFunc.id = this.functionCounter_++;
-    this.FUNCTION_PROTO.illegalConstructor = true;
-    this.FUNCTION_PROTO.class = 'Function';
-
-    this.setNativeFunctionPrototype(this.FUNCTION, 'apply', function apply_(func, thisArg, args) {
-      const state = thisInterpreter.getState();
-      if (!state) return;
-      // Rewrite the current CallExpression state to apply a different function.
-      // Note: 'func' is provided by the polyfill as a non-standard argument.
-      state.func_ = func;
-      // Assign the `this` object.
-      state.funcThis_ = thisArg;
-      // Bind any provided arguments.
-      state.arguments_ = [];
-      if (args !== null && args !== undefined) {
-        if (args instanceof Context.Object) {
-          // Convert the pseudo array of args into a native array.
-          // The pseudo array's properties object happens to be array-like.
-          state.arguments_ = Array.from(args.properties);
-        } else {
-          throwException(Constants.ERROR_KEYS.TypeError, 'CreateListFromArrayLike called on non-object', stack);
-        }
-      }
-      state.doneExec_ = false;
-    });
-
-    this.setNativeFunctionPrototype(this.FUNCTION, 'call', function call(thisArg /*, var_args */) {
-      const state = thisInterpreter.getState();
-      if (!state) return;
-      // Rewrite the current CallExpression state to call a different function.
-      state.func_ = this;
-      // Assign the `this` object.
-      state.funcThis_ = thisArg;
-      // Bind any provided arguments.
-      state.arguments_ = [];
-      for (let i = 1; i < arguments.length; i++) {
-        state.arguments_.push(arguments[i]);
-      }
-      state.doneExec_ = false;
-    });
-
-    // Function has no parent to inherit from, so it needs its own mandatory
-    // toString and valueOf functions.
-    wrapper = function toString() {
-      return String(this);
-    };
-    this.setNativeFunctionPrototype(this.FUNCTION, 'toString', wrapper);
-    this.setNativeFunctionProperty(this.FUNCTION, 'toString', wrapper);
-    wrapper = function valueOf() {
-      return this.valueOf();
-    };
-    this.setNativeFunctionPrototype(this.FUNCTION, 'valueOf', wrapper);
-    this.setNativeFunctionProperty(this.FUNCTION, 'valueOf', wrapper);
-    globalObject.setProperty('Function', this.FUNCTION, Context.NONENUMERABLE_DESCRIPTOR, stack);
   };
 };
 
@@ -497,7 +291,7 @@ Context.prototype.initObject = function (globalObject) {
     // Return the provided object.
     return value;
   };
-  this.OBJECT = this.createNativeFunction(wrapper, true);
+  this.OBJECT = globalObject.createNativeFunction(wrapper, true);
   // Throw away the created prototype and use the root prototype.
   this.setProperty(this.OBJECT, 'prototype', this.OBJECT_PROTO,
     Context.NONENUMERABLE_DESCRIPTOR);
@@ -525,7 +319,7 @@ Context.prototype.initObject = function (globalObject) {
     return thisInterpreter.nativeToPseudo(Object.getOwnPropertyNames(props));
   };
   this.setProperty(this.OBJECT, 'getOwnPropertyNames',
-    this.createNativeFunction(wrapper, false),
+    globalObject.createNativeFunction(wrapper, false),
     Context.NONENUMERABLE_DESCRIPTOR);
 
   wrapper = function keys(obj) {
@@ -536,7 +330,7 @@ Context.prototype.initObject = function (globalObject) {
     return thisInterpreter.nativeToPseudo(Object.keys(obj));
   };
   this.setProperty(this.OBJECT, 'keys',
-    this.createNativeFunction(wrapper, false),
+    globalObject.createNativeFunction(wrapper, false),
     Context.NONENUMERABLE_DESCRIPTOR);
 
   wrapper = function create_(proto) {
@@ -551,7 +345,7 @@ Context.prototype.initObject = function (globalObject) {
     return new Context.Object(proto);
   };
   this.setProperty(this.OBJECT, 'create',
-    this.createNativeFunction(wrapper, false),
+    globalObject.createNativeFunction(wrapper, false),
     Context.NONENUMERABLE_DESCRIPTOR);
 
   wrapper = function defineProperty(obj, prop, descriptor) {
@@ -575,7 +369,7 @@ Context.prototype.initObject = function (globalObject) {
     return obj;
   };
   this.setProperty(this.OBJECT, 'defineProperty',
-    this.createNativeFunction(wrapper, false),
+    globalObject.createNativeFunction(wrapper, false),
     Context.NONENUMERABLE_DESCRIPTOR);
 
   wrapper = function getOwnPropertyDescriptor(obj, prop) {
@@ -609,7 +403,7 @@ Context.prototype.initObject = function (globalObject) {
     return pseudoDescriptor;
   };
   this.setProperty(this.OBJECT, 'getOwnPropertyDescriptor',
-    this.createNativeFunction(wrapper, false),
+    globalObject.createNativeFunction(wrapper, false),
     Context.NONENUMERABLE_DESCRIPTOR);
 
   wrapper = function getPrototypeOf(obj) {
@@ -617,14 +411,14 @@ Context.prototype.initObject = function (globalObject) {
     return thisInterpreter.getPrototype(obj);
   };
   this.setProperty(this.OBJECT, 'getPrototypeOf',
-    this.createNativeFunction(wrapper, false),
+    globalObject.createNativeFunction(wrapper, false),
     Context.NONENUMERABLE_DESCRIPTOR);
 
   wrapper = function isExtensible(obj) {
     return Boolean(obj) && !obj.preventExtensions;
   };
   this.setProperty(this.OBJECT, 'isExtensible',
-    this.createNativeFunction(wrapper, false),
+    globalObject.createNativeFunction(wrapper, false),
     Context.NONENUMERABLE_DESCRIPTOR);
 
   wrapper = function preventExtensions(obj) {
@@ -634,15 +428,15 @@ Context.prototype.initObject = function (globalObject) {
     return obj;
   };
   this.setProperty(this.OBJECT, 'preventExtensions',
-    this.createNativeFunction(wrapper, false),
+    globalObject.createNativeFunction(wrapper, false),
     Context.NONENUMERABLE_DESCRIPTOR);
 
   // Instance methods on Object.
-  this.setNativeFunctionPrototype(this.OBJECT, 'toString',
+  globalObject.setNativeFunctionPrototype(this.OBJECT, 'toString',
     Context.Object.prototype.toString);
-  this.setNativeFunctionPrototype(this.OBJECT, 'toLocaleString',
+  globalObject.setNativeFunctionPrototype(this.OBJECT, 'toLocaleString',
     Context.Object.prototype.toString);
-  this.setNativeFunctionPrototype(this.OBJECT, 'valueOf',
+  globalObject.setNativeFunctionPrototype(this.OBJECT, 'valueOf',
     Context.Object.prototype.valueOf);
 
   wrapper = function hasOwnProperty(prop) {
@@ -653,7 +447,7 @@ Context.prototype.initObject = function (globalObject) {
     // Primitive.
     return this.hasOwnProperty(prop);
   };
-  this.setNativeFunctionPrototype(this.OBJECT, 'hasOwnProperty', wrapper);
+  globalObject.setNativeFunctionPrototype(this.OBJECT, 'hasOwnProperty', wrapper);
 
   wrapper = function propertyIsEnumerable(prop) {
     throwIfNullUndefined(this);
@@ -663,7 +457,7 @@ Context.prototype.initObject = function (globalObject) {
     // Primitive.
     return this.propertyIsEnumerable(prop);
   };
-  this.setNativeFunctionPrototype(this.OBJECT, 'propertyIsEnumerable', wrapper);
+  globalObject.setNativeFunctionPrototype(this.OBJECT, 'propertyIsEnumerable', wrapper);
 
   wrapper = function isPrototypeOf(obj) {
     while (true) {
@@ -678,7 +472,7 @@ Context.prototype.initObject = function (globalObject) {
       }
     }
   };
-  this.setNativeFunctionPrototype(this.OBJECT, 'isPrototypeOf', wrapper);
+  globalObject.setNativeFunctionPrototype(this.OBJECT, 'isPrototypeOf', wrapper);
   this.setProperty(globalObject, 'constructor', this.OBJECT,
     Context.NONENUMERABLE_DESCRIPTOR);
 };
@@ -714,7 +508,7 @@ Context.prototype.initArray = function (globalObject) {
     }
     return newArray;
   };
-  this.ARRAY = this.createNativeFunction(wrapper, true);
+  this.ARRAY = globalObject.createNativeFunction(wrapper, true);
   this.ARRAY_PROTO = this.ARRAY.properties['prototype'];
   this.setProperty(globalObject, 'Array', this.ARRAY,
     Context.NONENUMERABLE_DESCRIPTOR);
@@ -724,7 +518,7 @@ Context.prototype.initArray = function (globalObject) {
     return obj && obj.class === 'Array';
   };
   this.setProperty(this.ARRAY, 'isArray',
-    this.createNativeFunction(wrapper, false),
+    globalObject.createNativeFunction(wrapper, false),
     Context.NONENUMERABLE_DESCRIPTOR);
 
   // Instance methods on Array.
@@ -752,13 +546,13 @@ Context.prototype.initString = function (globalObject) {
       return value;
     }
   };
-  this.STRING = this.createNativeFunction(wrapper, true);
+  this.STRING = globalObject.createNativeFunction(wrapper, true);
   this.setProperty(globalObject, 'String', this.STRING,
     Context.NONENUMERABLE_DESCRIPTOR);
 
   // Static methods on String.
   this.setProperty(this.STRING, 'fromCharCode',
-    this.createNativeFunction(String.fromCharCode, false),
+    globalObject.createNativeFunction(String.fromCharCode, false),
     Context.NONENUMERABLE_DESCRIPTOR);
 
   // Instance methods on String.
@@ -767,7 +561,7 @@ Context.prototype.initString = function (globalObject) {
     'slice', 'substr', 'substring', 'toLocaleLowerCase', 'toLocaleUpperCase',
     'toLowerCase', 'toUpperCase', 'trim'];
   for (var i = 0; i < functions.length; i++) {
-    this.setNativeFunctionPrototype(this.STRING, functions[i],
+    globalObject.setNativeFunctionPrototype(this.STRING, functions[i],
       String.prototype[functions[i]]);
   }
 
@@ -782,7 +576,7 @@ Context.prototype.initString = function (globalObject) {
         'localeCompare: ' + e.message);
     }
   };
-  this.setNativeFunctionPrototype(this.STRING, 'localeCompare', wrapper);
+  globalObject.setNativeFunctionPrototype(this.STRING, 'localeCompare', wrapper);
 
   wrapper = function split(separator, limit, callback) {
     var string = String(this);
@@ -824,7 +618,7 @@ Context.prototype.initString = function (globalObject) {
     var jsList = string.split(separator, limit);
     callback(thisInterpreter.nativeToPseudo(jsList));
   };
-  this.setAsyncFunctionPrototype(this.STRING, 'split', wrapper);
+  globalObject.setAsyncFunctionPrototype(this.STRING, 'split', wrapper);
 
   wrapper = function match(regexp, callback) {
     var string = String(this);
@@ -861,7 +655,7 @@ Context.prototype.initString = function (globalObject) {
     var m = string.match(regexp);
     callback(m && thisInterpreter.matchToPseudo_(m));
   };
-  this.setAsyncFunctionPrototype(this.STRING, 'match', wrapper);
+  globalObject.setAsyncFunctionPrototype(this.STRING, 'match', wrapper);
 
   wrapper = function search(regexp, callback) {
     var string = String(this);
@@ -900,7 +694,7 @@ Context.prototype.initString = function (globalObject) {
     // Run search natively.
     callback(string.search(regexp));
   };
-  this.setAsyncFunctionPrototype(this.STRING, 'search', wrapper);
+  globalObject.setAsyncFunctionPrototype(this.STRING, 'search', wrapper);
 
   wrapper = function replace_(substr, newSubstr, callback) {
     // Support for function replacements is the responsibility of a polyfill.
@@ -941,7 +735,7 @@ Context.prototype.initString = function (globalObject) {
     // Run replace natively.
     callback(string.replace(substr, newSubstr));
   };
-  this.setAsyncFunctionPrototype(this.STRING, 'replace', wrapper);
+  globalObject.setAsyncFunctionPrototype(this.STRING, 'replace', wrapper);
 };
 
 /**
@@ -963,7 +757,7 @@ Context.prototype.initBoolean = function (globalObject) {
       return value;
     }
   };
-  this.BOOLEAN = this.createNativeFunction(wrapper, true);
+  this.BOOLEAN = globalObject.createNativeFunction(wrapper, true);
   this.setProperty(globalObject, 'Boolean', this.BOOLEAN,
     Context.NONENUMERABLE_DESCRIPTOR);
 };
@@ -987,7 +781,7 @@ Context.prototype.initNumber = function (globalObject) {
       return value;
     }
   };
-  this.NUMBER = this.createNativeFunction(wrapper, true);
+  this.NUMBER = globalObject.createNativeFunction(wrapper, true);
   this.setProperty(globalObject, 'Number', this.NUMBER,
     Context.NONENUMERABLE_DESCRIPTOR);
 
@@ -1007,7 +801,7 @@ Context.prototype.initNumber = function (globalObject) {
       thisInterpreter.throwException(thisInterpreter.ERROR, e.message);
     }
   };
-  this.setNativeFunctionPrototype(this.NUMBER, 'toExponential', wrapper);
+  globalObject.setNativeFunctionPrototype(this.NUMBER, 'toExponential', wrapper);
 
   wrapper = function toFixed(digits) {
     try {
@@ -1017,7 +811,7 @@ Context.prototype.initNumber = function (globalObject) {
       thisInterpreter.throwException(thisInterpreter.ERROR, e.message);
     }
   };
-  this.setNativeFunctionPrototype(this.NUMBER, 'toFixed', wrapper);
+  globalObject.setNativeFunctionPrototype(this.NUMBER, 'toFixed', wrapper);
 
   wrapper = function toPrecision(precision) {
     try {
@@ -1027,7 +821,7 @@ Context.prototype.initNumber = function (globalObject) {
       thisInterpreter.throwException(thisInterpreter.ERROR, e.message);
     }
   };
-  this.setNativeFunctionPrototype(this.NUMBER, 'toPrecision', wrapper);
+  globalObject.setNativeFunctionPrototype(this.NUMBER, 'toPrecision', wrapper);
 
   wrapper = function toString(radix) {
     try {
@@ -1037,7 +831,7 @@ Context.prototype.initNumber = function (globalObject) {
       thisInterpreter.throwException(thisInterpreter.ERROR, e.message);
     }
   };
-  this.setNativeFunctionPrototype(this.NUMBER, 'toString', wrapper);
+  globalObject.setNativeFunctionPrototype(this.NUMBER, 'toString', wrapper);
 
   wrapper = function toLocaleString(locales, options) {
     locales = locales ? thisInterpreter.pseudoToNative(locales) : undefined;
@@ -1050,7 +844,7 @@ Context.prototype.initNumber = function (globalObject) {
         'toLocaleString: ' + e.message);
     }
   };
-  this.setNativeFunctionPrototype(this.NUMBER, 'toLocaleString', wrapper);
+  globalObject.setNativeFunctionPrototype(this.NUMBER, 'toLocaleString', wrapper);
 };
 
 /**
@@ -1073,20 +867,19 @@ Context.prototype.initDate = function (globalObject) {
       Context.nativeGlobal.Date, args));
     return this;
   };
-  this.DATE = this.createNativeFunction(wrapper, true);
+  this.DATE = globalObject.createNativeFunction(wrapper, true);
   this.DATE_PROTO = this.DATE.properties['prototype'];
   this.setProperty(globalObject, 'Date', this.DATE,
     Context.NONENUMERABLE_DESCRIPTOR);
 
   // Static methods on Date.
-  this.setProperty(this.DATE, 'now', this.createNativeFunction(Date.now, false),
+  this.setProperty(this.DATE, 'now', globalObject.createNativeFunction(Date.now, false),
     Context.NONENUMERABLE_DESCRIPTOR);
-
   this.setProperty(this.DATE, 'parse',
-    this.createNativeFunction(Date.parse, false),
+    globalObject.createNativeFunction(Date.parse, false),
     Context.NONENUMERABLE_DESCRIPTOR);
 
-  this.setProperty(this.DATE, 'UTC', this.createNativeFunction(Date.UTC, false),
+  this.setProperty(this.DATE, 'UTC', globalObject.createNativeFunction(Date.UTC, false),
     Context.NONENUMERABLE_DESCRIPTOR);
 
   // Instance methods on Date.
@@ -1116,7 +909,7 @@ Context.prototype.initDate = function (globalObject) {
         return date[nativeFunc].apply(date, args);
       };
     })(functions[i]);
-    this.setNativeFunctionPrototype(this.DATE, functions[i], wrapper);
+    globalObject.setNativeFunctionPrototype(this.DATE, functions[i], wrapper);
   }
 
   // Unlike the previous instance methods, toISOString may throw.
@@ -1128,7 +921,7 @@ Context.prototype.initDate = function (globalObject) {
         'toISOString: ' + e.message);
     }
   };
-  this.setNativeFunctionPrototype(this.DATE, 'toISOString', wrapper);
+  globalObject.setNativeFunctionPrototype(this.DATE, 'toISOString', wrapper);
 };
 
 /**
@@ -1168,7 +961,7 @@ Context.prototype.initRegExp = function (globalObject) {
     thisInterpreter.populateRegExp(rgx, nativeRegExp);
     return rgx;
   };
-  this.REGEXP = this.createNativeFunction(wrapper, true);
+  this.REGEXP = globalObject.createNativeFunction(wrapper, true);
   this.REGEXP_PROTO = this.REGEXP.properties['prototype'];
   this.setProperty(globalObject, 'RegExp', this.REGEXP,
     Context.NONENUMERABLE_DESCRIPTOR);
@@ -1225,7 +1018,7 @@ Context.prototype.initRegExp = function (globalObject) {
     thisInterpreter.setProperty(this, 'lastIndex', regexp.lastIndex);
     callback(thisInterpreter.matchToPseudo_(match));
   };
-  this.setAsyncFunctionPrototype(this.REGEXP, 'exec', wrapper);
+  globalObject.setAsyncFunctionPrototype(this.REGEXP, 'exec', wrapper);
 };
 
 /**
@@ -1264,7 +1057,7 @@ Context.prototype.matchToPseudo_ = function (match) {
 Context.prototype.initError = function (globalObject) {
   var thisInterpreter = this;
   // Error constructor.
-  this.ERROR = this.createNativeFunction(function Error(opt_message) {
+  this.ERROR = globalObject.createNativeFunction(function Error(opt_message) {
     if (thisInterpreter.calledWithNew()) {
       // Called as `new Error()`.
       var newError = this;
@@ -1284,7 +1077,7 @@ Context.prototype.initError = function (globalObject) {
     Context.NONENUMERABLE_DESCRIPTOR);
 
   var createErrorSubclass = function (name) {
-    var constructor = thisInterpreter.createNativeFunction(
+    var constructor = globalObject.createNativeFunction(
       function (opt_message) {
         if (thisInterpreter.calledWithNew()) {
           // Called as `new XyzError()`.
@@ -1337,7 +1130,7 @@ Context.prototype.initMath = function (globalObject) {
     'round', 'sin', 'sqrt', 'tan'];
   for (var i = 0; i < numFunctions.length; i++) {
     this.setProperty(myMath, numFunctions[i],
-      this.createNativeFunction(Math[numFunctions[i]], false),
+      globalObject.createNativeFunction(Math[numFunctions[i]], false),
       Context.NONENUMERABLE_DESCRIPTOR);
   }
 };
@@ -1361,7 +1154,7 @@ Context.prototype.initJSON = function (globalObject) {
     }
     return thisInterpreter.nativeToPseudo(nativeObj);
   };
-  this.setProperty(myJSON, 'parse', this.createNativeFunction(wrapper, false));
+  this.setProperty(myJSON, 'parse', globalObject.createNativeFunction(wrapper, false));
 
   wrapper = function stringify(value, replacer, space) {
     if (replacer && replacer.class === 'Function') {
@@ -1390,7 +1183,7 @@ Context.prototype.initJSON = function (globalObject) {
     return str;
   };
   this.setProperty(myJSON, 'stringify',
-    this.createNativeFunction(wrapper, false));
+    globalObject.createNativeFunction(wrapper, false));
 };
 
 /**
@@ -1569,63 +1362,6 @@ Context.prototype.createArray = function () {
   return array;
 };
 
-// /**
-//  * Create a new function object (could become interpreted or native or async).
-//  * @param {number} argumentLength Number of arguments.
-//  * @param {boolean} isConstructor True if function can be used with 'new'.
-//  * @returns {!Context.Object} New function.
-//  * @private
-//  */
-// Context.prototype.createFunctionBase_ = function (argumentLength,
-//   isConstructor) {
-//   var func = new Context.Object(this.FUNCTION_PROTO);
-//   if (isConstructor) {
-//     var proto = new Context.Object(this.OBJECT_PROTO);
-//     this.setProperty(func, 'prototype', proto,
-//       Context.NONENUMERABLE_DESCRIPTOR);
-//     this.setProperty(proto, 'constructor', func,
-//       Context.NONENUMERABLE_DESCRIPTOR);
-//   } else {
-//     func.illegalConstructor = true;
-//   }
-//   this.setProperty(func, 'length', argumentLength,
-//     Context.READONLY_NONENUMERABLE_DESCRIPTOR);
-//   func.class = 'Function';
-//   // When making changes to this function, check to see if those changes also
-//   // need to be made to the creation of FUNCTION_PROTO in initFunction.
-//   return func;
-// };
-
-// /**
-//  * Create a new native function.
-//  * @param {!Function} nativeFunc JavaScript function.
-//  * @param {boolean} isConstructor True if function can be used with 'new'.
-//  * @returns {!Context.Object} New function.
-//  */
-// Context.prototype.createNativeFunction = function (nativeFunc,
-//   isConstructor) {
-//   var func = this.createFunctionBase_(nativeFunc.length, isConstructor);
-//   func.nativeFunc = nativeFunc;
-//   nativeFunc.id = this.functionCounter_++;
-//   this.setProperty(func, 'name', nativeFunc.name,
-//     Context.READONLY_NONENUMERABLE_DESCRIPTOR);
-//   return func;
-// };
-
-// /**
-//  * Create a new native asynchronous function.
-//  * @param {!Function} asyncFunc JavaScript function.
-//  * @returns {!Context.Object} New function.
-//  */
-// Context.prototype.createAsyncFunction = function (asyncFunc) {
-//   var func = this.createFunctionBase_(asyncFunc.length, true);
-//   func.asyncFunc = asyncFunc;
-//   asyncFunc.id = this.functionCounter_++;
-//   this.setProperty(func, 'name', asyncFunc.name,
-//     Context.READONLY_NONENUMERABLE_DESCRIPTOR);
-//   return func;
-// };
-
 /**
  * Converts from a native JavaScript object or value to a JS-Context object.
  * Can handle JSON-style values, regular expressions, dates and functions.
@@ -1635,6 +1371,7 @@ Context.prototype.createArray = function () {
  * @returns {Context.Value} The equivalent JS-Context object.
  */
 Context.prototype.nativeToPseudo = function (nativeObj, opt_cycles) {
+  const globalObject = this.globalScope?.object;
   if (nativeObj === null || nativeObj === undefined ||
     nativeObj === true || nativeObj === false ||
     typeof nativeObj === 'string' || typeof nativeObj === 'number') {
@@ -1695,7 +1432,7 @@ Context.prototype.nativeToPseudo = function (nativeObj, opt_cycles) {
       return thisInterpreter.nativeToPseudo(value);
     };
     var prototype = Object.getOwnPropertyDescriptor(nativeObj, 'prototype');
-    var pseudoFunction = this.createNativeFunction(wrapper, !!prototype);
+    var pseudoFunction = globalObject?.createNativeFunction(wrapper, !!prototype);
     cycles.pseudo.push(pseudoFunction);
     return pseudoFunction;
   }
@@ -2037,34 +1774,6 @@ Context.prototype.setProperty = function (obj, name, value, opt_descriptor, emit
     }
   }
 };
-
-// /**
-//  * Convenience method for adding a native function as a non-enumerable property
-//  * onto an object's prototype.
-//  * @param {!Context.Object} obj Data object.
-//  * @param {Context.Value} name Name of property.
-//  * @param {!Function} wrapper Function object.
-//  */
-// Context.prototype.setNativeFunctionPrototype =
-//   function (obj, name, wrapper) {
-//     this.setProperty(obj.properties['prototype'], name,
-//       this.createNativeFunction(wrapper, false),
-//       Context.NONENUMERABLE_DESCRIPTOR);
-//   };
-
-// /**
-//  * Convenience method for adding an async function as a non-enumerable property
-//  * onto an object's prototype.
-//  * @param {!Context.Object} obj Data object.
-//  * @param {Context.Value} name Name of property.
-//  * @param {!Function} wrapper Function object.
-//  */
-// Context.prototype.setAsyncFunctionPrototype =
-//   function (obj, name, wrapper) {
-//     this.setProperty(obj.properties['prototype'], name,
-//       this.createAsyncFunction(wrapper),
-//       Context.NONENUMERABLE_DESCRIPTOR);
-//   };
 
 /**
  * Is the current state directly being called with as a construction with 'new'.

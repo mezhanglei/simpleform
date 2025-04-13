@@ -8,7 +8,7 @@ class StateConstructor {
   done?: boolean;
   doneCallee_?: number;
   func_?: ObjectConstructor; // 当前函数执行引用
-  funcThis_?: ObjectConstructor; // 待绑定的新的指向
+  funcThis_?: ObjectConstructor; // apply/call新的引用
   doneArgs_?: boolean;
   arguments_?: any[];
   doneExec_?: boolean; // 执行状态是否完成

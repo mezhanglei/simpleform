@@ -145,10 +145,11 @@ class Script {
   populateScope_(node, scope: ScopeConstructor) {
     const context = this.options.context;
     if (!context) return;
+    const globalObject = context.globalScope?.object;
     const variableCache = traverseAstDeclar(node, (currentCache) => {
       for (const name in currentCache) {
         // 给作用域填充变量或者函数
-        const val = currentCache[name] === true ? undefined : context.createFunction(currentCache[name], scope);
+        const val = currentCache[name] === true ? undefined : globalObject?.createFunction(currentCache[name], scope);
         scope.object.setProperty(name, val, Script.VARIABLE_DESCRIPTOR);
       }
     });

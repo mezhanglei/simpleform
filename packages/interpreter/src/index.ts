@@ -15,6 +15,7 @@ import { Constants } from './constants';
 import StateConstructor from './constructor/State';
 import Context from './Context';
 import Script from './Script';
+import { createScope, createSpecialScope } from './utils/scope';
 
 export * from './Context';
 
@@ -253,10 +254,11 @@ Interpreter.prototype.setValueToScope = function (name, value) {
  */
 Interpreter.prototype.populateScope_ = function (node, scope) {
   if (!node) return;
+  const globalObject = this.context.globalScope?.object;
   const variableCache = traverseAstDeclar(node, (currentCache) => {
     for (const name in currentCache) {
       // 给作用域填充变量或者函数
-      const val = currentCache[name] === true ? undefined : this.context.createFunction(currentCache[name], scope);
+      const val = currentCache[name] === true ? undefined : globalObject?.createFunction(currentCache[name], scope);
       this.setProperty(scope.object, name, val, Interpreter.Context.VARIABLE_DESCRIPTOR);
     }
   });
@@ -615,7 +617,7 @@ Interpreter.prototype['stepCallExpression'] = function (stack, state) {
     }
     var funcNode = func.node;
     if (funcNode) {
-      var scope = this.context.createScope(funcNode.body, func.parentScope);
+      var scope = createScope(funcNode.body, func.parentScope);
       this.populateScope_(funcNode.body, scope);
       // Build arguments variable.
       var argsList = this.context.createArray();
@@ -659,7 +661,7 @@ Interpreter.prototype['stepCallExpression'] = function (stack, state) {
         var scope = state.directEval_ ? state.scope : this.context.globalScope;
         if (scope.strict) {
           // Strict mode get its own scope in eval.
-          scope = this.context.createScope(ast, scope);
+          scope = createScope(ast, scope);
         }
         this.populateScope_(ast, scope);
         this.script.value = undefined; // Default value if no code.
@@ -986,15 +988,16 @@ Interpreter.prototype['stepFunctionDeclaration'] =
 // 函数表达式 E.g. var x = function foo(){};
 Interpreter.prototype['stepFunctionExpression'] = function (stack, state) {
   const node = state.node;
+  const globalObject = this.context.globalScope?.object;
   stack.pop();
   state = stack[stack.length - 1];
   var parentScope = state.scope;
   if (node.id) {
     // Create a tiny scope to store the function name.
     // E.g. var x = function foo(){};
-    parentScope = this.context.createSpecialScope(parentScope);
+    parentScope = createSpecialScope(parentScope);
   }
-  state.value = this.context.createFunction(node, parentScope, state.destinationName);
+  state.value = globalObject?.createFunction(node, parentScope, state.destinationName);
   if (node.id) {
     // Record the function name, read-only.
     this.setProperty(parentScope.object, node.id.name, state.value,
@@ -1285,7 +1288,7 @@ Interpreter.prototype['stepTryStatement'] = function (stack, state) {
     !state.doneHandler_ && node.handler) {
     state.doneHandler_ = true;
     // Create an new scope and add the error variable.
-    var scope = this.context.createSpecialScope(state.scope);
+    var scope = createSpecialScope(state.scope);
     this.setProperty(scope.object, node.handler.param.name, state.cv.value);
     state.cv = undefined; // This error has been handled, don't rethrow.
     // Execute catch clause.
@@ -1459,7 +1462,7 @@ Interpreter.prototype['stepWithStatement'] = function (stack, state) {
     return new Interpreter.State(node.object, state.scope);
   }
   stack.pop();
-  var scope = this.context.createSpecialScope(state.scope, state.value);
+  var scope = createSpecialScope(state.scope, state.value);
   return new Interpreter.State(node.body, scope);
 };
 

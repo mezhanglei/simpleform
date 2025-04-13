@@ -1,10 +1,8 @@
-import ObjectConstructor from './Object';
-
 // 作用域构造函数
-class ScopeConstructor {
+class ScopeConstructor<T = any> {
   parentScope: ScopeConstructor;
   strict: boolean;
-  object: ObjectConstructor;
+  object: T;
   constructor(parentScope, strict, object) {
     this.parentScope = parentScope; // 父级作用域
     this.strict = strict; // 是否严格模式
