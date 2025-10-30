@@ -1,6 +1,6 @@
 import React from 'react';
 import { Col, ColProps, Row, RowProps } from "antd";
-import { WidgetContextProps } from '../typings';
+import { FRContext } from '../typings';
 import './grid.less';
 import classnames from 'classnames';
 
@@ -23,7 +23,7 @@ export const getColProps = (props: ColProps, inline?: boolean) => {
   };
 };
 
-export interface CustomRowProps extends RowProps, WidgetContextProps {
+export interface CustomRowProps extends RowProps, FRContext {
   children?: React.ReactNode;
 }
 // row组件
@@ -42,7 +42,7 @@ export const CustomRow = React.forwardRef<HTMLDivElement, CustomRowProps>((props
   );
 });
 
-export interface CustomColProps extends ColProps, WidgetContextProps {
+export interface CustomColProps extends ColProps, FRContext {
   children?: React.ReactNode;
 }
 // col组件

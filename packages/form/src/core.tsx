@@ -5,14 +5,14 @@ import { FormRule } from './validator';
 import { isEmpty } from './utils/type';
 import { FormProps } from './form';
 
-type TriggerType = string;
 export type FormEventHandler<V = unknown, A = unknown> = (obj: { name?: FormPathType; value?: V }, values?: A) => void;
 export interface ItemCoreProps {
   name?: FormPathType;
   nonform?: boolean;
+  clearOnUninstall?: boolean;
   index?: number;
-  trigger?: TriggerType; // 设置收集字段值变更的时机
-  validateTrigger?: TriggerType | TriggerType[];
+  trigger?: string; // 设置收集字段值变更的时机
+  validateTrigger?: string | string[];
   valueProp?: string | ((type: string) => string);
   valueGetter?: typeof getValueFromEvent;
   valueSetter?: (value) => unknown;
@@ -25,30 +25,24 @@ export interface ItemCoreProps {
   children?: React.ReactNode | ((P: { className?: string; form?: FormProps['form'], bindProps: ReturnType<NonNullable<FormProps['form']>['getBindProps']> }) => React.ReactNode);
 }
 
-export function getRulesTriggers(rules?: ItemCoreProps['rules']) {
-  const result = [] as TriggerType[];
-  if (rules instanceof Array) {
-    for (let i = 0; i < rules?.length; i++) {
-      const rule = rules?.[i];
-      const validateTrigger = rule?.validateTrigger;
-      if (validateTrigger) {
-        if (validateTrigger instanceof Array) {
-          result.push(...validateTrigger);
-        } else {
-          result.push(validateTrigger);
-        }
-      }
+export function bindWrapper(children, props, triggerName = 'onChange') {
+  const { bindProps, ...restProps } = props;
+  if (typeof children === 'function') {
+    return children(props);
+  } else {
+    const len = React.Children.count(children);
+    const cloneBindProps = { ...bindProps, ...restProps };
+    if (triggerName) {
+      cloneBindProps[triggerName] = (...args) => {
+        children?.props?.[triggerName]?.(...args);
+        bindProps?.[triggerName]?.(...args);
+      };
     }
+    if (len === 1 && React.isValidElement(children)) {
+      return React.cloneElement(children, cloneBindProps);
+    }
+    return children;
   }
-  return result;
-}
-
-export function mergeTriggers(trigger: ItemCoreProps['trigger'], validateTrigger: ItemCoreProps['validateTrigger'], ruleTriggers: Array<TriggerType>) {
-  return new Set<TriggerType>([
-    ...toArray(trigger),
-    ...toArray(validateTrigger),
-    ...ruleTriggers
-  ]);
 }
 
 export const ItemCore = (props: ItemCoreProps) => {
@@ -68,6 +62,7 @@ export const ItemCore = (props: ItemCoreProps) => {
     initialValue,
     trigger = 'onChange',
     validateTrigger,
+    clearOnUninstall = true,
     ...rest
   } = restProps;
 
@@ -95,44 +90,30 @@ export const ItemCore = (props: ItemCoreProps) => {
   // 表单域初始化值
   useEffect(() => {
     if (!isValidFormName(currentPath) || !form) return;
+    form?.setFieldProps(currentPath, fieldProps);
     // 回填初始值
     const initValue = initialValue === undefined ? deepGet(initialValues, currentPath) : initialValue;
     if (!isEmpty(initValue)) {
       form.setInitialValue(currentPath, initValue);
+    } else {
+      const lastValue = form.getFieldValue(currentPath);
+      if (clearOnUninstall === true && !isEmpty(lastValue)) {
+        setValue(lastValue);
+      }
     }
     onFieldsMounted && onFieldsMounted({ name: currentPath, value: initValue }, form?.getFieldValue());
     return () => {
-      // 清除该表单域的props(在设置值的前面)
-      form?.setFieldProps(currentPath, undefined);
-      // 清除初始值
-      form?.setInitialValue(currentPath, undefined);
+      if (clearOnUninstall === true) {
+        // 清除该表单域的props(在设置值的前面)
+        form?.setFieldProps(currentPath, undefined);
+        // 清除初始值
+        form?.setInitialValue(currentPath, undefined);
+      }
     };
   }, [JSON.stringify(currentPath)]);
 
-  // 对目标控件进行双向绑定
-  const bindChildren = (children: ItemCoreProps['children']) => {
-    if (typeof children === 'function') {
-      const bindProps = form && form.getBindProps(currentPath, value) || {};
-      return children({ className: errorClassName, form, bindProps });
-    } else {
-      const len = React.Children.count(children);
-      if (len === 1 && React.isValidElement(children)) {
-        const bindProps = form && form.getBindProps(currentPath, value) || {};
-        return React.cloneElement(children, {
-          ...bindProps,
-          [trigger]: (...args) => {
-            children?.props?.[trigger]?.(...args);
-            bindProps?.[trigger]?.(...args);
-          },
-          className: errorClassName,
-          form,
-        });
-      }
-      return children;
-    }
-  };
-
-  const childs = bindChildren(children);
+  const bindProps = form && form.getBindProps(currentPath, value) || {};
+  const childs = bindWrapper(children, { bindProps, className: errorClassName, form, }, trigger);
   return <>{childs}</>;
 };
 

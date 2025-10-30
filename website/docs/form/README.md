@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/form
-[![](https://img.shields.io/badge/version-2.2.2-green)](https://www.npmjs.com/package/@simpleform/form)
+[![](https://img.shields.io/badge/version-2.2.6-green)](https://www.npmjs.com/package/@simpleform/form)
 
 > 表单底层组件，通过回调函数方式实现表单值的显示和更新事件的绑定.
 
@@ -39,7 +39,7 @@ import '@simpleform/form/lib/css/main.css'
 - `useFormError`: `(form: SimpleForm, path?: FormPathType) => [string, (val: string) => void]` 使用 hooks 获取指定的报错信息。
 - `useFormValues`: `(form: SimpleForm, path?: FormPathType | Array<FormPathType>) => unknown`使用 hooks 获取表单值，支持单个或多个目标的表单值提取
 :::warning
-`>=2.2.2`版本`useFormValues`方法可以在完整表单值中提取对应路径的值组合成新的表单值，旧版本只会返回路径和值的映射。
+`>=2.2.6`版本`useFormValues`方法可以在完整表单值中提取对应路径的值组合成新的表单值，旧版本只会返回路径和值的映射。
 :::
 
 ### Form
@@ -85,6 +85,7 @@ import '@simpleform/form/lib/css/main.css'
 |`name`   |  表单控件的字段名  | `type FormPathType = string/number/Array<string/number>`  | -      |
 |`validateTrigger`| 设置表单域校验的触发事件, 默认`onChange` | `boolean`或`onChange/onBlur`等  | `onChange`      |
 |`valueProp` | 给控件绑定值的`props`是哪个字符 | `string`  | `value` |
+|`clearOnUninstall` | 控件卸载时是否清空表单值 | `boolean`  | `true` |
 |`valueGetter`| 格式化输出表单值的函数，一般配合`valueSetter`使用 | `<T>(value: T)=> T`  | -      |
 |`valueSetter`| 格式化输入表单值的函数，配合`valueGetter`使用 | `<T>(value: T)=> T`  | -      |
 |`rules` | 表单域的校验规则 | `FormRule[]`  |    [跳转](#rules)    |

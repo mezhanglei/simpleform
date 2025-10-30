@@ -14,7 +14,7 @@ export type FormValidatorCallBack = (message?: string) => void;
 export type FormValidator = <T>(value: T, callBack?: FormValidatorCallBack) => T | Promise<T>;
 
 // 处理单条规则
-const handleRule = async (rule?: FormRule, value?: unknown, eventName?: ItemCoreProps['trigger']) => {
+const handleRule = async (rule?: FormRule, value?: unknown, eventName?: Parameters<typeof isCanTrigger>[0]) => {
   if (!rule) return;
   const { validateTrigger, message: defaultMessage, validator, ...restRule } = rule || {};
   const canTrigger = isCanTrigger(eventName, validateTrigger);
@@ -53,7 +53,7 @@ const handleRule = async (rule?: FormRule, value?: unknown, eventName?: ItemCore
 };
 
 // 处理多条规则
-export const handleRules = async (rules?: FormRule[], value?: unknown, eventName?: ItemCoreProps['trigger']) => {
+export const handleRules = async (rules?: FormRule[], value?: unknown, eventName?: Parameters<typeof isCanTrigger>[0]) => {
   if (!(rules instanceof Array)) return;
   for (let i = 0; i < rules.length; i++) {
     const rule = rules[i];

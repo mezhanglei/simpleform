@@ -7,7 +7,7 @@ import {
 } from "@simpleform/editor";
 import './index.less';
 import { FormTableProps } from "..";
-import { joinFormPath, renderWidgetItem } from "../../../FormRender";
+import { joinFormPath, FormRenderNode } from "../../../FormRender";
 
 const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
   const {
@@ -63,9 +63,8 @@ const FormTable = React.forwardRef<any, FormTableProps>((props, ref) => {
           return originRender;
         }
         const childName = joinFormPath(curName, rowIndex, name);
-        const widget = { ...restCol, name: childName, label: '' };
-        const _options = { form, formrender, index: rowIndex, props: { disabled } };
-        return renderWidgetItem(formrender, widget, _options);
+        const widget = { ...restCol, name: childName, label: '', props: { disabled, ...restCol?.props, } };
+        return <FormRenderNode formrender={formrender} widget={widget} index={rowIndex} />;
       }
     };
   }) as TableProps<any>['columns'] || [];

@@ -1,7 +1,7 @@
 import { deepMergeObject } from '.';
 import { nanoid } from 'nanoid';
 import { EditorGenerateWidgetItem, CommonFormProps } from '../typings';
-import { SimpleFormRender, getInitialValues, WidgetOptions } from '@simpleform/render';
+import { SimpleFormRender, getInitialValues, FormRenderNodeProps } from '@simpleform/render';
 import { ConfigWidgetSetting, FormEditorState } from '../context';
 
 export const defaultGetId = (key?: string) => {
@@ -29,21 +29,21 @@ export const getConfigItem = (type: string | undefined, editorConfig?: FormEdito
 };
 
 // 根据路径获取节点的值和属性
-export const getWidgetItem = <V = EditorGenerateWidgetItem>(formrender?: SimpleFormRender | null, path?: WidgetOptions['path']) => {
+export const getWidgetItem = <V = EditorGenerateWidgetItem>(formrender?: SimpleFormRender | null, path?: FormRenderNodeProps['path']) => {
   if (!formrender) return;
   const item = formrender.getItemByPath(path) as (V | undefined);
   return item;
 };
 
 // 移动新节点
-export const moveWidgetItem = (formrender?: SimpleFormRender | null, from?: WidgetOptions['path'], to?: WidgetOptions['path']) => {
+export const moveWidgetItem = (formrender?: SimpleFormRender | null, from?: FormRenderNodeProps['path'], to?: FormRenderNodeProps['path']) => {
   if (!formrender || !from || !to) return;
   const actions = formrender?.getActions();
   actions?.moveItemByPath(from, to);
 };
 
 // 插入新节点
-export const insertWidgetItem = (formrender?: SimpleFormRender | null, data?: EditorGenerateWidgetItem, index?: number, parent?: WidgetOptions['path']) => {
+export const insertWidgetItem = (formrender?: SimpleFormRender | null, data?: EditorGenerateWidgetItem, index?: number, parent?: FormRenderNodeProps['path']) => {
   if (!formrender || !data) return;
   const newData = data?.panel?.nonform ? data : Object.assign({ name: defaultGetId(data?.type) }, data);
   const actions = formrender?.getActions();
@@ -51,14 +51,14 @@ export const insertWidgetItem = (formrender?: SimpleFormRender | null, data?: Ed
 };
 
 // 设置节点的属性
-export const setWidgetItem = (formrender?: SimpleFormRender | null, data?: unknown, path?: WidgetOptions['path']) => {
+export const setWidgetItem = (formrender?: SimpleFormRender | null, data?: unknown, path?: FormRenderNodeProps['path']) => {
   if (!formrender) return;
   const actions = formrender?.getActions();
   actions?.setItemByPath(data, path);
 };
 
 // 删除节点
-export const delWidgetItem = (formrender?: SimpleFormRender | null, path?: WidgetOptions['path']) => {
+export const delWidgetItem = (formrender?: SimpleFormRender | null, path?: FormRenderNodeProps['path']) => {
   if (!path?.length || !formrender) return;
   const actions = formrender?.getActions();
   actions?.delItemByPath(path);

@@ -13,7 +13,7 @@ import {
   setWidgetItem
 } from "@simpleform/editor";
 import FormTableColSetting from './column-setting';
-import { FormRenderProps, renderWidgetItem } from "../../../FormRender";
+import { FormRenderProps, FormRenderNode } from "../../../FormRender";
 
 const EditorTable = React.forwardRef<HTMLDivElement, FormTableProps<unknown>>(({
   columns = [],
@@ -95,8 +95,8 @@ const EditorTable = React.forwardRef<HTMLDivElement, FormTableProps<unknown>>(({
               path: columnsPath.concat(colIndex),
               onValuesChange: columnInputChange
             };
-            const widget = { ...col, label: '' };
-            const instance = renderWidgetItem(formrender, widget, _childOptions);
+            const widget = { ...col, label: '', onValuesChange: columnInputChange };
+            const instance = <FormRenderNode formrender={formrender} widget={widget} index={colIndex} path={columnsPath.concat(colIndex)} />;
             return (
               <BaseSelection
                 key={colIndex}

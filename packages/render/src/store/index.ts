@@ -1,13 +1,15 @@
-import { CustomUnionType, FormRenderProps, WidgetList, WidgetOptions } from "../typings";
-import { getItemByPath } from "../utils/utils";
-import { createFormElement, getFormComponent, mergeFormOptions } from "../utils/transform";
+import { FormRenderNodeProps, FormRenderProps } from '../typings';
+import { getItemByPath } from '../utils/utils';
+import { mergeFROptions } from '../utils/transform';
 import { Form } from "@simpleform/form";
-import { deepClone } from "../utils";
-import { CustomCol, CustomRow } from "../components";
+import { deepClone } from '../utils';
+import { CustomCol, CustomRow } from '../components';
 import reducer, { actionCreators } from './actions';
 
-const bindClassPrototype = (Factory, instance) => {
-  const attrs = Object.getOwnPropertyDescriptors(Factory?.prototype);
+/* eslint-disable */
+
+const bindClassPrototype = (target, instance) => {
+  const attrs = Object.getOwnPropertyDescriptors(target.prototype);
   for (const key in attrs) {
     const attr = instance[key];
     if (typeof attr === 'function' && key !== 'constructor') {
@@ -21,18 +23,18 @@ export type FormRenderListener<V> = (newValue?: V, oldValue?: V) => void;
 // 管理formrender过程中的数据
 export class SimpleFormRender {
   public config?: FormRenderProps;
-  private widgetList: WidgetList;
-  private lastWidgetList: WidgetList | undefined;
-  private widgetListListeners: FormRenderListener<WidgetList>[] = [];
+  private widgetList: FormRenderProps['widgetList'];
+  private lastWidgetList: FormRenderProps['widgetList'] | undefined;
+  private widgetListListeners: FormRenderListener<FormRenderProps['widgetList']>[] = [];
   constructor(config?: SimpleFormRender['config']) {
     this.widgetList = [];
     this.lastWidgetList = undefined;
     this.config = config || {
       components: {
-        'row': CustomRow,
-        'col': CustomCol,
-        'Form.Item': Form.Item
-      }
+        row: CustomRow,
+        col: CustomCol,
+        'Form.Item': Form.Item,
+      },
     };
     bindClassPrototype(SimpleFormRender, this);
   }
@@ -42,20 +44,8 @@ export class SimpleFormRender {
     if (typeof payload === 'function') {
       this.config = payload(this.config);
     } else {
-      this.config = mergeFormOptions(this.config, payload);
+      this.config = mergeFROptions(this.config, payload);
     }
-  }
-
-  // 返回目标声明组件
-  public getFormComponent(target?: CustomUnionType) {
-    const components = this.config?.components;
-    return getFormComponent(target, components);
-  }
-
-  // 创建components的实例
-  public createFormElement(target?: CustomUnionType, commonProps?: unknown) {
-    const components = this.config?.components;
-    return createFormElement(target, commonProps, components);
   }
 
   // 获取当前组件的widgetList
@@ -64,7 +54,7 @@ export class SimpleFormRender {
   }
 
   // 设置widgetList
-  setWidgetList(data?: SimpleFormRender['widgetList'], option?: { ignore?: boolean }) {
+  public setWidgetList(data?: SimpleFormRender['widgetList'], option?: { ignore?: boolean }) {
     this.lastWidgetList = this.widgetList;
     this.widgetList = data || [];
     if (option?.ignore) return;
@@ -72,7 +62,7 @@ export class SimpleFormRender {
   }
 
   // 获取指定路径的项
-  getItemByPath = (path?: WidgetOptions['path']) => {
+  public getItemByPath = (path?: FormRenderNodeProps['path']) => {
     const oldData = this.getWidgetList();
     if (oldData) {
       return getItemByPath(oldData, path);
@@ -81,12 +71,17 @@ export class SimpleFormRender {
 
   // 返回widgetList的操作方法
   public getActions() {
-    return Object.fromEntries(Object.keys(actionCreators)?.map(actionName => {
-      const actionFun = actionCreators[actionName];
-      return [actionName, (...args) => {
-        this.setWidgetList(reducer(this.widgetList, actionName, actionFun(...args)));
-      }];
-    }));
+    return Object.fromEntries(
+      Object.keys(actionCreators)?.map((actionName) => {
+        const actionFun = actionCreators[actionName];
+        return [
+          actionName,
+          (...args) => {
+            this.setWidgetList(reducer(this.widgetList, actionName, actionFun(...args)));
+          },
+        ];
+      })
+    );
   }
 
   // 订阅表单渲染数据的变动

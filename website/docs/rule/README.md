@@ -10,6 +10,9 @@ nav:
 [![](https://img.shields.io/badge/version-0.0.1-green)](https://www.npmjs.com/package/@simpleform/rule)
 
 > 规则构建器，自由配置符合`json-logic-js`的规则条件.
+:::warning
+待更新使用方式
+:::
 
 # Matters
  - 在使用之前需要先引入css样式文件，例：`import '@simpleform/rule/lib/css/main.css'`;

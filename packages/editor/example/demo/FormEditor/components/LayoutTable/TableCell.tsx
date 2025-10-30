@@ -12,7 +12,7 @@ import './index.less';
 import { Menu, MenuDivider, MenuItem } from '@szhsin/react-menu';
 import '@szhsin/react-menu/dist/index.css';
 import { LayoutTableRows } from '.';
-import { renderWidgetItem } from '../../FormRender';
+import { FormRenderNode } from '../../FormRender';
 
 export type CustomTableCellProps = React.HtmlHTMLAttributes<HTMLTableCellElement> & BaseSelectionProps & {
   rows: NonNullable<LayoutTableRows>;
@@ -96,12 +96,7 @@ const CustomTableCell = React.forwardRef<HTMLTableCellElement, CustomTableCellPr
   });
 
   const childs = widgetList?.map((child, childIndex) => {
-    const _childOptions = {
-      ...commonOptions,
-      index: childIndex,
-      path: (path || []).concat('children', childIndex),
-    };
-    const instance = renderWidgetItem(formrender, child, _childOptions);
+    const instance = <FormRenderNode formrender={formrender} widget={{ ...commonOptions, ...child }} index={childIndex} path={(path || []).concat('children', childIndex)} />;
     return instance;
   });
 

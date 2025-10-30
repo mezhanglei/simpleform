@@ -1,10 +1,9 @@
-import { isEqualPath, WidgetContextProps } from '@simpleform/render';
+import { isEqualPath, FRContext } from '@simpleform/render';
 import React, { useState } from 'react';
 import { delWidgetItem } from '../utils';
 import { FormEditorState } from '../context';
-import { EditorOptions } from '../typings';
 
-export interface SelectionCommonProps extends WidgetContextProps<EditorOptions> {
+export interface SelectionCommonProps extends FRContext {
   checked?: boolean;
   isOver?: boolean;
   setSelection?: () => void;

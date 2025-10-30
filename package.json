@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "workspaces": [
-    "packages/interpreter",
+    "packages/evaluator",
     "packages/form",
     "packages/render",
     "packages/rule",

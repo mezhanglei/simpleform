@@ -1,7 +1,8 @@
 import FormRender from './form';
 import FormChildren from './children';
+import FormRenderNode from './node';
 export default FormRender;
-export { FormChildren };
+export { FormChildren, FormRenderNode };
 export * from './typings';
 export * from './components';
 export * from './store/index';

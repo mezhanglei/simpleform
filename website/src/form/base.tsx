@@ -14,17 +14,17 @@ export default function Demo() {
     setFormRes({ error, values });
   };
 
-  const validator = (value: unknown) => {
+  const validator = (value?: any) => {
     if (value?.length < 2) {
       return Promise.reject(new Error('length is < 2'));
     }
   }
-  
+
   return (
     <div>
       <p>报错：<span style={{ color: 'red' }}>{formRes.error}</span></p>
       <p>提交表单值：<span style={{ color: 'green' }}>{JSON.stringify(formRes.values || {})}</span></p>
-      <Form initialValues={{ name1: 1111 }} form={form} onSubmit={onSubmit}>
+      <Form initialValues={{ name1: 1111 }} form={form}>
         <Form.Item tooltip="提示信息" label="Name1" name="name1" rules={[{ required: true, message: 'name1 is Empty' }, { validator: validator, message: 'validator error' }]}>
           {({ bindProps }: any) => (
             <div>
@@ -33,13 +33,13 @@ export default function Demo() {
           )}
         </Form.Item>
         <Form.Item label="object" name="name2.a" rules={[{ required: true, message: 'name2.a is empty' }]}>
-          {({ bindProps }: any) => <input {...bindProps} />}
+          <input />
         </Form.Item>
         <Form.Item label="list" name="name3[0]" rules={[{ required: true, message: 'name3[0] is empty' }]}>
-          {({ bindProps }: any) => <input {...bindProps} />}
+          <input />
         </Form.Item>
         <Form.Item label="">
-          <button>Submit</button>
+          <button type="submit" onClick={onSubmit}>Submit</button>
         </Form.Item>
       </Form>
     </div>

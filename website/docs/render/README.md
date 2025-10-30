@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-4.1.29-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.1.31-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
 
@@ -71,17 +71,17 @@ const widgetList = [{
 - 节点类型
 继承`@simpleform/form`组件的[FormItemProps](./form#formitem)
 ```javascript
-// 带表单域的组件节点(parser编译后)
-export type GenerateWidgetItem<P = {}> = P & FormItemProps & {
-  type?: string;
-  props?: Record<string, unknown>;
-  children?: any; // 嵌套子节点
-  inside?: CustomUnionType<P>; // 节点的内层
-  outside?: CustomUnionType<P>; // 节点的外层
-  readOnly?: boolean; // 只读模式
-  readOnlyRender?: ReactNode | ((context?: WidgetContextProps) => ReactNode); // 只读模式下的组件
-  typeRender?: ReactNode | ((context?: WidgetContextProps) => ReactNode); // 表单控件自定义渲染
-  hidden?: boolean;
+// 预处理后的节点信息
+export type FRGenerateNode = FormItemProps & {
+	type?: string | ReactComponent<any>;
+	props?: Record<string, unknown>;
+	children?: any;
+	inside?: ReactComponent<any> | ReactNode; // 节点的内层
+	outside?: ReactComponent<any> | ReactNode; // 节点的外层
+	readOnly?: boolean; // 只读模式
+	readOnlyRender?: ReactNode | ((context?: FRContext) => ReactNode); // 只读模式下的组件
+	typeRender?: ReactNode | ((context?: FRContext) => ReactNode); // 表单控件自定义渲染
+	hidden?: boolean;
 };
 ```
 :::warning
@@ -97,7 +97,7 @@ export type GenerateWidgetItem<P = {}> = P & FormItemProps & {
 - `form`: `SimpleForm`的实例
 - 节点组件的其他属性
 ```jsx | pure
-const CustomInput: React.FC<WidgetContextProps & InputProps> = (props) => {
+const CustomInput: React.FC<FRContext & InputProps> = (props) => {
   const {
     value,
     onChange,
@@ -154,19 +154,19 @@ const widgetList = [{
 ## API
 
 ### Hooks
-- `useSimpleFormRender`: `(widgetList: WidgetItem[]) => SimpleFormRender` 等于`new SimpleFormRender()`.
+- `useSimpleFormRender`: `(widgetList: FormChildrenProps['widgetList']) => SimpleFormRender` 等于`new SimpleFormRender()`.
 - `useSimpleForm`: 继承`@simpleform/form`组件的`hooks`.
 
 ### Props
 `FormRender`或`FormChildren`组件的`props`
-- `widgetList`: `WidgetItem[]` 渲染表单的DSL形式的json数据
+- `widgetList`: `FormChildrenProps['widgetList']` 渲染表单的DSL形式的json数据
 - `components`：注册表单中的所有组件;
 - `variables`: 表单中需要引入的变量;
 - `wrapper`: `FormChildren`的父节点
-- `options`： `GenerateWidgetItem<P> | ((item: GenerateWidgetItem<P>) => GenerateWidgetItem<P>)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
-- `renderList`：`(children, WidgetContextProps) => React.ReactNode`提供自定义渲染列表的函数.
-- `renderItem`：`(children, WidgetContextProps) => React.ReactNode`提供自定义渲染节点的函数.
-- `onRenderChange`: `(newValue: WidgetList) => void;` `widgetList`更改时回调函数
+- `options`： `FROptions | ((frGenerateNode) => FROptions)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
+- `renderList`：`(children, FRContext) => React.ReactNode`提供自定义渲染列表的函数.
+- `renderItem`：`(children, FRContext) => React.ReactNode`提供自定义渲染节点的函数.
+- `onRenderChange`: `(newValue: FormChildrenProps['widgetList']) => void;` `widgetList`更改时回调函数
 - `formrender`: `FormRender`通过`useSimpleFormRender()`创建的实例，负责表单界面渲染，选填.
 - `form`: `Form`。通过`useSimpleForm()`创建，负责表单值的管理，选填.
 - `parser`: `<V>(node?: unknown, variables?: object) => V` 字符串表达式解析函数，默认方法为`parseExpression`, 传`null`则表示不解析表达式.
@@ -181,4 +181,4 @@ const widgetList = [{
 - `insertItemByIndex`: `(data: unknown, index?: number, parent?: string) => void` 根据序号和父节点路径添加节点
 - `getItemByPath`: `(path: string) => void` 获取路径`path`对应的节点
 - `moveItemByPath`: `(from: { parent?: string, index: number }, to: { parent?: string, index?: number })` 把树中的选项从一个位置调换到另外一个位置
-- `setWidgetList`: `(data?: WidgetList) => void` 设置表单的`widgetList`属性;
+- `setWidgetList`: `(data?: FormChildrenProps['widgetList']) => void` 设置表单的`widgetList`属性;

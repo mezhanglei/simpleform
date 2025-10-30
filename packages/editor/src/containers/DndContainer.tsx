@@ -1,12 +1,11 @@
-import { WidgetContextProps, WidgetOptions } from '@simpleform/render';
+import { FormRenderNodeProps, FRContext } from '@simpleform/render';
 import React from 'react';
 import { getConfigItem, insertWidgetItem, moveWidgetItem } from '../utils';
-import { EditorOptions } from '../typings';
 
-export interface DndComomonProps extends WidgetContextProps<EditorOptions> {
-  dndPath?: WidgetOptions['path'];
+export interface DndComomonProps extends FRContext {
+  dndPath?: FormRenderNodeProps['path'];
   dndList?: Array<unknown>;
-  add?: (dropIndex?: number, from?: { path?: WidgetOptions['path'], data: any }) => void;
+  add?: (dropIndex?: number, from?: { path?: FormRenderNodeProps['path'], data: any }) => void;
   update?: (oldIndex?: number, newIndex?: number) => void;
 }
 

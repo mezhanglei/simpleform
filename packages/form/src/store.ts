@@ -1,7 +1,16 @@
-import { deepGet, deepSet, getValuePropName, comparePrefix, FormPathType, isValidFormName, isEqualName } from './utils/utils';
+import {
+  deepGet,
+  deepSet,
+  getValuePropName,
+  comparePrefix,
+  FormPathType,
+  isValidFormName,
+  isEqualName,
+  getRulesTriggers,
+  mergeTriggers,
+} from './utils/utils';
 import { deepClone } from './utils/object';
 import { handleRules, isCanTrigger } from './validator';
-import { getRulesTriggers, mergeTriggers } from './core';
 import { isArray, isEmpty, isObject } from './utils/type';
 import { FormItemProps } from './form-item';
 import { GetMapValueType, PathValue } from './typings';
@@ -90,9 +99,11 @@ export class SimpleForm<T = unknown> {
     const childValue = typeof valueSetter === 'function' ? valueSetter(currentValue) : (valueSetter ? undefined : currentValue);
     const bindProps = { [valuePropName]: childValue } as Record<string, any>;
     triggers.forEach((eventName) => {
-      bindProps[eventName] = (...args) => {
-        this.bindChange(path, eventName, ...args);
-      };
+      if (eventName) {
+        bindProps[eventName] = (...args) => {
+          this.bindChange(path, eventName, ...args);
+        };
+      }
     });
     return nonform === true ? {} : bindProps;
   }
@@ -104,6 +115,7 @@ export class SimpleForm<T = unknown> {
     if (field === undefined) {
       if (lastField !== undefined) {
         this.fieldPropsMap.delete(path);
+        this.setFieldError(path, undefined);
       }
     } else {
       const newField = Object.assign({}, lastField, field);
@@ -131,7 +143,7 @@ export class SimpleForm<T = unknown> {
   public setInitialValue(path?: FormPathType, initialValue?: unknown) {
     if (!isValidFormName(path)) return;
     const oldValue = this.getFieldValue(path);
-    if (isEmpty(oldValue) && isEmpty(initialValue) || !isEmpty(oldValue)) return;
+    if (isEmpty(oldValue) && isEmpty(initialValue)) return;
     this.initialValues = deepSet(this.initialValues, path, initialValue);
     // 旧表单值存储
     this.lastValues = this.values;
@@ -151,11 +163,11 @@ export class SimpleForm<T = unknown> {
   }
 
   // 更新表单值，单个表单值或多个表单值
-  public setFieldValue(path: object, eventName?: FieldProps['trigger']): void;
-  public setFieldValue(path: FormPathType, value?: unknown, eventName?: FieldProps['trigger']): void;
+  public setFieldValue(path: object, eventName?: Parameters<typeof isCanTrigger>[0]): void;
+  public setFieldValue(path: FormPathType, value?: unknown, eventName?: Parameters<typeof isCanTrigger>[0]): void;
   public setFieldValue(...args) {
     // 设置单个表单值
-    const setFormItemValue = (path?: FormPathType, value?: unknown, eventName?: FieldProps['trigger']) => {
+    const setFormItemValue = (path?: FormPathType, value?: unknown, eventName?: Parameters<typeof isCanTrigger>[0]) => {
       if (!isValidFormName(path)) return;
       // 旧表单值存储
       this.lastValues = this.values;
@@ -221,7 +233,7 @@ export class SimpleForm<T = unknown> {
   }
 
   // 校验整个表单或校验表单中的某个控件
-  public async validate(path?: FormPathType | Array<FormPathType>, eventName?: FieldProps['trigger']) {
+  public async validate(path?: FormPathType | Array<FormPathType>, eventName?: Parameters<typeof isCanTrigger>[0]) {
 
     const validateError = async (path: FormPathType) => {
       this.setFieldError(path, undefined);

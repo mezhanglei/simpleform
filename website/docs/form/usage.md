@@ -6,12 +6,15 @@ order: 1
 # 高级用法
 
 ## 双向绑定
-1. 通过`Form.Item`嵌套回调函数来提供值和事件双向绑定的`bindProps`参数, 此方法为推荐方法.
+1. 通过`Form.Item`来提供值和事件双向绑定, 也可以通过回调函数方式传入`bindProps`参数.
 ```javascript
 ...
 
 <Form.Item label="object" name="name1">
-  {({ bindProps }) =>  <input {...bindProps} />}
+  {/* 默认自动绑定 */}
+  <input />
+  {/* 回调函数方式绑定 */} 
+  {/* ({ bindProps }) =>  <input {...bindProps} /> */}
 </Form.Item>
 ```
 2. ~通过`form`实例的`getBindProps`方法来实现值和事件的双向绑定(`>2.x`已废弃)~
@@ -35,13 +38,13 @@ const form = useSimpleForm();
 // 数组写法
 
 <Form.Item label="object" name="list[0]">
-  {({ bindProps }) =>  <input {...bindProps} />}
+  <input />
 </Form.Item>
 ```
 ```javascript
 // 对象写法
 
 <Form.Item label="object" name="obj.a">
-  {({ bindProps }) =>  <input {...bindProps} />}
+  <input />
 </Form.Item>
 ```

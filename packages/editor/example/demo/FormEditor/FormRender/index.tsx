@@ -6,7 +6,7 @@ import defineConfig from './defineConfig';
 
 export * from '@simpleform/editor';
 
-export type CustomFormChildrenProps = FormChildrenProps<EditorOptions>;
+export type CustomFormChildrenProps = FormChildrenProps;
 export function FormChildren(props: CustomFormChildrenProps) {
   const { components, variables, ...rest } = props;
   return (
@@ -19,7 +19,7 @@ export function FormChildren(props: CustomFormChildrenProps) {
   );
 }
 
-export type CustomFormRenderProps = FormRenderProps<EditorOptions>;
+export type CustomFormRenderProps = FormRenderProps;
 export default function FormRender(props: CustomFormRenderProps) {
   const { components, variables, ...rest } = props;
   return (

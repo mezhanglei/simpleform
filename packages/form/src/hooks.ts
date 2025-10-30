@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SimpleForm } from './store';
-import { deepSet, FormPathType, isIndexCode, pathToArr } from './utils/utils';
+import { deepGet, deepSet, FormPathType, isIndexCode, joinFormPath, pathToArr } from './utils/utils';
 
 export function useSimpleForm<T>(
   values?: T
@@ -42,21 +42,27 @@ export function useFormValues<V>(form: SimpleForm<V>, path?: FormPathType | Arra
 
   const subscribe = useCallback(() => {
     if (!form?.subscribeFormValue) return;
-    const paths = path instanceof Array ? path : path !== undefined && [path];
-    if (paths) {
-      const isArr = paths.some((k) => isIndexCode(pathToArr(k)?.[0])); // 表单值是否为列表
-      let result: unknown = isArr ? [] : {};
-      paths.forEach((key) => {
-        form?.subscribeFormValue(key, (newVal) => {
-          result = deepSet(result, key, newVal);
+    form?.subscribeFormValue((newVal) => {
+      if (path) {
+        const isArr = path instanceof Array ? isIndexCode(pathToArr(path[0])?.[0]) : isIndexCode(pathToArr(path)?.[0]);
+        const initial = isArr ? [] : {};
+        if (path instanceof Array) {
+          let temp = initial;
+          path.forEach((formPath) => {
+            const item = deepGet(newVal, formPath);
+            if (item !== undefined) {
+              temp = deepSet(temp, formPath, item) as any;
+            }
+          });
+          setMapData(temp as Partial<V>);
+        } else {
+          const result = deepGet(newVal, path) || initial;
           setMapData(result as Partial<V>);
-        });
-      });
-    } else {
-      form?.subscribeFormValue((newVal) => {
+        }
+      } else {
         setMapData(newVal as Partial<V>);
-      });
-    }
+      }
+    });
   }, [form?.subscribeFormValue, JSON.stringify(path)]);
 
   useMemo(() => {

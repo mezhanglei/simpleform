@@ -1,5 +1,5 @@
 import { deepSet, deepGet } from "@simpleform/form";
-import { WidgetList, WidgetOptions } from "../typings";
+import { FormRenderNodeProps, FormRenderProps } from "src/typings";
 
 // 路径是否相等
 export const isEqualPath = (a, b) => {
@@ -9,14 +9,14 @@ export const isEqualPath = (a, b) => {
 };
 
 // 设置指定路径的值
-export const setItemByPath = <V>(widgetList?: V, data?: unknown, path?: WidgetOptions['path']) => {
+export const setItemByPath = <V>(widgetList?: V, data?: unknown, path?: FormRenderNodeProps['path']) => {
   // 无路径时表示设置当前值
   if (!path?.length) return data as V;
   return deepSet(widgetList, path, data);
 };
 
 // 根据path获取指定路径的项
-export const getItemByPath = <V, Path extends WidgetOptions['path']>(widgetList?: V, path?: Path) => {
+export const getItemByPath = <V, Path extends FormRenderNodeProps['path']>(widgetList?: V, path?: Path) => {
   if (!path?.length) return widgetList;
   return deepGet(widgetList, path);
 };
@@ -45,7 +45,12 @@ export function parseEntries<T>(entries?: Array<[string, T]> | Array<[number, T]
 };
 
 // 通过序号插入数据
-export const insertItemByIndex = (widgetList: WidgetList | undefined, data: unknown, index?: number, parent?: WidgetOptions['path']) => {
+export const insertItemByIndex = (
+  widgetList: FormRenderProps['widgetList'] | undefined,
+  data: unknown,
+  index?: number,
+  parent?: FormRenderNodeProps['path']
+) => {
   const container = getItemByPath(widgetList, parent);
   if (!(container instanceof Array) || data === undefined || data === '' || data === null) return widgetList;
   const entriesData = toEntries(container);
@@ -61,9 +66,9 @@ export const insertItemByIndex = (widgetList: WidgetList | undefined, data: unkn
 
 // 调整位置
 export const moveItemByPath = (
-  widgetList: WidgetList | undefined,
-  fromPath: WidgetOptions['path'],
-  toPath: WidgetOptions['path'],
+  widgetList: FormRenderProps['widgetList'] | undefined,
+  fromPath: FormRenderNodeProps['path'],
+  toPath: FormRenderNodeProps['path'],
 ) => {
   if (!fromPath?.length) return widgetList;
   const fromData = getItemByPath(widgetList, fromPath);

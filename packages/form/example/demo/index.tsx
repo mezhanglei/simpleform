@@ -21,7 +21,7 @@ export default function Demo() {
   const formData = useFormValues(form, ['[0].name1', '[1].name2']);
   console.log(formData, '值');
   return (
-    <Form initialValues={[{ name1: 1111 }]} form={form} onSubmit={onSubmit}>
+    <Form initialValues={[{ name1: 1111 }]} form={form}>
       <Form.Item tooltip='11111' label="Name1" name="[0].name1" rules={[{ required: true, message: 'name1 is Empty' }, { validator: validator, message: '自定义校验' }]}>
         {({ bindProps }) => (
           <div>
@@ -33,7 +33,7 @@ export default function Demo() {
         {({ bindProps }) => <input style={{ height: '100px' }} {...bindProps} />}
       </Form.Item>
       <Form.Item label="">
-        <button>Submit</button>
+        <button onClick={onSubmit}>Submit</button>
       </Form.Item>
     </Form>
   );

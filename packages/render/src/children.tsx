@@ -3,67 +3,60 @@ import { FormChildrenProps } from './typings';
 import { SimpleFormContext } from '@simpleform/form';
 import '@simpleform/form/lib/css/main.css';
 import { useSimpleFormRender, useWidgetList } from './hooks';
-import { renderWidgetList, withSide, mergeFormOptions } from './utils/transform';
+import { createFRElement, renderFRNodeList, withSide } from './utils/transform';
 import { deepClone } from './utils';
 import { parseExpression } from './utils/parser';
 
+/* eslint-disable */
 // 渲染表单children
 export default function FormChildren(props: FormChildrenProps) {
-  const curFormrender = useSimpleFormRender();
-  const formContext = useContext(SimpleFormContext);
-  const {
-    wrapper,
-    options,
-    plugins,
-    variables,
-    onRenderChange,
-    renderList,
-    components = {},
-    widgetList: propWidgetList,
-    parser = parseExpression,
-    form = formContext?.form,
-    formrender = curFormrender,
-  } = props;
-  const curVariables = Object.assign({}, plugins, variables);
-  formrender.defineConfig({
-    ...props,
-    parser,
-    formrender,
-    form,
-    components,
-    variables: curVariables,
+	const curFormrender = useSimpleFormRender();
+	const formContext = useContext(SimpleFormContext);
+	const {
+		wrapper,
+		plugins,
+		variables,
+		onRenderChange,
+		renderList,
+		components = {},
+		widgetList: propWidgetList,
+		parser = parseExpression,
+		form = formContext?.form,
+		formrender = curFormrender,
+	} = props;
+
+	const curVariables = Object.assign({}, plugins, variables);
+
+	// formrender挂载所有props
+	formrender.defineConfig({
+		...props,
+		parser,
+		form,
+		formrender,
+		components,
+		variables: curVariables,
+	});
+
+	const [widgetList, setWidgetList] = useWidgetList(formrender, onRenderChange);
+
+	// 从props中同步widgetList
+	useEffect(() => {
+		const cloneData = deepClone(propWidgetList);
+		setWidgetList(cloneData || []);
+		formrender?.setWidgetList(cloneData, { ignore: true });
+	}, [propWidgetList]);
+
+	const childs = renderFRNodeList(formrender, widgetList, formContext, {
+    onValuesChange: () => {
+      // 监听表单事件
+      setWidgetList((old) => [...(old || [])]);
+    },
   });
 
-  const _baseOptions = {
-    ...formContext,
-    ...(typeof options === 'function' ? options() : options),
-    formrender,
-    form,
-  };
+	const wrapperEle = createFRElement(wrapper, {}, formrender?.config?.components);
 
-  const [widgetList, setWidgetList] = useWidgetList(formrender, onRenderChange);
-
-  // 从props中同步widgetList, 不触发subscribeWidgetList监听
-  useEffect(() => {
-    if (!formrender) return;
-    const cloneData = deepClone(propWidgetList);
-    setWidgetList(cloneData || []);
-    formrender.setWidgetList(cloneData, { ignore: true });
-  }, [propWidgetList]);
-
-  const childs = renderWidgetList(formrender, widgetList, mergeFormOptions(_baseOptions, {
-    // 监听表单值，重新渲染
-    onValuesChange: () => {
-      setWidgetList(old => [...(old || [])]);
-    },
-  }));
-
-  return <>{
-    withSide(
-      childs,
-      renderList,
-      formrender.createFormElement(wrapper, { _options: _baseOptions }), { _options: _baseOptions })
-  }</>;
+	return <>{withSide(childs, renderList, wrapperEle)}</>;
 }
 
 FormChildren.displayName = 'Form.Children';
+/* eslint-enable */

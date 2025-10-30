@@ -134,3 +134,33 @@ export function deepSet<T, P extends FormPathType>(obj?: T, path?: P, value?: un
   }
   return cloneData;
 }
+
+export function getRulesTriggers(rules?: ItemCoreProps['rules']) {
+  const result = [] as Array<ItemCoreProps['trigger']>;
+  if (rules instanceof Array) {
+    for (let i = 0; i < rules?.length; i++) {
+      const rule = rules?.[i];
+      const validateTrigger = rule?.validateTrigger;
+      if (validateTrigger) {
+        if (validateTrigger instanceof Array) {
+          result.push(...validateTrigger);
+        } else {
+          result.push(validateTrigger);
+        }
+      }
+    }
+  }
+  return result;
+}
+
+export function mergeTriggers(
+  trigger: ItemCoreProps['trigger'],
+  validateTrigger: ItemCoreProps['validateTrigger'],
+  ruleTriggers: Array<ItemCoreProps['trigger']>,
+) {
+  return new Set([
+    ...toArray(trigger),
+    ...toArray(validateTrigger),
+    ...ruleTriggers
+  ]);
+}

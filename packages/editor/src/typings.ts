@@ -1,8 +1,4 @@
-import {
-  GenerateWidgetItem,
-  WidgetItem,
-  WidgetContextProps
-} from '@simpleform/render';
+import { FRContext, FRGenerateNode, FRNode } from '@simpleform/render';
 import React from 'react';
 import { ConfigWidgetSetting, FormEditorContextProps } from './context';
 
@@ -23,11 +19,11 @@ export interface EditorOptions {
   props?: unknown;
 }
 // 编辑器节点信息（解析联动前）
-export type EditorWidgetItem = WidgetItem<EditorOptions> & { type?: string };
+export type EditorWidgetItem = FRNode & { type?: string };
 // 编辑器节点信息（解析联动后）
-export type EditorGenerateWidgetItem = GenerateWidgetItem<EditorOptions> & { type?: string };
+export type EditorGenerateWidgetItem = FRGenerateNode & { type?: string };
 // 组件公共props
-export type CommonFormProps<V = unknown, C = unknown> = WidgetContextProps<EditorOptions & C> & {
+export type CommonFormProps<V = unknown> = FRContext & {
   value?: V;
   onChange?: (val?: V) => void;
   disabled?: boolean;
