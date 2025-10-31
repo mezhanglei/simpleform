@@ -91,7 +91,6 @@ export type FRGenerateNode = FormItemProps & {
 
 ## 表单上下文参数
 表单中的任意组件都会被注入上下文参数字段`_options`:
-- `index`：当前组件所在的列表的索引数字
 - `path`：当前组件所在的节点路径
 - `formrender`: `SimpleFormRender`的实例
 - `form`: `SimpleForm`的实例

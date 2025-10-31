@@ -1,6 +1,6 @@
 {
   "name": "@simpleform/evaluator",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "sandboxed JavaScript evaluator written in JavaScript",
   "author": "mezhanglei <496623925@qq.com>",
   "homepage": "https://github.com/mezhanglei/simpleform#readme",

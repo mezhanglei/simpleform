@@ -1,18 +1,15 @@
-# `@simpleform/rule`
+# `@simpleform/evaluator`
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-0.0.1-green)](https://www.npmjs.com/package/@simpleform/rule)
+[![](https://img.shields.io/badge/version-0.0.2-green)](https://www.npmjs.com/package/@simpleform/evaluator)
 
-> Rule Builder, Outputting Conditions Compliant with `json-logic-js`
-
-# Matters
-- The css style file needs to be introduced before it can be used, for example: `import '@simpleform/rule/lib/css/main.css'`;
+> javascript sandbox，depends on `quickjs-emscripten@0.31.0`
 
 ## install
 - [Node.js](https://nodejs.org/en/) Version >= 14.0.0
 - [react](https://react.docschina.org/) Version >= 16.8.0
 ```bash
-npm install @simpleform/rule --save
+npm install @simpleform/evalutor --save
 # or
-yarn add @simpleform/rule
+yarn add @simpleform/evalutor
 ```
