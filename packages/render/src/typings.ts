@@ -31,11 +31,13 @@ export type WithExpression<T> = {
 export type FRNode = WithExpression<WithGenerateNode<FRGenerateNode, 'inside' | 'outside'>>;
 
 // options参数
-export type FROptions = Partial<FRGenerateNode> & Pick<FormChildrenProps, 'formrender'> & Pick<FormProps, 'form'>;
+export type FROptions = Partial<FRGenerateNode> & { [key in string]: any };
 
 // context
 export type FRContext = {
-	_options: FROptions & {
+	_options: FROptions &
+	Pick<FormChildrenProps, 'formrender'> &
+	Pick<FormProps, 'form'> & {
 		index?: number;
 		path?: Array<string | number>;
 	};

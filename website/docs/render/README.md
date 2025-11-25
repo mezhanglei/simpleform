@@ -162,7 +162,7 @@ const widgetList = [{
 - `components`：注册表单中的所有组件;
 - `variables`: 表单中需要引入的变量;
 - `wrapper`: `FormChildren`的父节点
-- `options`： `FROptions | ((frGenerateNode) => FROptions)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
+- `options`： `FRGenerateNode | ((frGenerateNode) => FRGenerateNode)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
 - `renderList`：`(children, FRContext) => React.ReactNode`提供自定义渲染列表的函数.
 - `renderItem`：`(children, FRContext) => React.ReactNode`提供自定义渲染节点的函数.
 - `onRenderChange`: `(newValue: FormChildrenProps['widgetList']) => void;` `widgetList`更改时回调函数

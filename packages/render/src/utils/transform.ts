@@ -161,8 +161,7 @@ export const renderFRNode = (node?: FormRenderNodeProps, formContext?) => {
   const parseNode = parseFRData(widget, formrender, curForm);
   const defineOptions =
     typeof defineConfig?.options === 'function' ? defineConfig?.options(parseNode) : defineConfig?.options;
-  const parseOptions = parseFRData(defineOptions, formrender, curForm);
-  const baseOptions = mergeFROptions(formContext, parseOptions);
+  const baseOptions = mergeFROptions(formContext, defineOptions);
   const curData = mergeFROptions(baseOptions, parseNode);
   const { hidden, readOnlyRender, typeRender, type, props, children, inside, outside, ...formItemProps } = curData;
   const frContext = {

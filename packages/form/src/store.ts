@@ -118,8 +118,7 @@ export class SimpleForm<T = unknown> {
         this.setFieldError(path, undefined);
       }
     } else {
-      const newField = Object.assign({}, lastField, field);
-      this.fieldPropsMap.set(path, newField);
+      this.fieldPropsMap.set(path, field);
     };
   }
 
