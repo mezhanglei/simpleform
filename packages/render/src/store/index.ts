@@ -1,6 +1,5 @@
 import { FormRenderNodeProps, FormRenderProps } from '../typings';
 import { getItemByPath } from '../utils/utils';
-import { mergeFROptions } from '../utils/transform';
 import { Form } from "@simpleform/form";
 import { deepClone } from '../utils';
 import { CustomCol, CustomRow } from '../components';
@@ -44,7 +43,7 @@ export class SimpleFormRender {
     if (typeof payload === 'function') {
       this.config = payload(this.config);
     } else {
-      this.config = mergeFROptions(this.config, payload);
+      this.config = payload;
     }
   }
 
