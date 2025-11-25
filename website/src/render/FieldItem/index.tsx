@@ -36,7 +36,7 @@ export default function Demo() {
   return (
     <div>
       <Checkbox onChange={(e) => setIsNew(e.target.checked)}>切换新表单域组件</Checkbox>
-      <FormRender widgetList={widgetList} options={isNew ? { component: Item } : {}} />
+      <FormRender widgetList={widgetList} options={isNew ? { component: Item } : { component: undefined }} />
     </div>
   );
 }

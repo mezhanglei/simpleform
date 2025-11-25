@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-4.1.31-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.1.32-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
 
