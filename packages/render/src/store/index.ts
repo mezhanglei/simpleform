@@ -19,6 +19,14 @@ const bindClassPrototype = (target, instance) => {
 
 export type FormRenderListener<V> = (newValue?: V, oldValue?: V) => void;
 
+const defaultConfig = {
+  components: {
+    row: CustomRow,
+    col: CustomCol,
+    'Form.Item': Form.Item,
+  },
+}
+
 // 管理formrender过程中的数据
 export class SimpleFormRender {
   public config?: FormRenderProps;
@@ -28,13 +36,7 @@ export class SimpleFormRender {
   constructor(config?: SimpleFormRender['config']) {
     this.widgetList = [];
     this.lastWidgetList = undefined;
-    this.config = config || {
-      components: {
-        row: CustomRow,
-        col: CustomCol,
-        'Form.Item': Form.Item,
-      },
-    };
+    this.config = config || defaultConfig;
     bindClassPrototype(SimpleFormRender, this);
   }
 
@@ -43,7 +45,7 @@ export class SimpleFormRender {
     if (typeof payload === 'function') {
       this.config = payload(this.config);
     } else {
-      this.config = payload;
+      this.config = { ...payload, components: { ...defaultConfig.components, ...payload?.components } };
     }
   }
 
