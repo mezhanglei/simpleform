@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-4.1.34-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.2.0-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
 
@@ -126,28 +126,30 @@ const CustomInput: React.FC<FRContext & InputProps> = (props) => {
 <code src="../../src/render/expression.tsx"></code>
 
 ### 表达式使用规则
-- 目标有且只能有一对`{{`和`}}`包裹.
-- 导出`toExpression`方法可以代替手写序列化
-- 表达式中使用的模块或变量由`variables`注入，默认内置的有三个:
+- `{{`和`}}`只能包裹目标表达式，表达式中的语法为`>=ES5`版本语法.
+- 表达式中使用的模块或变量由`variables`属性注入，默认内置的有三个:
   - `form`：即`useSimpleForm()`
   - `formrender`：即`useSimpleFormRender()`
   - `formvalues`：即`form.getFieldValue()`
 ```javascript
 import dayjs from 'dayjs';
-import FormRender, { toExpression } from "./FormRender";
+import FormRender from "./FormRender";
 
 const widgetList = [{
   label: "name3",
+  // required属性为表达式
+  rules: [{ required: '{{formvalues?.name1 === true}}', message: "name2 empty" }],
+  // 表达式使用dayjs变量
   initialValue: "{{dayjs().format('YYYY-MM-DD')}}",
-  // initialValue: toExpression(dayjs().format('YYYY-MM-DD')),
   type: 'Input',
   props: {}
 }]
- 
+// variables属性注入dayjs变量
 <FormRender widgetList={widgetList} variables={{ dayjs }} />
 ```
 :::warning
 `>=4.1.25`导出序列化函数`toExpression`和反序列化函数`parseExpression`
+`>=4.2.0`由`@simpleform/evaluator`代替`new Function`提供javascript表达式解析，支持能力更好，推荐升级。
 :::
 
 ## API

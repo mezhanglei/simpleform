@@ -19,28 +19,37 @@ export const toExpression = (val?: unknown) => {
 // 匹配字符串表达式
 export const matchExpression = (value?: unknown) => {
   if (typeof value === 'string') {
-    // /{{([\s\S]+?)}}/g
-    const reg = new RegExp('{{s*.*?s*}}', 'g');
-    const result = value?.match(reg)?.[0];
-    return result;
+    const matches = value.match(/({{.*?}})|([^{{]*)/g)?.filter((p) => !!p);
+    return matches;
   }
 };
 
 // 从序列化字符串转化为js
 export const parseExpression = <V>(value: V, variables?: object) => {
-  if (typeof value === 'string') {
-    const matchStr = matchExpression(value);
-    if (matchStr) {
-      evaluator.expose(variables || {});
-      // 尝试计算表达式的值
-      const result = evaluator.evalCode(matchStr);
-      return result;
+  if (typeof value !== 'string') return value;
+  const matches = matchExpression(value);
+  const bracketRegx = /^{{(.*)}}$/;
+  const codeList = matches?.filter((str) => bracketRegx.test(str));
+  if (!codeList?.length) return value;
+
+  // js沙盒解析字符串能力，目前处于隐藏状态
+  const compileCode = (code) => {
+    evaluator.expose(variables || {});
+    const result = evaluator.evalCode(code);
+    return result;
+  };
+
+  // 遍历解析
+  const target = matches?.map((part) => {
+    if (bracketRegx.test(part)) {
+      const code = part?.replace(bracketRegx, '$1');
+      return compileCode(code);
     } else {
-      return value;
+      return part;
     }
-  } else {
-    return value;
-  }
+  })
+  const res = matches?.length === 1 ? target?.[0] : target?.join('')
+  return res
 };
 
 /* eslint-enable */

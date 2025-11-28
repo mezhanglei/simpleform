@@ -19,16 +19,18 @@ export type FRGenerateNode = FormItemProps & {
 	hidden?: boolean;
 };
 
-export type WithGenerateNode<T, K extends keyof FRGenerateNode> = {
-	[P in keyof T]: P extends K ? T[P] | FRGenerateNode : T[P];
-};
-
 export type WithExpression<T> = {
 	[P in keyof T]: T[P] | string;
 };
 
+export type ArrWithExpression<T extends Array<any> | undefined> = Array<WithExpression<NonNullable<T>[number]>>
+
 // 编译前的节点信息
-export type FRNode = WithExpression<WithGenerateNode<FRGenerateNode, 'inside' | 'outside'>>;
+export type FRNode = WithExpression<Omit<FRGenerateNode, 'rules' | 'inside' | 'outside'> & {
+	rules?: ArrWithExpression<FormItemProps['rules']>
+	inside?: FRGenerateNode['inside'] | FRGenerateNode;
+	outside?: FRGenerateNode['inside'] | FRGenerateNode;
+}>;
 
 // options参数
 export type FROptions = Partial<FRGenerateNode> & { [key in string]: any };
