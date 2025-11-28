@@ -85,8 +85,8 @@ export type FRGenerateNode = FormItemProps & {
 };
 ```
 :::warning
-`>=4`版本嵌套子节点由`widgetList`字段名改为`children`。
-`>=4.1.12`版本`readOnlyRender`字段和`typeRender`字段的组件类型变更。
+- `>=4`版本嵌套子节点由`widgetList`字段名改为`children`。
+- `>=4.1.12`版本`readOnlyRender`字段和`typeRender`字段的组件类型变更。
 :::
 
 ## 表单上下文参数
@@ -148,8 +148,8 @@ const widgetList = [{
 <FormRender widgetList={widgetList} variables={{ dayjs }} />
 ```
 :::warning
-`>=4.1.25`导出序列化函数`toExpression`和反序列化函数`parseExpression`
-`>=4.2.0`由`@simpleform/evaluator`代替`new Function`提供javascript表达式解析，支持能力更好，推荐升级。
+- `>=4.1.25`导出序列化函数`toExpression`和反序列化函数`parseExpression`
+- `>=4.2.0`由`@simpleform/evaluator`代替`new Function`提供javascript表达式解析，支持能力更好，推荐升级。
 :::
 
 ## API
@@ -162,7 +162,7 @@ const widgetList = [{
 `FormRender`或`FormChildren`组件的`props`
 - `widgetList`: `FormChildrenProps['widgetList']` 渲染表单的DSL形式的json数据
 - `components`：注册表单中的所有组件;
-- `variables`: 表单中需要引入的变量;
+- `variables`: `widgetList`中表达式中需要引入的变量;
 - `wrapper`: `FormChildren`的父节点
 - `options`： `FRGenerateNode | ((frGenerateNode) => FRGenerateNode)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
 - `renderList`：`(children, FRContext) => React.ReactNode`提供自定义渲染列表的函数.
@@ -172,7 +172,7 @@ const widgetList = [{
 - `form`: `Form`。通过`useSimpleForm()`创建，负责表单值的管理，选填.
 - `parser`: `<V>(node?: unknown, variables?: object) => V` 字符串表达式解析函数，默认方法为`parseExpression`, 传`null`则表示不解析表达式.
 :::warning
-`>=4.1.25`新增`parser`和`wrapper`, 并且移除`uneval`.
+- `>=4.1.25`新增`parser`和`wrapper`, 并且移除`uneval`.
 :::
 
 ### SimpleFormRender Method

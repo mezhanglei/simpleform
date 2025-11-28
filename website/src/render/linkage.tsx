@@ -18,7 +18,7 @@ export default function Demo() {
     {
       label: "展示控件",
       name: 'name2',
-      rules: [{ required: formvalues && formvalues.name1 === true, message: "name2 empty" }],
+      rules: [{ required: formvalues?.name1 === true, message: "name2 empty" }],
       initialValue: 1,
       type: 'Input',
       props: {}
