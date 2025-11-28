@@ -32,7 +32,7 @@ export const parseExpression = <V>(value: V, variables?: object) => {
   const codeList = matches?.filter((str) => bracketRegx.test(str));
   if (!codeList?.length) return value;
 
-  // js沙盒解析字符串能力，目前处于隐藏状态
+  // js沙盒解析字符串能力
   const compileCode = (code) => {
     evaluator.expose(variables || {});
     const result = evaluator.evalCode(code);

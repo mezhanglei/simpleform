@@ -1,6 +1,14 @@
-import { Button } from 'antd';
+import { Row, Col, Button } from 'antd';
 import React, { useState } from 'react';
 import FormRender, { useSimpleForm } from './FormRender';
+
+const FRWrapper = (params?: unknown) => {
+  return <Row {...params} gutter={[16, 16]} />
+}
+
+const FRCol = (params?: unknown) => {
+  return <Col {...params} span={8} />
+}
 
 export default function Demo() {
 
@@ -11,7 +19,7 @@ export default function Demo() {
       readOnly: true,
       readOnlyRender: "readonly component",
       initialValue: 1111,
-      hidden: '{{formvalues && formvalues.name6 == true}}',
+      hidden: '{{formvalues?.name6 == true}}',
       type: 'Input',
       props: {}
     },
@@ -20,7 +28,7 @@ export default function Demo() {
       name: 'name2',
       rules: [{ required: true, message: 'input empty' }],
       initialValue: 1,
-      hidden: '{{formvalues && formvalues.name6 == true}}',
+      hidden: '{{formvalues?.name6 == true}}',
       type: 'Input',
       props: {}
     },
@@ -59,9 +67,12 @@ export default function Demo() {
       rules: [{ required: true, message: 'first empty' }],
       type: 'Select',
       props: {
-        style: { width: '100%' }
+        style: { width: '100%' },
+        options: [
+          { label: 'option1', value: 1 },
+          { label: 'option2', value: 2 },
+        ],
       },
-      children: [{ type: 'Select.Option', props: { key: 1, value: '1' }, children: 'option1' }]
     },
     {
       label: 'second',
@@ -69,9 +80,12 @@ export default function Demo() {
       rules: [{ required: true, message: 'second empty' }],
       type: 'Select',
       props: {
-        style: { width: '100%' }
+        style: { width: '100%' },
+        options: [
+          { label: 'option1', value: 1 },
+          { label: 'option2', value: 2 },
+        ],
       },
-      children: [{ type: 'Select.Option', props: { key: 1, value: '1' }, children: 'option1' }]
     },
     {
       label: 'name5',
@@ -81,13 +95,13 @@ export default function Demo() {
       valueGetter: "{{(value) => ({span: value})}}",
       type: 'Select',
       props: {
-        style: { width: '100%' }
-      },
-      children: [
-        { type: 'Select.Option', props: { key: 1, value: 12 }, children: 'option1' },
-        { type: 'Select.Option', props: { key: 2, value: 6 }, children: 'option2' },
-        { type: 'Select.Option', props: { key: 3, value: 4 }, children: 'option3' }
-      ]
+        style: { width: '100%' },
+        options: [
+          { key: 1, label: 'options1', value: 12 },
+          { key: 2, label: 'options2', value: 6 },
+          { key: 3, label: 'options3', value: 4 },
+        ]
+      }
     },
     {
       label: 'checkbox',
@@ -119,10 +133,12 @@ export default function Demo() {
       <p>报错：<span style={{ color: 'red' }}>{formRes.error}</span></p>
       <p>提交表单值：<span style={{ color: 'green' }}>{JSON.stringify(formRes.values || {})}</span></p>
       <FormRender
+        wrapper={FRWrapper}
+        options={{ outside: FRCol }}
         form={form}
         widgetList={widgetList}
       />
-      <div style={{ marginLeft: '120px' }}>
+      <div style={{ marginLeft: '120px', marginTop: 16 }}>
         <Button onClick={onSubmit}>submit</Button>
       </div>
     </div>

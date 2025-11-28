@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { SimpleFormContext, FormInitialValuesContext } from './context';
-import { deepGet, FormPathType, getValueFromEvent, isValidFormName, toArray } from './utils/utils';
+import { deepGet, FormPathType, getValueFromEvent, isValidFormName } from './utils/utils';
 import { FormRule } from './validator';
 import { isEmpty } from './utils/type';
 import { FormProps } from './form';

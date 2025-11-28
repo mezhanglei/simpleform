@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-4.2.0-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.2.1-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
 
@@ -36,6 +36,8 @@ import '@simpleform/render/lib/css/main.css';
 ```
 ### 基本使用
 概述：1.注册组件对象 → 2.赋值给`FormRender`或`FormChildren`中的`components`即可完成前置工作
+- 表单引擎支持给节点设置`wrapper`和`outside`, `wrapper`为`FormChildren`组件的外层节点, `outside`是给`widgetList`中每个组件节点的外层插入目标组件节点, 从而实现布局调整和控制。
+
 <code src="../../src/render/base.tsx"></code>
 
 ## 多模块渲染

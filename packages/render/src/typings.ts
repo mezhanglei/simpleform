@@ -11,8 +11,8 @@ export type FRGenerateNode = FormItemProps & {
 	type?: string | ReactComponent<any>;
 	props?: Record<string, unknown>;
 	children?: any;
-	inside?: ReactComponent<any> | ReactNode; // 节点的内层
-	outside?: ReactComponent<any> | ReactNode; // 节点的外层
+	inside?: ReactComponent<any> | ReactNode | FRGenerateNode; // 节点的内层
+	outside?: ReactComponent<any> | ReactNode | FRGenerateNode; // 节点的外层
 	readOnly?: boolean; // 只读模式
 	readOnlyRender?: ReactNode | ((context?: FRContext) => ReactNode); // 只读模式下的组件
 	typeRender?: ReactNode | ((context?: FRContext) => ReactNode); // 表单控件自定义渲染
@@ -26,10 +26,8 @@ export type WithExpression<T> = {
 export type ArrWithExpression<T extends Array<any> | undefined> = Array<WithExpression<NonNullable<T>[number]>>
 
 // 编译前的节点信息
-export type FRNode = WithExpression<Omit<FRGenerateNode, 'rules' | 'inside' | 'outside'> & {
+export type FRNode = WithExpression<Omit<FRGenerateNode, 'rules'> & {
 	rules?: ArrWithExpression<FormItemProps['rules']>
-	inside?: FRGenerateNode['inside'] | FRGenerateNode;
-	outside?: FRGenerateNode['inside'] | FRGenerateNode;
 }>;
 
 // options参数
