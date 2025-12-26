@@ -7,25 +7,21 @@ export * from '@simpleform/render';
 
 export type CustomFormChildrenProps = FormChildrenProps;
 export function FormChildren(props: CustomFormChildrenProps) {
-  const { components, variables, ...rest } = props;
   return (
     <DefaultFormChildren
       options={defineConfig.options}
-      components={{ ...defineConfig.components, ...components }}
-      variables={{ ...variables, ...defineConfig.variables }}
-      {...rest}
+      {...defineConfig}
+      {...props}
     />
   );
 }
 export type CustomFormRenderProps = FormRenderProps;
 export default function FormRender(props: CustomFormRenderProps) {
-  const { components, variables, ...rest } = props;
   return (
     <DefaultFormRender
       options={defineConfig.options}
-      components={{ ...defineConfig.components, ...components }}
-      variables={{ ...variables, ...defineConfig.variables }}
-      {...rest}
+      {...defineConfig}
+      {...props}
     />
   );
 };

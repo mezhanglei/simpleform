@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-4.2.1-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.2.2-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
 
@@ -129,10 +129,10 @@ const CustomInput: React.FC<FRContext & InputProps> = (props) => {
 
 ### 表达式使用规则
 - `{{`和`}}`只能包裹目标表达式，表达式中的语法为`>=ES5`版本语法.
-- 表达式中使用的模块或变量由`variables`属性注入，默认内置的有三个:
+- 表达式中使用的模块或变量由`variables`属性注入，默认内置的有2个:
   - `form`：即`useSimpleForm()`
   - `formrender`：即`useSimpleFormRender()`
-  - `formvalues`：即`form.getFieldValue()`
+  - ~`formvalues`：即`form.getFieldValue()`~, `>=4.2.2`已移除.
 ```javascript
 import dayjs from 'dayjs';
 import FormRender from "./FormRender";
@@ -140,7 +140,7 @@ import FormRender from "./FormRender";
 const widgetList = [{
   label: "name3",
   // required属性为表达式
-  rules: [{ required: '{{formvalues?.name1 === true}}', message: "name2 empty" }],
+  rules: [{ required: '{{form?.getFieldValue("name1") === true}}', message: "name2 empty" }],
   // 表达式使用dayjs变量
   initialValue: "{{dayjs().format('YYYY-MM-DD')}}",
   type: 'Input',
@@ -164,6 +164,7 @@ const widgetList = [{
 `FormRender`或`FormChildren`组件的`props`
 - `widgetList`: `FormChildrenProps['widgetList']` 渲染表单的DSL形式的json数据
 - `components`：注册表单中的所有组件;
+- `formConfig`: 自定义配置`Form`组件相关，默认为内置的`@simpleform/form`相关配置，`>=4.2.2`可使用
 - `variables`: `widgetList`中表达式中需要引入的变量;
 - `wrapper`: `FormChildren`的父节点
 - `options`： `FRGenerateNode | ((frGenerateNode) => FRGenerateNode)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
@@ -171,7 +172,6 @@ const widgetList = [{
 - `renderItem`：`(children, FRContext) => React.ReactNode`提供自定义渲染节点的函数.
 - `onRenderChange`: `(newValue: FormChildrenProps['widgetList']) => void;` `widgetList`更改时回调函数
 - `formrender`: `FormRender`通过`useSimpleFormRender()`创建的实例，负责表单界面渲染，选填.
-- `form`: `Form`。通过`useSimpleForm()`创建，负责表单值的管理，选填.
 - `parser`: `<V>(node?: unknown, variables?: object) => V` 字符串表达式解析函数，默认方法为`parseExpression`, 传`null`则表示不解析表达式.
 :::warning
 - `>=4.1.25`新增`parser`和`wrapper`, 并且移除`uneval`.

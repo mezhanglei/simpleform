@@ -1,14 +1,13 @@
 import React from 'react';
 import { FormRenderProps } from './typings';
-import { Form, useSimpleForm } from '@simpleform/form';
 import FormChildren from './children';
+import { useFormConfig } from './hooks';
 
 // 渲染表单
 export default function FormRender(props: FormRenderProps) {
-  const curForm = useSimpleForm();
+
   const {
     formrender,
-    form = curForm,
     parser,
     wrapper,
     widgetList,
@@ -19,12 +18,19 @@ export default function FormRender(props: FormRenderProps) {
     renderList,
     onRenderChange,
     options,
+    formConfig = formrender?.config?.formConfig,
     ...formOptions
   } = props;
 
+  const propFormConfig = formOptions?.form ? { form: formOptions?.form, ...formConfig } : formConfig;
+  const curFormConfig = useFormConfig(propFormConfig);
+  const curForm = curFormConfig?.form;
+  const FormCom = curFormConfig?.Form;
+
   return (
-    <Form form={form} {...formOptions}>
+    <FormCom {...formOptions} form={curForm} >
       <FormChildren
+        formConfig={curFormConfig}
         wrapper={wrapper}
         options={options}
         parser={parser}
@@ -37,6 +43,6 @@ export default function FormRender(props: FormRenderProps) {
         renderList={renderList}
         onRenderChange={onRenderChange}
       />
-    </Form>
+    </FormCom>
   );
 }

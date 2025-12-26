@@ -1,14 +1,14 @@
-import React, { useContext } from 'react';
+import React from 'react';
+import { useFormConfig } from './hooks';
 import { FormRenderNodeProps } from './typings';
 import { renderFRNode } from './utils';
-import { SimpleFormContext } from '@simpleform/form';
 
 /* eslint-disable */
 
 // 渲染节点
 const FormRenderNode: React.FC<FormRenderNodeProps> = (node) => {
-  const formContext = useContext(SimpleFormContext)
-  return <>{renderFRNode(node, formContext)}</>
+  const formConfig = useFormConfig(node?.formrender?.config?.formConfig);
+  return <>{renderFRNode(node, formConfig)}</>
 }
 
 export default FormRenderNode

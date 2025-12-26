@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import FormRender, { useSimpleForm } from './FormRender';
 
 const FRWrapper = (params?: unknown) => {
-  return <Row {...params} gutter={[16, 16]} />
+  return <Row {...params} gutter={16} />
 }
 
 const FRCol = (params?: unknown) => {
@@ -19,7 +19,7 @@ export default function Demo() {
       readOnly: true,
       readOnlyRender: "readonly component",
       initialValue: 1111,
-      hidden: '{{formvalues?.name6 == true}}',
+      hidden: '{{form?.getFieldValue("name6") == true}}',
       type: 'Input',
       props: {}
     },
@@ -28,7 +28,7 @@ export default function Demo() {
       name: 'name2',
       rules: [{ required: true, message: 'input empty' }],
       initialValue: 1,
-      hidden: '{{formvalues?.name6 == true}}',
+      hidden: '{{form?.getFieldValue("name6") == true}}',
       type: 'Input',
       props: {}
     },

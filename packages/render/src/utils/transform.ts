@@ -1,7 +1,15 @@
-import { deepSet, Form, isValidFormName } from '@simpleform/form';
+import { deepSet, isValidFormName } from '@simpleform/form';
 import React from 'react';
 import { cloneElement, createElement, isValidComponent, isValidElement } from './framework';
-import { CustomRenderType, FormRenderNodeProps, FormRenderProps, FRContext, ReactComponent } from '../typings';
+import {
+  CustomRenderType,
+  FormChildrenProps,
+  FormRenderNodeProps,
+  FormRenderProps,
+  FRContext,
+  FRGenerateNode,
+  ReactComponent
+} from '../typings';
 import { isEmpty, isObject } from './type';
 
 /* eslint-disable */
@@ -74,12 +82,13 @@ export const traverseParse = <V>(obj: V, variables?: object, parser?: FormRender
 };
 
 // 提取widgetList中的默认值
-export const getInitialValues = <V>(widgetList?: FormRenderProps['widgetList']) => {
+export const getInitialValues = (widgetList?: FRGenerateNode[]) => {
   if (!(widgetList instanceof Array)) return;
-  let initialValues = {} as V;
+  let initialValues = {};
   traverseList(widgetList, (item) => {
-    if (item?.initialValue !== undefined && isValidFormName(item?.name)) {
-      initialValues = (deepSet(initialValues, item.name, item?.initialValue) || {}) as V;
+    const name = item?.name;
+    if (item?.initialValue !== undefined && isValidFormName(name)) {
+      initialValues = (deepSet(initialValues, item.name, item?.initialValue) || {});
     }
   });
   return initialValues;
@@ -115,11 +124,10 @@ export const createFRElement = (
 // 解析
 export const parseFRData = (data, formrender: FormRenderProps['formrender'], form?: FormRenderProps['form']) => {
   const defineConfig = formrender?.config;
-  const curForm = form || defineConfig?.form;
+  const curForm = form || defineConfig?.formConfig?.form;
   const variables = {
     form: curForm,
     formrender,
-    formvalues: curForm?.getFieldValue() || {},
     ...defineConfig?.variables,
   };
   const parseData = traverseParse(data, variables, defineConfig?.parser);
@@ -141,7 +149,7 @@ export const withSide = (
 };
 
 // 渲染节点
-export const renderFRNode = (node?: FormRenderNodeProps, formContext?) => {
+export const renderFRNode = (node?: FormRenderNodeProps, formConfig?: FormChildrenProps['formConfig']) => {
   if (!node?.formrender) return;
   const { formrender, widget, index, path, onValuesChange, renderItem, renderList } = node;
   if (
@@ -153,8 +161,11 @@ export const renderFRNode = (node?: FormRenderNodeProps, formContext?) => {
   ) {
     return widget;
   }
-  const defineConfig = formrender?.config || {};
-  const curForm = defineConfig?.form || formContext?.form;
+  const defineConfig = formrender?.config;
+  const curFormConfig = { ...defineConfig?.formConfig, ...formConfig };
+  const formContext = curFormConfig?.context;
+  const FormItem = curFormConfig?.Item;
+  const curForm = curFormConfig?.form;
   const customItem = renderItem || defineConfig?.renderItem;
   const customList = renderList || defineConfig?.renderList;
   // 节点信息
@@ -180,7 +191,7 @@ export const renderFRNode = (node?: FormRenderNodeProps, formContext?) => {
   const outsideEle = createFRElement(outside, frContext, defineConfig?.components);
   const typeChildren =
     children instanceof Array
-      ? renderFRNodeList(formrender, children, formContext, { ...node, path: path?.concat('children') })
+      ? renderFRNodeList(formrender, children, curFormConfig, { ...node, path: path?.concat('children') })
       : children;
   // 元素节点
   let curNode;
@@ -189,9 +200,9 @@ export const renderFRNode = (node?: FormRenderNodeProps, formContext?) => {
   } else {
     curNode = isEmpty(typeWidget) ? typeChildren : typeWidget;
   }
-  const result = isFormWidget
+  const result = isFormWidget && FormItem
     ? createElement(
-      Form.Item,
+      FormItem,
       {
         ...formItemProps,
         onValuesChange: (a, b) => {
@@ -208,7 +219,7 @@ export const renderFRNode = (node?: FormRenderNodeProps, formContext?) => {
 export const renderFRNodeList = (
   formrender: FormRenderNodeProps['formrender'],
   widgetList?,
-  formContext?,
+  formConfig?: FormChildrenProps['formConfig'],
   parentNode?: Partial<FormRenderNodeProps>
 ) => {
   if (!formrender || !(widgetList instanceof Array)) return;
@@ -222,7 +233,7 @@ export const renderFRNodeList = (
         index,
         path: curPath,
       },
-      formContext
+      formConfig
     );
   });
 };

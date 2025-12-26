@@ -1,8 +1,7 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { FormChildrenProps } from './typings';
-import { SimpleFormContext } from '@simpleform/form';
 import '@simpleform/form/lib/css/main.css';
-import { useSimpleFormRender, useWidgetList } from './hooks';
+import { useFormConfig, useSimpleFormRender, useWidgetList } from './hooks';
 import { createFRElement, renderFRNodeList, withSide } from './utils/transform';
 import { deepClone } from './utils';
 import { parseExpression } from './utils/parser';
@@ -11,7 +10,6 @@ import { parseExpression } from './utils/parser';
 // 渲染表单children
 export default function FormChildren(props: FormChildrenProps) {
 	const curFormrender = useSimpleFormRender();
-	const formContext = useContext(SimpleFormContext);
 	const {
 		wrapper,
 		plugins,
@@ -21,7 +19,6 @@ export default function FormChildren(props: FormChildrenProps) {
 		components = {},
 		widgetList: propWidgetList,
 		parser = parseExpression,
-		form = formContext?.form,
 		formrender = curFormrender,
 	} = props;
 
@@ -31,12 +28,12 @@ export default function FormChildren(props: FormChildrenProps) {
 	formrender.defineConfig({
 		...props,
 		parser,
-		form,
 		formrender,
 		components,
 		variables: curVariables,
 	});
 
+	const formConfig = useFormConfig(formrender?.config?.formConfig);
 	const [widgetList, setWidgetList] = useWidgetList(formrender, onRenderChange);
 
 	// 从props中同步widgetList
@@ -46,12 +43,12 @@ export default function FormChildren(props: FormChildrenProps) {
 		formrender?.setWidgetList(cloneData, { ignore: true });
 	}, [propWidgetList]);
 
-	const childs = renderFRNodeList(formrender, widgetList, formContext, {
-    onValuesChange: () => {
-      // 监听表单事件
-      setWidgetList((old) => [...(old || [])]);
-    },
-  });
+	const childs = renderFRNodeList(formrender, widgetList, formConfig, {
+		onValuesChange: () => {
+			// 监听表单事件
+			setWidgetList((old) => [...(old || [])]);
+		},
+	});
 
 	const wrapperEle = createFRElement(wrapper, {}, formrender?.config?.components);
 
@@ -59,4 +56,5 @@ export default function FormChildren(props: FormChildrenProps) {
 }
 
 FormChildren.displayName = 'Form.Children';
+
 /* eslint-enable */

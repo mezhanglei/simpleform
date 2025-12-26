@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import "./index.less";
 import FormRender, { useSimpleForm } from '../../src/index';
 import '../../lib/css/main.css';
@@ -35,7 +35,7 @@ export default function Demo(props) {
       readOnly: true,
       readOnlyRender: () => "readonly component",
       initialValue: 1111,
-      hidden: '{{formvalues && formvalues.name6 == true}}',
+      hidden: '{{form?.getFieldValue("name6") == true}}',
       type: 'Input',
       props: {}
     },
@@ -46,7 +46,7 @@ export default function Demo(props) {
       outside: { type: 'col', props: { span: 12 } },
       readOnlyRender: () => "测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果",
       initialValue: 1111,
-      hidden: '{{formvalues.name6 == true}}',
+      hidden: '{{form?.getFieldValue("name6") == true}}',
       type: 'Input',
       props: {}
     },
@@ -57,7 +57,7 @@ export default function Demo(props) {
       outside: { type: 'col', props: { span: 12 } },
       readOnlyRender: () => "测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果",
       initialValue: 1111,
-      hidden: '{{formvalues.name6 == true}}',
+      hidden: '{{form?.getFieldValue("name6") == true}}',
       type: 'Input',
       props: {}
     },
@@ -66,7 +66,7 @@ export default function Demo(props) {
       name: 'name3',
       rules: [{ required: true, message: 'input empty' }],
       initialValue: 1,
-      hidden: '{{formvalues && formvalues.name6 == true}}',
+      hidden: '{{form?.getFieldValue("name6") == true}}',
       type: 'Input',
       props: {}
     },

@@ -1,9 +1,9 @@
 import { FormRenderNodeProps, FormRenderProps } from '../typings';
 import { getItemByPath } from '../utils/utils';
-import { Form } from "@simpleform/form";
 import { deepClone } from '../utils';
 import { CustomCol, CustomRow } from '../components';
 import reducer, { actionCreators } from './actions';
+import { Form } from '@simpleform/form';
 
 /* eslint-disable */
 
@@ -20,32 +20,43 @@ const bindClassPrototype = (target, instance) => {
 export type FormRenderListener<V> = (newValue?: V, oldValue?: V) => void;
 
 const defaultConfig = {
+  formConfig: {
+    Form,
+    Item: Form.Item,
+  },
   components: {
     row: CustomRow,
     col: CustomCol,
-    'Form.Item': Form.Item,
   },
 }
 
 // 管理formrender过程中的数据
 export class SimpleFormRender {
-  public config?: FormRenderProps;
+  public config: Omit<FormRenderProps, 'formConfig' | 'components'> & {
+    formConfig: NonNullable<FormRenderProps['formConfig']>;
+    components: NonNullable<FormRenderProps['components']>;
+  };
   private widgetList: FormRenderProps['widgetList'];
   private lastWidgetList: FormRenderProps['widgetList'] | undefined;
   private widgetListListeners: FormRenderListener<FormRenderProps['widgetList']>[] = [];
+  static defaultConfig = defaultConfig;
   constructor(config?: SimpleFormRender['config']) {
     this.widgetList = [];
     this.lastWidgetList = undefined;
-    this.config = config || defaultConfig;
+    this.config = { ...defaultConfig, ...config };
     bindClassPrototype(SimpleFormRender, this);
   }
 
   // 配置项
-  public defineConfig(payload?: SimpleFormRender['config'] | ((config?: FormRenderProps) => Partial<FormRenderProps>)) {
+  public defineConfig(payload?: Partial<SimpleFormRender['config']> | ((config?: SimpleFormRender['config']) => SimpleFormRender['config'])) {
     if (typeof payload === 'function') {
       this.config = payload(this.config);
     } else {
-      this.config = { ...payload, components: { ...defaultConfig.components, ...payload?.components } };
+      this.config = {
+        ...defaultConfig,
+        ...payload,
+        components: { ...defaultConfig.components, ...payload?.components }
+      };
     }
   }
 
