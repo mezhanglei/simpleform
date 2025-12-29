@@ -9,18 +9,18 @@ nav:
 # @simpleform/render
 [![](https://img.shields.io/badge/version-4.2.2-green)](https://www.npmjs.com/package/@simpleform/render)
 
-> 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单.
+> 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单
 
 ## 特性
 - 组件注册(`components`属性): 使用之前需要注册表单控件和非表单组件，如果是表单控件需要控件内部支持`value`和`onChange`两个`props`字段.
 - 组件描述(`widgetList`属性)：我们使用列表来描述界面UI结构, 列表中的每一项都表示一个组件节点.支持节点嵌套`children`属性字段.
 - 组件模块：默认导出`FormRender`, `FormRender`组件由[Form](./form)和`FormChildren`组成, 支持多模块渲染，[Form](./form)组件处理表单的值, `FormChildren`组件处理表单的渲染, 一个`Form`组件可以支持多个`FormChildren`组件在内部渲染.
-- 组件联动：表单属性均可以支持字符串表达式描述联动条件(`children`属性除外).
+- 组件联动：表单属性均可以支持字符串表达式描述联动条件(`children`属性除外)，`>=4.2.2`版本内置了`quickjs`支持.
 
 ## 安装
 
 ### npm安装
-推荐使用 npm 的方式安装。
+推荐使用 npm 的方式安装
 - [Node.js](https://nodejs.org/en/) Version >= 14.0.0
 - [react](https://react.docschina.org/) Version >= 16.8.0
 ```bash

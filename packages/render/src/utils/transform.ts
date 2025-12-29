@@ -162,7 +162,7 @@ export const renderFRNode = (node?: FormRenderNodeProps, formConfig?: FormChildr
     return widget;
   }
   const defineConfig = formrender?.config;
-  const curFormConfig = { ...defineConfig?.formConfig, ...formConfig };
+  const curFormConfig = formConfig || defineConfig?.formConfig;
   const formContext = curFormConfig?.context;
   const FormItem = curFormConfig?.Item;
   const curForm = curFormConfig?.form;
