@@ -51,21 +51,17 @@ export type FRContext = {
 	};
 };
 
-export type CustomRenderType = <C>(children?: C, context?: FRContext) => C;
-
 // 渲染节点组件
 export type FormRenderNodeProps = {
 	formrender: SimpleFormRender;
 	widget: FRNode;
 	index?: FRContext['_options']['index'];
 	path?: FRContext['_options']['path'];
-	renderList?: CustomRenderType;
-	renderItem?: CustomRenderType;
 	onValuesChange?: (...args) => void;
 };
 
 // 渲染列表
-export type FormChildrenProps = Pick<FormRenderNodeProps, 'renderList' | 'renderItem'> & {
+export type FormChildrenProps = {
 	/**@deprecated no longer recommended, please use 'variables' instead */
 	plugins?: Record<string, unknown>; // 外部模块
 	formrender?: SimpleFormRender;

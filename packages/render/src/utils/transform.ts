@@ -2,7 +2,6 @@ import { deepSet, isValidFormName } from '@simpleform/form';
 import React from 'react';
 import { cloneElement, createElement, isValidComponent, isValidElement } from './framework';
 import {
-  CustomRenderType,
   FormChildrenProps,
   FormRenderNodeProps,
   FormRenderProps,
@@ -137,21 +136,19 @@ export const parseFRData = (data, formrender: FormRenderProps['formrender'], for
 // 目标嵌套其他组件
 export const withSide = (
   target?: React.ReactNode,
-  customRender?: CustomRenderType,
   side?: React.ReactNode,
   context?: FRContext
 ) => {
-  const childs = typeof customRender === 'function' ? customRender(target, context) : target;
   if (isValidElement(side)) {
-    return cloneElement(side, { key: context?._options?.path?.toString() }, childs);
+    return cloneElement(side, { key: context?._options?.path?.toString() }, target);
   }
-  return childs as React.ReactElement<any, any>;
+  return target as React.ReactElement<any, any>;
 };
 
 // 渲染节点
 export const renderFRNode = (node?: FormRenderNodeProps, formConfig?: FormChildrenProps['formConfig']) => {
   if (!node?.formrender) return;
-  const { formrender, widget, index, path, onValuesChange, renderItem, renderList } = node;
+  const { formrender, widget, index, path, onValuesChange } = node;
   if (
     isValidElement(widget) ||
     widget === undefined ||
@@ -166,8 +163,6 @@ export const renderFRNode = (node?: FormRenderNodeProps, formConfig?: FormChildr
   const formContext = curFormConfig?.context;
   const FormItem = curFormConfig?.Item;
   const curForm = curFormConfig?.form;
-  const customItem = renderItem || defineConfig?.renderItem;
-  const customList = renderList || defineConfig?.renderList;
   // 节点信息
   const parseNode = parseFRData(widget, formrender, curForm);
   const defineOptions =
@@ -196,7 +191,7 @@ export const renderFRNode = (node?: FormRenderNodeProps, formConfig?: FormChildr
   // 元素节点
   let curNode;
   if (isValidElement(typeWidget) && !isEmpty(typeChildren)) {
-    curNode = cloneElement(typeWidget, {}, withSide(typeChildren, customList, insideEle, frContext));
+    curNode = cloneElement(typeWidget, {}, withSide(typeChildren, insideEle, frContext));
   } else {
     curNode = isEmpty(typeWidget) ? typeChildren : typeWidget;
   }
@@ -213,7 +208,7 @@ export const renderFRNode = (node?: FormRenderNodeProps, formConfig?: FormChildr
       curNode
     )
     : curNode;
-  return withSide(result, customItem, outsideEle, frContext);
+  return withSide(result, outsideEle, frContext);
 };
 
 export const renderFRNodeList = (

@@ -15,7 +15,6 @@ export default function FormChildren(props: FormChildrenProps) {
 		plugins,
 		variables,
 		onRenderChange,
-		renderList,
 		components = {},
 		widgetList: propWidgetList,
 		parser = parseExpression,
@@ -52,7 +51,7 @@ export default function FormChildren(props: FormChildrenProps) {
 
 	const wrapperEle = createFRElement(wrapper, {}, formrender?.config?.components);
 
-	return <>{withSide(childs, renderList, wrapperEle)}</>;
+	return <>{withSide(childs, wrapperEle)}</>;
 }
 
 FormChildren.displayName = 'Form.Children';

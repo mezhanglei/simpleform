@@ -14,8 +14,6 @@ export default function FormRender(props: FormRenderProps) {
     components,
     plugins,
     variables,
-    renderItem,
-    renderList,
     onRenderChange,
     options,
     formConfig = formrender?.config?.formConfig,
@@ -39,8 +37,6 @@ export default function FormRender(props: FormRenderProps) {
         components={components}
         plugins={plugins}
         variables={variables}
-        renderItem={renderItem}
-        renderList={renderList}
         onRenderChange={onRenderChange}
       />
     </FormCom>

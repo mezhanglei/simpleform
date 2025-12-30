@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-4.2.2-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.3.0-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单
 
@@ -15,7 +15,7 @@ nav:
 - 组件注册(`components`属性): 使用之前需要注册表单控件和非表单组件，如果是表单控件需要控件内部支持`value`和`onChange`两个`props`字段.
 - 组件描述(`widgetList`属性)：我们使用列表来描述界面UI结构, 列表中的每一项都表示一个组件节点.支持节点嵌套`children`属性字段.
 - 组件模块：默认导出`FormRender`, `FormRender`组件由[Form](./form)和`FormChildren`组成, 支持多模块渲染，[Form](./form)组件处理表单的值, `FormChildren`组件处理表单的渲染, 一个`Form`组件可以支持多个`FormChildren`组件在内部渲染.
-- 组件联动：表单属性均可以支持字符串表达式描述联动条件(`children`属性除外)，`>=4.2.2`版本内置了`quickjs`支持.
+- 组件联动：表单属性均可以支持字符串表达式描述联动条件(`children`属性除外)，`>=4.3.0`版本内置了`quickjs`支持.
 
 ## 安装
 
@@ -132,7 +132,7 @@ const CustomInput: React.FC<FRContext & InputProps> = (props) => {
 - 表达式中使用的模块或变量由`variables`属性注入，默认内置的有2个:
   - `form`：即`useSimpleForm()`
   - `formrender`：即`useSimpleFormRender()`
-  - ~`formvalues`：即`form.getFieldValue()`~, `>=4.2.2`已移除.
+  - ~`formvalues`：即`form.getFieldValue()`~, `>=4.3.0`已移除.
 ```javascript
 import dayjs from 'dayjs';
 import FormRender from "./FormRender";
@@ -151,7 +151,7 @@ const widgetList = [{
 ```
 :::warning
 - `>=4.1.25`导出序列化函数`toExpression`和反序列化函数`parseExpression`
-- `>=4.2.0`由`@simpleform/evaluator`代替`new Function`提供javascript表达式解析，支持能力更好，推荐升级。
+- `>=4.3.0`由`@simpleform/evaluator`代替`new Function`提供javascript表达式解析，支持能力更好，推荐升级。
 :::
 
 ## API
@@ -164,17 +164,16 @@ const widgetList = [{
 `FormRender`或`FormChildren`组件的`props`
 - `widgetList`: `FormChildrenProps['widgetList']` 渲染表单的DSL形式的json数据
 - `components`：注册表单中的所有组件;
-- `formConfig`: 自定义配置`Form`组件相关，默认为内置的`@simpleform/form`相关配置，`>=4.2.2`可使用
+- `formConfig`: 自定义配置`Form`组件相关，默认为内置的`@simpleform/form`相关配置，`>=4.3.0`可使用
 - `variables`: `widgetList`中表达式中需要引入的变量;
 - `wrapper`: `FormChildren`的父节点
 - `options`： `FRGenerateNode | ((frGenerateNode) => FRGenerateNode)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
-- `renderList`：`(children, FRContext) => React.ReactNode`提供自定义渲染列表的函数.
-- `renderItem`：`(children, FRContext) => React.ReactNode`提供自定义渲染节点的函数.
 - `onRenderChange`: `(newValue: FormChildrenProps['widgetList']) => void;` `widgetList`更改时回调函数
 - `formrender`: `FormRender`通过`useSimpleFormRender()`创建的实例，负责表单界面渲染，选填.
 - `parser`: `<V>(node?: unknown, variables?: object) => V` 字符串表达式解析函数，默认方法为`parseExpression`, 传`null`则表示不解析表达式.
 :::warning
 - `>=4.1.25`新增`parser`和`wrapper`, 并且移除`uneval`.
+- `>=4.3.0`移除`renderItem`和`renderList`属性.
 :::
 
 ### SimpleFormRender Method
