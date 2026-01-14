@@ -113,6 +113,10 @@ export const createFRElement = (
   if (isValidComponent(target)) {
     return createElement(target as ReactComponent<any>, props);
   }
+  // 是否为组件声明
+  if (isValidComponent(target?.type)) {
+    return createElement(target?.type, Object.assign({}, props, target?.props));
+  }
   // 是否为注册组件
   if (typeof target?.type === 'string' && widgets?.[target?.type]) {
     const Com = widgets?.[target?.type];
