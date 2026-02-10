@@ -18,8 +18,8 @@ export type FRGenerateNode = {
 	type?: string | ReactComponent<any>;
 	props?: Record<string, unknown>;
 	children?: any;
-	inside?: ReactComponent<any> | ReactNode | FRGenerateNode; // 节点的内层
-	outside?: ReactComponent<any> | ReactNode | FRGenerateNode; // 节点的外层
+	inside?: ReactComponent<any> | FRGenerateNode; // 节点的内层
+	outside?: ReactComponent<any> | FRGenerateNode; // 节点的外层
 	readOnly?: boolean; // 只读模式
 	readOnlyRender?: ReactNode | ((context?: FRContext) => ReactNode); // 只读模式下的组件
 	typeRender?: ReactNode | ((context?: FRContext) => ReactNode); // 表单控件自定义渲染
@@ -34,12 +34,12 @@ export type ArrWithExpression<T extends Array<any> | undefined> = Array<WithExpr
 
 // 编译前的节点信息
 export type FRNode = WithExpression<Omit<FRGenerateNode, 'inside' | 'outside'> & {
-	inside?: ReactComponent<any> | ReactNode | FRNode;
-	outside?: ReactComponent<any> | ReactNode | FRNode;
+	inside?: ReactComponent<any> | FRNode;
+	outside?: ReactComponent<any> | FRNode;
 }>;
 
 // options参数
-export type FROptions = Partial<FRGenerateNode> & { [key in string]: any };
+export type FROptions = Partial<FRGenerateNode>;
 
 // context
 export type FRContext = {
@@ -62,10 +62,11 @@ export type FormRenderNodeProps = {
 
 // 渲染列表
 export type FormChildrenProps = {
+	path?: FRContext['_options']['path'];
 	/**@deprecated no longer recommended, please use 'variables' instead */
 	plugins?: Record<string, unknown>; // 外部模块
 	formrender?: SimpleFormRender;
-	wrapper?: FRNode['inside'];
+	wrapper?: FRGenerateNode['inside'];
 	options?: FROptions | ((frGenerateNode) => FROptions);
 	widgetList?: Array<FRNode>; // 渲染数据
 	variables?: Record<string, unknown>; // 外部模块

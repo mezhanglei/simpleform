@@ -5,11 +5,10 @@ import {
   FormChildrenProps,
   FormRenderNodeProps,
   FormRenderProps,
-  FRContext,
   FRGenerateNode,
   ReactComponent
 } from '../typings';
-import { isEmpty, isObject } from './type';
+import { isObject } from './type';
 
 /* eslint-disable */
 
@@ -80,6 +79,25 @@ export const traverseParse = <V>(obj: V, variables?: object, parser?: FormRender
   });
 };
 
+export const getFRComponent = (
+  widget?: ReactComponent<any> | FRGenerateNode,
+  components?: FormRenderProps['components'],
+) => {
+  // 是否为组件声明
+  if (isValidComponent(widget)) {
+    return [widget]
+  }
+  const widgetType = widget?.['type'];
+  if (isValidComponent(widgetType)) {
+    return [widgetType, widget?.['props']]
+  }
+  // 是否为注册组件
+  if (typeof widgetType === 'string' && components?.[widgetType]) {
+    return [components?.[widgetType], widget?.['props']]
+  }
+  return []
+}
+
 // 提取widgetList中的默认值
 export const getInitialValues = (widgetList?: FRGenerateNode[]) => {
   if (!(widgetList instanceof Array)) return;
@@ -95,33 +113,17 @@ export const getInitialValues = (widgetList?: FRGenerateNode[]) => {
 
 // 创建元素
 export const createFRElement = (
-  target?: any,
-  props?: any,
-  widgets?: FormRenderProps['components']
+  Com?: ReactComponent<any> | React.ReactElement,
+  ComProps?: any,
+  ...children: React.ReactNode[]
 ): React.ReactNode => {
-  if (target instanceof Array) {
-    return target.map((item) => createFRElement(item, props, widgets));
+  if (!Com) {
+    return children?.length === 1 ? children[0] : children;
+  };
+  if (isValidElement(Com)) {
+    return cloneElement(Com, ComProps);
   }
-  if (target === undefined || target === null || typeof target === 'string' || typeof target === 'number') {
-    return target;
-  }
-  // 判断是否为ReactElment
-  if (isValidElement(target)) {
-    return cloneElement(target, props as React.Attributes);
-  }
-  // 是否为组件声明
-  if (isValidComponent(target)) {
-    return createElement(target as ReactComponent<any>, props);
-  }
-  // 是否为组件声明
-  if (isValidComponent(target?.type)) {
-    return createElement(target?.type, Object.assign({}, props, target?.props));
-  }
-  // 是否为注册组件
-  if (typeof target?.type === 'string' && widgets?.[target?.type]) {
-    const Com = widgets?.[target?.type];
-    return createElement(Com, Object.assign({}, props, target?.props));
-  }
+  return createElement(Com, ComProps, ...children)
 };
 
 // 解析
@@ -137,22 +139,13 @@ export const parseFRData = (data, formrender: FormRenderProps['formrender'], for
   return parseData;
 };
 
-// 目标嵌套其他组件
-export const withSide = (
-  target?: React.ReactNode,
-  side?: React.ReactNode,
-  context?: FRContext
+// 解析节点组件
+export const parseWidget = (
+  widget: FormRenderNodeProps['widget'] | React.ReactElement,
+  formrender: FormRenderNodeProps['formrender'],
+  formConfig?: FormChildrenProps['formConfig']
 ) => {
-  if (isValidElement(side)) {
-    return cloneElement(side, { key: context?._options?.path?.toString() }, target);
-  }
-  return target as React.ReactElement<any, any>;
-};
-
-// 渲染节点
-export const renderFRNode = (node?: FormRenderNodeProps, formConfig?: FormChildrenProps['formConfig']) => {
-  if (!node?.formrender) return;
-  const { formrender, widget, index, path, onValuesChange } = node;
+  if (!formrender) return;
   if (
     isValidElement(widget) ||
     widget === undefined ||
@@ -164,77 +157,15 @@ export const renderFRNode = (node?: FormRenderNodeProps, formConfig?: FormChildr
   }
   const defineConfig = formrender?.config;
   const curFormConfig = formConfig || defineConfig?.formConfig;
-  const formContext = curFormConfig?.context;
-  const FormItem = curFormConfig?.Item;
   const curForm = curFormConfig?.form;
+  const formContext = curFormConfig?.context;
   // 节点信息
-  const parseNode = parseFRData(widget, formrender, curForm);
+  const parseData = parseFRData(widget, formrender, curForm);
   const defineOptions =
-    typeof defineConfig?.options === 'function' ? defineConfig?.options(parseNode) : defineConfig?.options;
-  const baseOptions = mergeFROptions(formContext, defineOptions);
-  const curData = mergeFROptions(baseOptions, parseNode);
-  const { hidden, readOnlyRender, typeRender, type, props, children, inside, outside, ...formItemProps } = curData;
-  const frContext = {
-    _options: { ...curData, formrender, index, path },
-  };
-  if (hidden === true) return null;
-  const isFormWidget = isValidFormName(formItemProps?.name) ? true : false;
-  const readOnlyEle = typeof readOnlyRender === 'function' ? readOnlyRender(frContext) : readOnlyRender;
-  const typeRenderEle = typeof typeRender === 'function' ? typeRender(frContext) : typeRender;
-  const typeWidget = createFRElement(
-    formItemProps?.readOnly === true ? readOnlyEle : typeRenderEle || { type, props },
-    frContext,
-    defineConfig.components
-  );
-  const insideEle = createFRElement(inside, frContext, defineConfig?.components);
-  const outsideEle = createFRElement(outside, frContext, defineConfig?.components);
-  const typeChildren =
-    children instanceof Array
-      ? renderFRNodeList(formrender, children, curFormConfig, { ...node, path: path?.concat('children') })
-      : children;
-  // 元素节点
-  let curNode;
-  if (isValidElement(typeWidget) && !isEmpty(typeChildren)) {
-    curNode = cloneElement(typeWidget, {}, withSide(typeChildren, insideEle, frContext));
-  } else {
-    curNode = isEmpty(typeWidget) ? typeChildren : typeWidget;
-  }
-  const result = isFormWidget && FormItem
-    ? createElement(
-      FormItem,
-      {
-        ...formItemProps,
-        onValuesChange: (a, b) => {
-          onValuesChange?.(a, b);
-          return formItemProps?.onValuesChange?.(a, b);
-        },
-      } as React.Attributes,
-      curNode
-    )
-    : curNode;
-  return withSide(result, outsideEle, frContext);
-};
-
-export const renderFRNodeList = (
-  formrender: FormRenderNodeProps['formrender'],
-  widgetList?,
-  formConfig?: FormChildrenProps['formConfig'],
-  parentNode?: Partial<FormRenderNodeProps>
-) => {
-  if (!formrender || !(widgetList instanceof Array)) return;
-  return widgetList.map((item, index) => {
-    const curPath = (parentNode?.path || []).concat(index);
-    return renderFRNode(
-      {
-        ...parentNode,
-        formrender,
-        widget: item,
-        index,
-        path: curPath,
-      },
-      formConfig
-    );
-  });
-};
+    typeof defineConfig?.options === 'function' ? defineConfig?.options(parseData) : defineConfig?.options;
+  const baseOptions = Object.assign({}, defineOptions, formContext);
+  const parseResult = mergeFROptions(baseOptions, parseData);
+  return parseResult;
+}
 
 /* eslint-enable */

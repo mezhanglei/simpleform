@@ -20,7 +20,7 @@ export default function FormRender(props: FormRenderProps) {
     ...formOptions
   } = props;
 
-  const propFormConfig = formOptions?.form ? { form: formOptions?.form, ...formConfig } : formConfig;
+  const propFormConfig = { ...formConfig, form: formOptions?.form || formConfig?.form, };
   const curFormConfig = useFormConfig(propFormConfig);
   const curForm = curFormConfig?.form;
   const FormCom = curFormConfig?.Form;

@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { FormChildrenProps } from './typings';
 import '@simpleform/form/lib/css/main.css';
-import { useFormConfig, useSimpleFormRender, useWidgetList } from './hooks';
-import { createFRElement, renderFRNodeList, withSide } from './utils/transform';
+import { useSimpleFormRender, useWidgetList } from './hooks';
+import { createFRElement, getFRComponent } from './utils/transform';
 import { deepClone } from './utils';
 import { parseExpression } from './utils/parser';
+import FormRenderNode from './node';
 
 /* eslint-disable */
 // 渲染表单children
@@ -19,6 +20,7 @@ export default function FormChildren(props: FormChildrenProps) {
 		widgetList: propWidgetList,
 		parser = parseExpression,
 		formrender = curFormrender,
+		path,
 	} = props;
 
 	const curVariables = Object.assign({}, plugins, variables);
@@ -32,7 +34,6 @@ export default function FormChildren(props: FormChildrenProps) {
 		variables: curVariables,
 	});
 
-	const formConfig = useFormConfig(formrender?.config?.formConfig);
 	const [widgetList, setWidgetList] = useWidgetList(formrender, onRenderChange);
 
 	// 从props中同步widgetList
@@ -42,16 +43,21 @@ export default function FormChildren(props: FormChildrenProps) {
 		formrender?.setWidgetList(cloneData, { ignore: true });
 	}, [propWidgetList]);
 
-	const childs = renderFRNodeList(formrender, widgetList, formConfig, {
-		onValuesChange: () => {
-			// 监听表单事件
-			setWidgetList((old) => [...(old || [])]);
-		},
-	});
-
-	const wrapperEle = createFRElement(wrapper, {}, formrender?.config?.components);
-
-	return <>{withSide(childs, wrapperEle)}</>;
+	const [WrapperCom, WrapperProps] = getFRComponent(wrapper, formrender?.config?.components);
+	const childs = widgetList?.map((widget, index) => {
+		const curPath = (path || []).concat(index);
+		return <FormRenderNode
+			formrender={formrender}
+			widget={widget}
+			index={index}
+			path={curPath}
+			onValuesChange={() => {
+				// 监听表单事件
+				setWidgetList((old) => [...(old || [])]);
+			}}
+		/>
+	})
+	return <>{createFRElement(WrapperCom, WrapperProps, childs)}</>
 }
 
 FormChildren.displayName = 'Form.Children';

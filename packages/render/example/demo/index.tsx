@@ -67,7 +67,7 @@ export default function Demo(props) {
       rules: [{ required: true, message: 'input empty' }],
       initialValue: 1,
       hidden: '{{form?.getFieldValue("name6") == true}}',
-      type: 'Input',
+      type: Input,
       props: {}
     },
     {

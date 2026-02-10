@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-4.3.1-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.3.5-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单
 
@@ -71,24 +71,25 @@ const widgetList = [{
 }]
 ```
 - 节点类型
-继承`@simpleform/form`组件的[FormItemProps](./form#formitem)
+默认继承`@simpleform/form`组件的[FormItemProps](./form#formitem)
 ```javascript
 // 预处理后的节点信息
-export type FRGenerateNode = FormItemProps & {
+export type FRGenerateNode = {
 	type?: string | ReactComponent<any>;
 	props?: Record<string, unknown>;
 	children?: any;
-	inside?: ReactComponent<any> | ReactNode; // 节点的内层
-	outside?: ReactComponent<any> | ReactNode; // 节点的外层
+	inside?: ReactComponent<any> | FRGenerateNode; // 节点的内层
+	outside?: ReactComponent<any> | FRGenerateNode; // 节点的外层
 	readOnly?: boolean; // 只读模式
 	readOnlyRender?: ReactNode | ((context?: FRContext) => ReactNode); // 只读模式下的组件
 	typeRender?: ReactNode | ((context?: FRContext) => ReactNode); // 表单控件自定义渲染
 	hidden?: boolean;
-};
+} & React.ComponentProps<FormConfig['Item']>;
 ```
 :::warning
 - `>=4`版本嵌套子节点由`widgetList`字段名改为`children`。
 - `>=4.1.12`版本`readOnlyRender`字段和`typeRender`字段的组件类型变更。
+- `>=4.3.5`版本`inside`、`outside`、和`wrapper`字段移除`ReactNode`类型。
 :::
 
 ## 表单上下文参数
@@ -167,10 +168,11 @@ const widgetList = [{
 - `formConfig`: 自定义配置`Form`组件相关，默认为内置的`@simpleform/form`相关配置，`>=4.3.0`可使用
 - `variables`: `widgetList`中表达式中需要引入的变量;
 - `wrapper`: `FormChildren`的父节点
-- `options`： `FRGenerateNode | ((frGenerateNode) => FRGenerateNode)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
+- `options`： `FROptions | ((frGenerateNode) => FROptions)` 传递给表单节点组件的参数信息. 优先级比表单节点自身的参数要低
 - `onRenderChange`: `(newValue: FormChildrenProps['widgetList']) => void;` `widgetList`更改时回调函数
 - `formrender`: `FormRender`通过`useSimpleFormRender()`创建的实例，负责表单界面渲染，选填.
 - `parser`: `<V>(node?: unknown, variables?: object) => V` 字符串表达式解析函数，默认方法为`parseExpression`, 传`null`则表示不解析表达式.
+- `path`: 增加`FormChildren`的父级路径(`>=4.3.5`可用).
 :::warning
 - `>=4.1.25`新增`parser`和`wrapper`, 并且移除`uneval`.
 - `>=4.3.0`移除`renderItem`和`renderList`属性.
