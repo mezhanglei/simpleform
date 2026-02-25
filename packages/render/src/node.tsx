@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useFormConfig } from './hooks';
 import { FormRenderNodeProps, FRGenerateNode } from './typings';
 import { createFRElement, getFRComponent, isEmpty, isValidElement, parseWidget, } from './utils';
+import fastDeepEqual from 'fast-deep-equal';
 import { stringify } from 'flatted';
 
 /* eslint-disable */
@@ -16,7 +17,10 @@ const FormRenderNode: React.FC<FormRenderNodeProps> = (params) => {
   const newData = parseWidget(widget, formrender, formConfig) || {};
 
   useEffect(() => {
-    setParseData(newData)
+    const prevData = parseData
+    if (!fastDeepEqual(prevData, newData)) {
+      setParseData(newData)
+    }
   }, [stringify(newData)]);
 
   const FormItem = formConfig?.Item;
@@ -31,7 +35,7 @@ const FormRenderNode: React.FC<FormRenderNodeProps> = (params) => {
   const [insideCom, insideProps] = getFRComponent(inside, defineConfig?.components);
   const [outsideCom, outsideProps] = getFRComponent(outside, defineConfig?.components);
   const [widgetCom, widgetProps] = getFRComponent({ type, props }, defineConfig?.components);
-  const typeEle = typeof typeRender === 'function' ? typeRender(mergeCtx()) : typeRender;
+  const typeRenderEle = typeof typeRender === 'function' ? typeRender(mergeCtx()) : typeRender;
   const nestChildren = children instanceof Array ? children : [children];
   const childs = !isEmpty(children)
     ? createFRElement(
@@ -48,14 +52,14 @@ const FormRenderNode: React.FC<FormRenderNodeProps> = (params) => {
         ) {
           return child;
         }
-        return <FormRenderNode {...params} widget={child} index={childIndex} path={curPath} />;
+        return <FormRenderNode key={curPath?.toString()} {...params} widget={child} index={childIndex} path={curPath} />;
       })
     )
     : undefined;
   const readonlyEle = typeof readOnlyRender === 'function' ? readOnlyRender(mergeCtx()) : readOnlyRender;
   const curNode = formItemProps?.readOnly === true
     ? readonlyEle
-    : createFRElement(!isEmpty(typeRender) ? typeEle : widgetCom, mergeCtx(widgetProps), childs);
+    : createFRElement(!isEmpty(typeRender) ? typeRenderEle : widgetCom, mergeCtx(widgetProps), childs);
   if (isFormWidget && FormItem) {
     return <>
       {

@@ -105,9 +105,12 @@ export default function Demo(props) {
       rules: [{ required: true, message: 'first empty' }],
       type: 'Select',
       props: {
-        style: { width: '100%' }
+        style: { width: '100%' },
+        options: [
+          { label: 'option1', value: 1 },
+          { label: 'option2', value: 2 },
+        ],
       },
-      children: [{ type: 'Select.Option', props: { key: 1, value: '1' }, children: 'option1' }]
     },
     {
       label: 'second',
@@ -115,9 +118,12 @@ export default function Demo(props) {
       rules: [{ required: true, message: 'second empty' }],
       type: 'Select',
       props: {
-        style: { width: '100%' }
+        style: { width: '100%' },
+        options: [
+          { label: 'option1', value: 1 },
+          { label: 'option2', value: 2 },
+        ],
       },
-      children: [{ type: 'Select.Option', props: { key: 1, value: '1' }, children: 'option1' }]
     },
     {
       label: 'name5',
@@ -127,13 +133,13 @@ export default function Demo(props) {
       valueGetter: "{{(value) => ({span: value})}}",
       type: 'Select',
       props: {
-        style: { width: '100%' }
+        style: { width: '100%' },
+        options: [
+          { value: 12, label: 'option1' },
+          { value: 6, label: 'option2' },
+          { value: 4, label: 'option3' }
+        ]
       },
-      children: [
-        { type: 'Select.Option', props: { key: 1, value: 12 }, children: 'option1' },
-        { type: 'Select.Option', props: { key: 2, value: 6 }, children: 'option2' },
-        { type: 'Select.Option', props: { key: 3, value: 4 }, children: 'option3' }
-      ]
     },
     {
       label: 'checkbox',

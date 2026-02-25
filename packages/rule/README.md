@@ -1,7 +1,7 @@
 # `@simpleform/rule`
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-0.0.1-green)](https://www.npmjs.com/package/@simpleform/rule)
+[![](https://img.shields.io/badge/version-0.0.2-green)](https://www.npmjs.com/package/@simpleform/rule)
 
 > Rule Builder, Outputting Conditions Compliant with `json-logic-js`
 

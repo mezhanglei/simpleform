@@ -47,6 +47,7 @@ export default function FormChildren(props: FormChildrenProps) {
 	const childs = widgetList?.map((widget, index) => {
 		const curPath = (path || []).concat(index);
 		return <FormRenderNode
+			key={curPath?.toString()}
 			formrender={formrender}
 			widget={widget}
 			index={index}
