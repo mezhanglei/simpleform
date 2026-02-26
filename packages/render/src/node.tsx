@@ -1,27 +1,30 @@
 import { isValidFormName } from '@simpleform/form';
-import React, { useEffect, useState } from 'react';
+import React, { useRef } from 'react';
 import { useFormConfig } from './hooks';
-import { FormRenderNodeProps, FRGenerateNode } from './typings';
+import { FormRenderNodeProps } from './typings';
 import { createFRElement, getFRComponent, isEmpty, isValidElement, parseWidget, } from './utils';
 import fastDeepEqual from 'fast-deep-equal';
-import { stringify } from 'flatted';
 
 /* eslint-disable */
+
+const createMemoizedFn = (fn) => {
+  let lastResult;
+  return (...args) => {
+    const currentResult = fn(...args);
+    if (!lastResult || !fastDeepEqual(currentResult, lastResult)) {
+      lastResult = currentResult
+    }
+    return lastResult
+  }
+}
 
 // 渲染节点
 const FormRenderNode: React.FC<FormRenderNodeProps> = (params) => {
   const { formrender, widget, index, path, onValuesChange } = params;
   const defineConfig = formrender?.config;
   const formConfig = useFormConfig(defineConfig?.formConfig);
-  const [parseData, setParseData] = useState<FRGenerateNode>({});
-  const newData = parseWidget(widget, formrender, formConfig) || {};
-
-  useEffect(() => {
-    const prevData = parseData
-    if (!fastDeepEqual(prevData, newData)) {
-      setParseData(newData)
-    }
-  }, [stringify(newData)]);
+  const parseRef = useRef(createMemoizedFn(parseWidget))
+  const parseData = parseRef.current(widget, formrender, formConfig) || {};
 
   const FormItem = formConfig?.Item;
   const { hidden, readOnlyRender, typeRender, type, props, children, inside, outside, ...formItemProps } = parseData;

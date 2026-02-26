@@ -7,7 +7,7 @@ nav:
 ---
 
 # @simpleform/render
-[![](https://img.shields.io/badge/version-4.3.6-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.3.7-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 基于`@simpleform/form`实现的轻量级动态表单引擎，实现动态渲染表单很简单
 
@@ -152,7 +152,7 @@ const widgetList = [{
 ```
 :::warning
 - `>=4.1.25`导出序列化函数`toExpression`和反序列化函数`parseExpression`
-- `>=4.3.0`由`@simpleform/evaluator`代替`new Function`提供javascript表达式解析，支持能力更好，推荐升级。
+- `>=4.3.x`由`@simpleform/evaluator`代替`new Function`提供javascript表达式解析，支持能力更好，推荐升级。
 :::
 
 ## API
