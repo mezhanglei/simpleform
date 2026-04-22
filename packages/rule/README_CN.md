@@ -2,9 +2,9 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-0.0.2-green)](https://www.npmjs.com/package/@simpleform/rule)
+[![](https://img.shields.io/badge/version-0.0.5-green)](https://www.npmjs.com/package/@simpleform/rule)
 
-> 规则构建器，输出符合`json-logic-js`的规则条件.
+> 规则构建器，支持自定义配置控件.
 
 # Matters
  - 在使用之前需要先引入css样式文件，例：`import '@simpleform/rule/lib/css/main.css'`;

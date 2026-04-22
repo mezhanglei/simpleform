@@ -1,17 +1,14 @@
-import React, { useEffect } from 'react';
-import { useRuleBuilder, useRuleBuilderTree } from './hooks';
-import { RuleBuilderGroupItem, RuleBuilderProps, RuleBuilderRuleItem } from './typings';
-import { deepClone } from './utils/object';
-import Group from './components/Group';
-import Rule from './components/Rule';
-
+import React, { useEffect } from "react";
+import { useRuleBuilder, useRuleBuilderTree } from "./hooks";
+import { RuleBuilderGroup, RuleBuilderProps, RuleBuilderRule } from "./typings";
+import { deepClone } from "./utils/object";
+import Group from "./components/Group";
+import Rule from "./components/Rule";
+import { stringify } from "flatted";
 
 export default function Builder(props: RuleBuilderProps) {
   const curBuilder = useRuleBuilder();
-  const {
-    builder = curBuilder,
-    ...config
-  } = props;
+  const { builder = curBuilder, ...config } = props;
 
   const { tree: propTree, onRenderChange } = config || {};
 
@@ -25,19 +22,22 @@ export default function Builder(props: RuleBuilderProps) {
     const cloneData = deepClone(propTree);
     setTree(cloneData);
     builder.setTree(cloneData, { ignore: true });
-  }, [propTree]);
+  }, [stringify(propTree)]);
 
   const actions = builder?.getActions();
 
-  const renderItem = (item: RuleBuilderGroupItem | RuleBuilderRuleItem, path?: Array<string | number>) => {
-    if (!item) return;
-    const isGroup = item?.type === 'group';
+  const renderItem = (
+    item?: RuleBuilderGroup | RuleBuilderRule,
+    path?: Array<string | number>
+  ) => {
+    if (!item) return null;
+    const isGroup = item?.type === "group";
     const curPath = path || [];
     if (isGroup) {
-      const groupItem = item as RuleBuilderGroupItem;
+      const groupItem = item as RuleBuilderGroup;
       const groupProperties = groupItem?.properties;
       const children = groupItem?.children;
-      const childPath = curPath?.concat('children');
+      const childPath = curPath?.concat("children");
       return (
         <Group
           key={childPath.toString()}
@@ -47,24 +47,27 @@ export default function Builder(props: RuleBuilderProps) {
           config={config}
         >
           {children
-            ? children
-              .map((child, index) => renderItem(child, childPath.concat(index)))
+            ? children.map((child, index) =>
+              renderItem(child, childPath.concat(index))
+            )
             : null}
         </Group>
       );
     } else {
-      const ruleItem = item as RuleBuilderRuleItem;
+      const ruleItem = item as RuleBuilderRule;
       const ruleProperties = ruleItem?.properties;
       // 单个规则
-      return <Rule
-        key={curPath.toString()}
-        properties={ruleProperties}
-        path={curPath}
-        actions={actions}
-        config={config}
-      />;
+      return (
+        <Rule
+          key={curPath.toString()}
+          properties={ruleProperties}
+          path={curPath}
+          actions={actions}
+          config={config}
+        />
+      );
     }
   };
 
-  return tree && renderItem(tree);
-};
+  return <>{renderItem(tree)}</>;
+}

@@ -7,6 +7,5 @@ export * from './typings';
 export * from './components';
 export * from './store/index';
 export * from "./hooks";
-export * from "./utils/utils";
-export * from "./utils/transform";
+export * from "./utils";
 export * from '@simpleform/form';

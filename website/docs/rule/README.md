@@ -7,12 +7,9 @@ nav:
 ---
 
 # @simpleform/rule
-[![](https://img.shields.io/badge/version-0.0.1-green)](https://www.npmjs.com/package/@simpleform/rule)
+[![](https://img.shields.io/badge/version-0.0.5-green)](https://www.npmjs.com/package/@simpleform/rule)
 
-> 规则构建器，自由配置符合`json-logic-js`的规则条件.
-:::warning
-待更新使用方式
-:::
+> 规则构建器，支持自定义配置控件.
 
 # Matters
  - 在使用之前需要先引入css样式文件，例：`import '@simpleform/rule/lib/css/main.css'`;
@@ -24,4 +21,25 @@ nav:
 npm install @simpleform/rule --save
 # 或者
 yarn add @simpleform/rule
+```
+
+### 基本使用
+<code src="../../src/rule/base/index.tsx"></code>
+
+### 类型
+
+- 规则行类型
+```javascript
+export interface RuleBuilderRule {
+  type: string;
+  properties: any;
+}
+```
+- 规则组类型
+```javascript
+export interface RuleBuilderGroup {
+  type: string;
+  children: Array<RuleBuilderRule | RuleBuilderGroup>;
+  properties: { conjunction: string };
+}
 ```

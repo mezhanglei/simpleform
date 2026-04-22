@@ -1,66 +1,72 @@
-import React, { useEffect } from 'react';
-import { FormChildrenProps } from './typings';
-import '@simpleform/form/lib/css/main.css';
-import { useSimpleFormRender, useWidgetList } from './hooks';
-import { createFRElement, getFRComponent } from './utils/transform';
-import { deepClone } from './utils';
-import { parseExpression } from './utils/parser';
-import FormRenderNode from './node';
+import React, { useEffect } from "react";
+import { FormChildrenProps } from "./typings";
+import "@simpleform/form/lib/css/main.css";
+import { useSimpleFormRender, useWidgetList } from "./hooks";
+import { createFRElement, getFRComponent } from "./utils/transform";
+import { deepClone } from "./utils";
+import { parseExpression } from "./utils/parser";
+import FormRenderNode from "./node";
+import { stringify } from "flatted";
 
 /* eslint-disable */
 // 渲染表单children
 export default function FormChildren(props: FormChildrenProps) {
-	const curFormrender = useSimpleFormRender();
-	const {
-		wrapper,
-		plugins,
-		variables,
-		onRenderChange,
-		components = {},
-		widgetList: propWidgetList,
-		parser = parseExpression,
-		formrender = curFormrender,
-		path,
-	} = props;
+  const curFormrender = useSimpleFormRender();
+  const {
+    wrapper,
+    plugins,
+    variables,
+    onRenderChange,
+    components = {},
+    widgetList: propWidgetList,
+    parser = parseExpression,
+    formrender = curFormrender,
+    path,
+  } = props;
 
-	const curVariables = Object.assign({}, plugins, variables);
+  const curVariables = Object.assign({}, plugins, variables);
 
-	// formrender挂载所有props
-	formrender.defineConfig({
-		...props,
-		parser,
-		formrender,
-		components,
-		variables: curVariables,
-	});
+  // formrender挂载所有props
+  formrender.defineConfig({
+    ...props,
+    parser,
+    formrender,
+    components,
+    variables: curVariables,
+  });
 
-	const [widgetList, setWidgetList] = useWidgetList(formrender, onRenderChange);
+  const [widgetList, setWidgetList] = useWidgetList(formrender, onRenderChange);
 
-	// 从props中同步widgetList
-	useEffect(() => {
-		const cloneData = deepClone(propWidgetList);
-		setWidgetList(cloneData || []);
-		formrender?.setWidgetList(cloneData, { ignore: true });
-	}, [propWidgetList]);
+  // 从props中同步widgetList
+  useEffect(() => {
+    const cloneData = deepClone(propWidgetList);
+    setWidgetList(cloneData || []);
+    formrender?.setWidgetList(cloneData, { ignore: true });
+  }, [stringify(propWidgetList)]);
 
-	const [WrapperCom, WrapperProps] = getFRComponent(wrapper, formrender?.config?.components);
-	const childs = widgetList?.map((widget, index) => {
-		const curPath = (path || []).concat(index);
-		return <FormRenderNode
-			key={curPath?.toString()}
-			formrender={formrender}
-			widget={widget}
-			index={index}
-			path={curPath}
-			onValuesChange={() => {
-				// 监听表单事件
-				setWidgetList((old) => [...(old || [])]);
-			}}
-		/>
-	})
-	return <>{createFRElement(WrapperCom, WrapperProps, childs)}</>
+  const [WrapperCom, WrapperProps] = getFRComponent(
+    wrapper,
+    formrender?.config?.components
+  );
+  const childs = widgetList?.map((widget, index) => {
+    const curPath = (path || []).concat(index);
+    return (
+      <FormRenderNode
+        key={curPath?.toString()}
+        formrender={formrender}
+        widget={widget}
+        index={index}
+        path={curPath}
+        onValuesChange={() => {
+          // 监听表单事件
+          setWidgetList((old) => [...(old || [])]);
+        }}
+      />
+    );
+  });
+  return <>{createFRElement(WrapperCom, WrapperProps, childs)}</>;
 }
 
-FormChildren.displayName = 'Form.Children';
+FormChildren.displayName = "Form.Children";
 
 /* eslint-enable */

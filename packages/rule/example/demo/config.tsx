@@ -1,97 +1,63 @@
-import React from 'react';
-import { RuleBuilderConfig } from '../../src/typings';
-import { DateWidget, SelectWidget, TextWidget } from './widgets';
+import React from "react";
+import { DateWidget, SelectWidget, TextWidget } from "./widgets";
 
 export default {
   conjunctions: {
     and: {
-      label: 'And'
+      label: "And",
     },
     or: {
-      label: 'Or'
-    },
-  },
-  fields: {
-    name: {
-      label: 'Name',
-      widget: 'text',
-      operators: [
-        '===',
-        'contains',
-        'startsWith',
-        'endsWith',
-        'includes',
-      ],
-    },
-    date: {
-      label: 'Date',
-      widget: 'date',
-      operators: ['===', 'contains', 'startsWith', 'endsWith'],
-    },
-    color: {
-      label: 'Color',
-      widget: [
-        'select',
-        {
-          options: [{
-            label: 'Yellow',
-            value: 'yellow'
-          }, {
-            label: 'Green',
-            value: 'green',
-          }, {
-            label: 'Orange',
-            value: 'orange'
-          }],
-        },
-      ],
-      operators: ['==='],
+      label: "Or",
     },
   },
   operators: {
     "===": {
-      label: 'Equals'
+      label: "Equals",
     },
     "!==": {
-      label: 'Not Equals'
+      label: "Not Equals",
     },
     ">": {
-      label: 'greater than'
+      label: "greater than",
     },
     ">=": {
-      label: 'greater than or equal'
+      label: "greater than or equal",
     },
     "<": {
-      label: 'less than'
+      label: "less than",
     },
     "<=": {
-      label: 'less than or equal'
+      label: "less than or equal",
     },
     contains: {
-      label: 'Contains'
+      label: "Contains",
     },
     startsWith: {
-      label: 'Starts with'
+      label: "Starts with",
     },
     endsWith: {
-      label: 'Ends with',
+      label: "Ends with",
     },
     includes: {
-      label: 'includes',
+      label: "includes",
     },
   },
   widgets: {
     text: {
-      factory: props => <TextWidget {...props} />,
+      factory: (props) => <TextWidget {...props} />,
     },
     select: {
-      factory: props => <SelectWidget {...props} />,
+      factory: (props) => <SelectWidget {...props} />,
     },
     date: {
-      factory: props => <DateWidget {...props} />,
+      factory: (props) => <DateWidget {...props} />,
     },
   },
   settings: {
-    maxNesting: 10,
+    maxNesting: 0,
+    addGroup: { text: "添加组" },
+    addRule: { text: "添加规则" },
+    deleteGroup: { text: "删除" },
+    deleteRule: { text: "删除" },
   },
-} as RuleBuilderConfig;
+};

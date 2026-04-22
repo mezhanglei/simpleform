@@ -1,21 +1,23 @@
-import React from 'react';
-import { Builder, defaultData } from '../../src';
+import React from "react";
+import Builder, {
+  defaultData,
+  useRuleBuilder,
+  useRuleBuilderTree,
+} from "../../src";
 // import '@simpleform/rule/lib/css/main.css';
-import config from './config';
+import config from "./config";
+import fields from "./fields";
 
 export default function Demo() {
   const state = defaultData(config);
+  const builder = useRuleBuilder();
+  const [builderTree] = useRuleBuilderTree(builder);
+
   return (
     <>
-      {/* <Preview config={config}>
-        {query => (
-          <code className="query-preview">
-            {query || 'Use the builder below to create a search query.'}
-          </code>
-        )}
-      </Preview> */}
       <div className="query-builder">
-        <Builder {...config} tree={state} />
+        <div>规则：{JSON.stringify(builderTree)}</div>
+        <Builder {...config} builder={builder} tree={state} fields={fields} />
       </div>
     </>
   );

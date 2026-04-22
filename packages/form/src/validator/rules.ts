@@ -11,7 +11,7 @@ const required = <T>(ruleValue: T, value?: unknown) => {
 
 // pattern 表达式校验
 const pattern = <T>(ruleValue: T, value?: unknown) => {
-  if (typeof value !== 'string') return;
+  if (typeof value !== 'string' || isEmpty(value)) return;
   if (ruleValue instanceof RegExp) {
     return !ruleValue.test(value);
   } else if (typeof ruleValue === 'string') {

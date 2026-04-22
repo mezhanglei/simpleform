@@ -56,7 +56,7 @@ export const traverseMapObject = (val, callback) => {
 // 递归遍历widgetList数据结构
 export const traverseList = <V>(
   list?: Array<V>,
-  callback?: (item: V, index: number, parent?: Array<string | number>) => any | void,
+  callback?: (item: V, index: number, path?: Array<string | number>) => any | void,
   parent?: Array<string | number>
 ) => {
   if (!(list instanceof Array)) return;

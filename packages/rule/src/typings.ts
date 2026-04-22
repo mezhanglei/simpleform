@@ -1,59 +1,60 @@
 import React from "react";
 import { RuleBuilder } from "./store";
 
-export type ConjunctionType = 'and' | 'or'
-export interface RuleBuilderConfig {
-  tree?: RuleBuilderGroupItem
-  fields?: Record<string, {
-    label: string;
-    widget: string | [string, any];
-    operators: string[];
-  }>;
-  conjunctions?: Record<string, { label: string; }>
-  operators?: Record<string, {
-    label: string;
-    cardinality?: number; // 值的数量
-    options?: {
-      factory: (props) => React.ReactNode;
-      defaults?: any
-    },
-  }>
-  widgets?: Record<string, {
-    factory: (props) => React.ReactNode
-  }>
-  settings?: {
-    defaultField?: string | ((config?: RuleBuilderConfig) => string); // 默认要素
-    defaultOperator?: string | ((config?: RuleBuilderConfig, field?: string) => string); // 默认操作符
-    defaultConjunction?: string; // 默认连接符
-    maxNesting?: number // 默认的最大嵌套深度
+export type ValueOfRecord<T> = NonNullable<NonNullable<T>[keyof T]>;
+
+export type RBFactory = <V = any>(
+  props?: BuilderOptions & {
+    properties?: V;
+    onChange?: (...args) => void;
   }
-}
+) => React.ReactNode;
 
-export interface RuleBuilderRuleItem {
-  type: string;
-  properties: {
-    field: string;
-    operator: string;
-    value: unknown;
-    operatorOptions: NonNullable<NonNullable<RuleBuilderConfig['operators']>[keyof RuleBuilderConfig['operators']]['options']>['defaults'];
+export type RBField = {
+  label?: React.ReactNode;
+  name: string;
+  defaultValue?: any;
+  widget: string | [string, ValueOfRecord<RuleBuilderConfig["widgets"]>] | any;
+};
+
+export type ConjunctionType = "and" | "or";
+export interface RuleBuilderConfig {
+  tree?: RuleBuilderGroup;
+  conjunctions?: Record<string, { label: string }>;
+  operators?: Record<string, { label: string; cardinality?: number }>; // cardinality集合大小，用于比较符右边的值
+  widgets?: Record<string, { factory?: RBFactory } & Record<string, any>>;
+  settings?: {
+    defaultConjunction?: string; // 默认连接符
+    maxNesting?: number; // 默认的最大嵌套深度
+    addGroup: { text?: string; factory?: RBFactory };
+    addRule: { text?: string; factory?: RBFactory };
+    deleteGroup: { text?: string; factory?: RBFactory };
+    deleteRule: { text?: string; factory?: RBFactory };
   };
+  fields?: ((options) => Array<RBField>) | Array<RBField>;
 }
 
-export interface RuleBuilderGroupItem {
+export interface RuleBuilderRule {
   type: string;
-  children: Array<RuleBuilderRuleItem | RuleBuilderGroupItem>;
+  properties: any;
+}
+
+export interface RuleBuilderGroup {
+  type: string;
+  children: Array<RuleBuilderRule | RuleBuilderGroup>;
   properties: { conjunction: string };
 }
 
-export type BuilderCommonProps = {
-  path: Array<string | number>
-  actions?: Record<string, (...args: unknown[]) => void>
-  config?: RuleBuilderConfig
-}
-
-export interface RuleBuilderProps extends RuleBuilderConfig {
-  builder?: RuleBuilder
-  onRenderChange?: (newData?: RuleBuilderGroupItem, oldData?: RuleBuilderGroupItem) => void;
+export type BuilderOptions = {
+  path: Array<string | number>;
+  actions?: Record<string, (...args: unknown[]) => void>;
+  config?: RuleBuilderConfig;
 };
 
-export type RemainingParams<T extends any[], H extends any[]> = T extends [...H, ...infer Rest] ? Rest : never;
+export interface RuleBuilderProps extends RuleBuilderConfig {
+  builder?: RuleBuilder;
+  onRenderChange?: (
+    newData?: RuleBuilderGroup,
+    oldData?: RuleBuilderGroup
+  ) => void;
+}

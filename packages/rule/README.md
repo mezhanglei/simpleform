@@ -1,9 +1,9 @@
 # `@simpleform/rule`
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-0.0.2-green)](https://www.npmjs.com/package/@simpleform/rule)
+[![](https://img.shields.io/badge/version-0.0.5-green)](https://www.npmjs.com/package/@simpleform/rule)
 
-> Rule Builder, Outputting Conditions Compliant with `json-logic-js`
+> Rule Builder, support custom config.
 
 # Matters
 - The css style file needs to be introduced before it can be used, for example: `import '@simpleform/rule/lib/css/main.css'`;
