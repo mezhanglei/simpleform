@@ -1,11 +1,20 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { SimpleFormContext, FormInitialValuesContext } from './context';
-import { deepGet, FormPathType, getValueFromEvent, isValidFormName } from './utils/utils';
-import { FormRule } from './validator';
-import { isEmpty } from './utils/type';
-import { FormProps } from './form';
+import React, { useContext, useEffect, useState } from "react";
+import { SimpleFormContext, FormInitialValuesContext } from "./context";
+import {
+  deepGet,
+  FormPathType,
+  getValueFromEvent,
+  isValidFormName,
+} from "./utils/utils";
+import { FormRule } from "./validator";
+import { isEmpty } from "./utils/type";
+import { FormProps } from "./form";
+import { stringify } from "flatted";
 
-export type FormEventHandler<V = unknown, A = unknown> = (obj: { name?: FormPathType; value?: V }, values?: A) => void;
+export type FormEventHandler<V = unknown, A = unknown> = (
+  obj: { name?: FormPathType; value?: V },
+  values?: A
+) => void;
 export interface ItemCoreProps {
   name?: FormPathType;
   nonform?: boolean;
@@ -22,12 +31,18 @@ export interface ItemCoreProps {
   onFieldsChange?: FormEventHandler;
   onFieldsMounted?: FormEventHandler;
   onValuesChange?: FormEventHandler;
-  children?: React.ReactNode | ((P: { className?: string; form?: FormProps['form'], bindProps: ReturnType<NonNullable<FormProps['form']>['getBindProps']> }) => React.ReactNode);
+  children?:
+    | React.ReactNode
+    | ((P: {
+        className?: string;
+        form?: FormProps["form"];
+        bindProps: ReturnType<NonNullable<FormProps["form"]>["getBindProps"]>;
+      }) => React.ReactNode);
 }
 
-export function bindWrapper(children, props, triggerName = 'onChange') {
+export function bindWrapper(children, props, triggerName = "onChange") {
   const { bindProps, ...restProps } = props;
-  if (typeof children === 'function') {
+  if (typeof children === "function") {
     return children(props);
   } else {
     const len = React.Children.count(children);
@@ -52,7 +67,7 @@ export const ItemCore = (props: ItemCoreProps) => {
   const { children, ...restProps } = mergeProps;
   const {
     name,
-    valueProp = 'value',
+    valueProp = "value",
     valueGetter = getValueFromEvent,
     valueSetter,
     errorClassName,
@@ -60,7 +75,7 @@ export const ItemCore = (props: ItemCoreProps) => {
     onFieldsMounted,
     onValuesChange,
     initialValue,
-    trigger = 'onChange',
+    trigger = "onChange",
     validateTrigger,
     clearOnUninstall = true,
     ...rest
@@ -68,10 +83,14 @@ export const ItemCore = (props: ItemCoreProps) => {
 
   const fieldProps = { ...restProps, valueProp, valueGetter, trigger };
   const nonform = rest?.nonform || rest?.readOnly;
-  const currentPath = (!isValidFormName(name) || nonform === true) ? undefined : name;
+  const currentPath =
+    !isValidFormName(name) || nonform === true ? undefined : name;
   const [value, setValue] = useState<unknown>();
+  
   // 初始化fieldProps
-  form?.setFieldProps(currentPath, fieldProps);
+  if (stringify(form?.getBindProps(currentPath)) !== stringify(fieldProps)) {
+    form?.setFieldProps(currentPath, fieldProps);
+  }
 
   // 订阅更新值的函数
   useEffect(() => {
@@ -80,7 +99,11 @@ export const ItemCore = (props: ItemCoreProps) => {
     form.subscribeFormItem(currentPath, (newValue, oldValue) => {
       setValue(newValue);
       if (isEmpty(newValue) && isEmpty(oldValue)) return;
-      onValuesChange && onValuesChange({ name: currentPath, value: newValue }, form?.getFieldValue());
+      onValuesChange &&
+        onValuesChange(
+          { name: currentPath, value: newValue },
+          form?.getFieldValue()
+        );
     });
     return () => {
       form.unsubscribeFormItem(currentPath);
@@ -92,7 +115,10 @@ export const ItemCore = (props: ItemCoreProps) => {
     if (!isValidFormName(currentPath) || !form) return;
     form?.setFieldProps(currentPath, fieldProps);
     // 回填初始值
-    const initValue = initialValue === undefined ? deepGet(initialValues, currentPath) : initialValue;
+    const initValue =
+      initialValue === undefined
+        ? deepGet(initialValues, currentPath)
+        : initialValue;
     if (!isEmpty(initValue)) {
       form.setInitialValue(currentPath, initValue);
     } else {
@@ -101,7 +127,11 @@ export const ItemCore = (props: ItemCoreProps) => {
         setValue(lastValue);
       }
     }
-    onFieldsMounted && onFieldsMounted({ name: currentPath, value: initValue }, form?.getFieldValue());
+    onFieldsMounted &&
+      onFieldsMounted(
+        { name: currentPath, value: initValue },
+        form?.getFieldValue()
+      );
     return () => {
       if (clearOnUninstall === true) {
         // 清除该表单域的props(在设置值的前面)
@@ -112,8 +142,12 @@ export const ItemCore = (props: ItemCoreProps) => {
     };
   }, [JSON.stringify(currentPath)]);
 
-  const bindProps = form && form.getBindProps(currentPath, value) || {};
-  const childs = bindWrapper(children, { bindProps, className: errorClassName, form, }, trigger);
+  const bindProps = (form && form.getBindProps(currentPath, value)) || {};
+  const childs = bindWrapper(
+    children,
+    { bindProps, className: errorClassName, form },
+    trigger
+  );
   return <>{childs}</>;
 };
 
