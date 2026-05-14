@@ -86,9 +86,9 @@ export const ItemCore = (props: ItemCoreProps) => {
   const currentPath =
     !isValidFormName(name) || nonform === true ? undefined : name;
   const [value, setValue] = useState<unknown>();
-  
+
   // 初始化fieldProps
-  if (stringify(form?.getBindProps(currentPath)) !== stringify(fieldProps)) {
+  if (stringify(form?.getFieldProps(currentPath)) !== stringify(fieldProps)) {
     form?.setFieldProps(currentPath, fieldProps);
   }
 

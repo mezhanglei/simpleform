@@ -74,7 +74,9 @@ export class SimpleForm<T = unknown> {
 
   // 获取
   public getFieldProps(): FormFieldsProps;
-  public getFieldProps(path: FormPathType): GetMapValueType<FormFieldsProps>;
+  public getFieldProps(
+    path: FormPathType | undefined
+  ): GetMapValueType<FormFieldsProps>;
   public getFieldProps(path?: FormPathType) {
     if (path === undefined) {
       return this.fieldPropsMap;
@@ -114,8 +116,8 @@ export class SimpleForm<T = unknown> {
       typeof valueSetter === "function"
         ? valueSetter(currentValue)
         : valueSetter
-        ? undefined
-        : currentValue;
+          ? undefined
+          : currentValue;
     const bindProps = { [valuePropName]: childValue } as Record<string, any>;
     triggers.forEach((eventName) => {
       if (eventName) {
