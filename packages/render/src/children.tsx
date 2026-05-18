@@ -6,7 +6,6 @@ import { createFRElement, getFRComponent } from "./utils/transform";
 import { deepClone } from "./utils";
 import { parseExpression } from "./utils/parser";
 import FormRenderNode from "./node";
-import { stringify } from "flatted";
 
 /* eslint-disable */
 // 渲染表单children
@@ -42,7 +41,7 @@ export default function FormChildren(props: FormChildrenProps) {
     const cloneData = deepClone(propWidgetList);
     setWidgetList(cloneData || []);
     formrender?.setWidgetList(cloneData, { ignore: true });
-  }, [stringify(propWidgetList)]);
+  }, [propWidgetList]);
 
   const [WrapperCom, WrapperProps] = getFRComponent(
     wrapper,

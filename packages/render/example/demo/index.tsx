@@ -1,6 +1,6 @@
 import React from 'react';
 import "./index.less";
-import FormRender, { useSimpleForm } from '../../src/index';
+import FormRender, { useSimpleForm } from '../../lib/index';
 import '../../lib/css/main.css';
 import { Button, Checkbox, Input, Radio, Select } from 'antd';
 
@@ -42,7 +42,7 @@ export default function Demo(props) {
     {
       label: "readonly",
       readOnly: true,
-      name: 'name11',
+      name: 'name1',
       outside: { type: 'col', props: { span: 12 } },
       readOnlyRender: () => "测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果测试结果",
       initialValue: 1111,

@@ -14,7 +14,7 @@ import { handleRules, isCanTrigger } from "./validator";
 import { isArray, isEmpty, isObject } from "./utils/type";
 import { FormItemProps } from "./form-item";
 import { GetMapValueType, PathValue } from "./typings";
-import serialize from "serialize-javascript";
+import { stringify } from "flatted";
 
 const bindClassPrototype = (Factory, instance) => {
   const attrs = Object.getOwnPropertyDescriptors(Factory?.prototype);
@@ -133,6 +133,7 @@ export class SimpleForm<T = unknown> {
   public setFieldProps(path?: FormPathType, field?) {
     if (!isValidFormName(path)) return;
     const lastField = this.fieldPropsMap.get(path);
+    if (stringify(lastField) === stringify(field)) return;
     if (field === undefined) {
       if (lastField !== undefined) {
         this.fieldPropsMap.delete(path);
@@ -143,7 +144,7 @@ export class SimpleForm<T = unknown> {
       const lastError = this.getFieldError(path);
       if (
         lastError &&
-        serialize(field?.rules) !== serialize(lastField?.rules)
+        stringify(field?.rules) !== stringify(lastField?.rules)
       ) {
         this.validate(path);
       }

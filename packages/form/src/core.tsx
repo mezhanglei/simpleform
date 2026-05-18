@@ -9,7 +9,6 @@ import {
 import { FormRule } from "./validator";
 import { isEmpty } from "./utils/type";
 import { FormProps } from "./form";
-import { stringify } from "flatted";
 
 export type FormEventHandler<V = unknown, A = unknown> = (
   obj: { name?: FormPathType; value?: V },
@@ -88,9 +87,7 @@ export const ItemCore = (props: ItemCoreProps) => {
   const [value, setValue] = useState<unknown>();
 
   // 初始化fieldProps
-  if (stringify(form?.getFieldProps(currentPath)) !== stringify(fieldProps)) {
-    form?.setFieldProps(currentPath, fieldProps);
-  }
+  form?.setFieldProps(currentPath, fieldProps);
 
   // 订阅更新值的函数
   useEffect(() => {
