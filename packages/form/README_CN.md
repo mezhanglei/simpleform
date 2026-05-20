@@ -2,9 +2,11 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-2.2.18-green)](https://www.npmjs.com/package/@simpleform/form)
+[![](https://img.shields.io/badge/version-2.2.19-green)](https://www.npmjs.com/package/@simpleform/form)
 
 > 表单底层组件，通过回调函数方式实现表单值的显示和更新事件的绑定.
+
+* [文档](https://mezhanglei.github.io/simpleform/docs/#/)
 
 # Matters
  - 在使用之前需要先引入css样式文件，例：`import '@simpleform/form/lib/css/main.css'`;

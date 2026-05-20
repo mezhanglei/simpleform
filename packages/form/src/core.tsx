@@ -9,6 +9,7 @@ import {
 import { FormRule } from "./validator";
 import { isEmpty } from "./utils/type";
 import { FormProps } from "./form";
+import serialize from "serialize-javascript";
 
 export type FormEventHandler<V = unknown, A = unknown> = (
   obj: { name?: FormPathType; value?: V },
@@ -88,6 +89,14 @@ export const ItemCore = (props: ItemCoreProps) => {
 
   // 初始化fieldProps
   form?.setFieldProps(currentPath, fieldProps);
+
+  // 监听rules
+  useEffect(() => {
+    const error = form?.getFieldError(currentPath);
+    if (currentPath && error) {
+      form?.validate(currentPath);
+    }
+  }, [serialize(fieldProps?.rules)]);
 
   // 订阅更新值的函数
   useEffect(() => {

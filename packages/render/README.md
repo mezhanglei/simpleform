@@ -2,9 +2,11 @@
 
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-4.3.14-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.3.15-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > A lightweight dynamic forms engine that makes it easy to dynamically render forms.
+
+* [Document](https://mezhanglei.github.io/simpleform/docs/#/)
 
 ## Introduction
 - Component registration (`components` property): We need to register form controls and non-form components before using them, in case of form controls we need to support `value` and `onChange` `props` inside the control.

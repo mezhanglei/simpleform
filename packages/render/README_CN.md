@@ -2,9 +2,11 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-4.3.14-green)](https://www.npmjs.com/package/@simpleform/render)
+[![](https://img.shields.io/badge/version-4.3.15-green)](https://www.npmjs.com/package/@simpleform/render)
 
 > 轻量级动态表单引擎，实现动态渲染表单很简单.
+
+* [文档](https://mezhanglei.github.io/simpleform/docs/#/)
 
 ## 介绍
 - 组件注册(`components`属性): 使用之前需要注册表单控件和非表单组件，如果是表单控件需要控件内部支持`value`和`onChange`两个`props`.

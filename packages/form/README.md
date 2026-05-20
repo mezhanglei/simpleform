@@ -1,9 +1,11 @@
 # `@simpleform/form`
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-2.2.18-green)](https://www.npmjs.com/package/@simpleform/form)
+[![](https://img.shields.io/badge/version-2.2.19-green)](https://www.npmjs.com/package/@simpleform/form)
 
 > The underlying form component, Binding of form values to display and update events is accomplished through callback functions.
+
+* [Document](https://mezhanglei.github.io/simpleform/docs/#/)
 
 # Matters
 - The css style file needs to be introduced before it can be used, for example: `import '@simpleform/form/lib/css/main.css'`;
