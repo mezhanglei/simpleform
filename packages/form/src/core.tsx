@@ -139,9 +139,9 @@ export const ItemCore = (props: ItemCoreProps) => {
         form?.getFieldValue()
       );
     return () => {
+      // 清除该表单域的props(在设置值的前面)
+      form?.setFieldProps(currentPath, undefined);
       if (clearOnUninstall === true) {
-        // 清除该表单域的props(在设置值的前面)
-        form?.setFieldProps(currentPath, undefined);
         // 清除初始值
         form?.setInitialValue(currentPath, undefined);
       }

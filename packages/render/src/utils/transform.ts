@@ -1,14 +1,19 @@
-import { deepSet, isValidFormName } from '@simpleform/form';
-import React from 'react';
-import { cloneElement, createElement, isValidComponent, isValidElement } from './framework';
+import { deepSet, isValidFormName } from "@simpleform/form";
+import React from "react";
+import {
+  cloneElement,
+  createElement,
+  isValidComponent,
+  isValidElement,
+} from "./framework";
 import {
   FormChildrenProps,
   FormRenderNodeProps,
   FormRenderProps,
   FRGenerateNode,
-  ReactComponent
-} from '../typings';
-import { isObject } from './type';
+  ReactComponent,
+} from "../typings";
+import { isObject } from "./type";
 
 /* eslint-disable */
 
@@ -16,7 +21,11 @@ import { isObject } from './type';
 export const mergeFROptions = (
   oldConfig,
   newConfig,
-  mergeFunNames: string[] = ['onValuesChange', 'onFieldsMounted', 'onFieldsChange']
+  mergeFunNames: string[] = [
+    "onValuesChange",
+    "onFieldsMounted",
+    "onFieldsChange",
+  ]
 ) => {
   if (!isObject(newConfig)) return oldConfig;
   const cloneConfig = { ...oldConfig };
@@ -25,7 +34,7 @@ export const mergeFROptions = (
     const newItem = newConfig?.[key];
     if (isObject(oldItem) && isObject(newItem) && !isValidElement(oldItem)) {
       cloneConfig[key] = { ...oldItem, ...newItem };
-    } else if (typeof oldItem === 'function' && mergeFunNames.includes(key)) {
+    } else if (typeof oldItem === "function" && mergeFunNames.includes(key)) {
       cloneConfig[key] = (...args: unknown[]) => {
         oldItem?.(...args);
         return newItem?.(...args);
@@ -50,13 +59,17 @@ export const traverseMapObject = (val, callback) => {
     });
     return temp;
   }
-  return typeof callback === 'function' ? callback(val) : val;
+  return typeof callback === "function" ? callback(val) : val;
 };
 
 // 递归遍历widgetList数据结构
 export const traverseList = <V>(
   list?: Array<V>,
-  callback?: (item: V, index: number, path?: Array<string | number>) => any | void,
+  callback?: (
+    item: V,
+    index: number,
+    path?: Array<string | number>
+  ) => any | void,
   parent?: Array<string | number>
 ) => {
   if (!(list instanceof Array)) return;
@@ -65,14 +78,18 @@ export const traverseList = <V>(
     const curPath = (parent || []).concat(index);
     callback?.(item, index, curPath);
     if (children instanceof Array) {
-      traverseList(children, callback, curPath?.concat('children'));
+      traverseList(children, callback, curPath?.concat("children"));
     }
   });
 };
 
 // 递归解析对象或数组中的每个属性
-export const traverseParse = <V>(obj: V, variables?: object, parser?: FormRenderProps['parser']) => {
-  if (typeof parser !== 'function') return obj;
+export const traverseParse = <V>(
+  obj: V,
+  variables?: object,
+  parser?: FormRenderProps["parser"]
+) => {
+  if (typeof parser !== "function") return obj;
   return traverseMapObject(obj, (val) => {
     const generateItem = parser(val, variables);
     return generateItem;
@@ -81,31 +98,34 @@ export const traverseParse = <V>(obj: V, variables?: object, parser?: FormRender
 
 export const getFRComponent = (
   widget?: ReactComponent<any> | FRGenerateNode,
-  components?: FormRenderProps['components'],
+  components?: FormRenderProps["components"]
 ) => {
   // 是否为组件声明
   if (isValidComponent(widget)) {
-    return [widget]
+    return [widget];
   }
-  const widgetType = widget?.['type'];
+  const widgetType = widget?.["type"];
   if (isValidComponent(widgetType)) {
-    return [widgetType, widget?.['props']]
+    return [widgetType, widget?.["props"]];
   }
   // 是否为注册组件
-  if (typeof widgetType === 'string' && components?.[widgetType]) {
-    return [components?.[widgetType], widget?.['props']]
+  if (typeof widgetType === "string" && components?.[widgetType]) {
+    return [components?.[widgetType], widget?.["props"]];
   }
-  return []
-}
+  return [];
+};
 
 // 提取widgetList中的默认值
-export const getInitialValues = (widgetList?: FRGenerateNode[]) => {
+export const getInitialValues = (
+  widgetList?: FRGenerateNode[],
+  code = "initialValue"
+) => {
   if (!(widgetList instanceof Array)) return;
   let initialValues = {};
   traverseList(widgetList, (item) => {
     const name = item?.name;
-    if (item?.initialValue !== undefined && isValidFormName(name)) {
-      initialValues = (deepSet(initialValues, item.name, item?.initialValue) || {});
+    if (item?.[code] !== undefined && isValidFormName(name)) {
+      initialValues = deepSet(initialValues, item.name, item?.[code]) || {};
     }
   });
   return initialValues;
@@ -119,15 +139,19 @@ export const createFRElement = (
 ): React.ReactNode => {
   if (!Com) {
     return children?.length === 1 ? children[0] : children;
-  };
+  }
   if (isValidElement(Com)) {
     return cloneElement(Com, ComProps);
   }
-  return createElement(Com, ComProps, ...children)
+  return createElement(Com, ComProps, ...children);
 };
 
 // 解析
-export const parseFRData = (data, formrender: FormRenderProps['formrender'], form?: FormRenderProps['form']) => {
+export const parseFRData = (
+  data,
+  formrender: FormRenderProps["formrender"],
+  form?: FormRenderProps["form"]
+) => {
   const defineConfig = formrender?.config;
   const curForm = form || defineConfig?.formConfig?.form;
   const variables = {
@@ -141,17 +165,17 @@ export const parseFRData = (data, formrender: FormRenderProps['formrender'], for
 
 // 解析节点组件
 export const parseWidget = (
-  widget: FormRenderNodeProps['widget'] | React.ReactElement,
-  formrender: FormRenderNodeProps['formrender'],
-  formConfig?: FormChildrenProps['formConfig']
+  widget: FormRenderNodeProps["widget"] | React.ReactElement,
+  formrender: FormRenderNodeProps["formrender"],
+  formConfig?: FormChildrenProps["formConfig"]
 ) => {
   if (!formrender) return;
   if (
     isValidElement(widget) ||
     widget === undefined ||
     widget === null ||
-    typeof widget === 'string' ||
-    typeof widget === 'number'
+    typeof widget === "string" ||
+    typeof widget === "number"
   ) {
     return widget;
   }
@@ -162,10 +186,12 @@ export const parseWidget = (
   // 节点信息
   const parseData = parseFRData(widget, formrender, curForm);
   const defineOptions =
-    typeof defineConfig?.options === 'function' ? defineConfig?.options(parseData) : defineConfig?.options;
+    typeof defineConfig?.options === "function"
+      ? defineConfig?.options(parseData)
+      : defineConfig?.options;
   const baseOptions = Object.assign({}, defineOptions, formContext);
   const parseResult = mergeFROptions(baseOptions, parseData);
   return parseResult;
-}
+};
 
 /* eslint-enable */
