@@ -120,15 +120,15 @@ export const ItemCore = (props: ItemCoreProps) => {
   useEffect(() => {
     if (!isValidFormName(currentPath) || !form) return;
     form?.setFieldProps(currentPath, fieldProps);
+    const lastValue = form.getFieldValue(currentPath);
     // 回填初始值
     const initValue =
       initialValue === undefined
         ? deepGet(initialValues, currentPath)
         : initialValue;
     if (!isEmpty(initValue)) {
-      form.setInitialValue(currentPath, initValue);
+      form.setInitialValue(currentPath, lastValue ?? initValue);
     } else {
-      const lastValue = form.getFieldValue(currentPath);
       if (clearOnUninstall === true && !isEmpty(lastValue)) {
         setValue(lastValue);
       }

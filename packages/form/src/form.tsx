@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
-import { FormItem, FormItemOptions } from './form-item';
-import { SimpleFormContext, FormInitialValuesContext } from './context';
-import { ItemProps } from './components/Item';
-import { isObject } from './utils/type';
-import { SimpleForm } from './store';
+import React, { useEffect } from "react";
+import { FormItem, FormItemOptions } from "./form-item";
+import { SimpleFormContext, FormInitialValuesContext } from "./context";
+import { ItemProps } from "./components/Item";
+import { isObject } from "./utils/type";
+import { SimpleForm } from "./store";
 
 interface CreateFormProps extends React.HTMLAttributes<HTMLElement> {
   tagName?: keyof React.ReactHTML;
@@ -17,30 +17,46 @@ const CreateForm = React.forwardRef<unknown, CreateFormProps>((props, ref) => {
 
 export type WatchHandler = <T>(newValue: T, oldValue: T) => void;
 export type FormProps<V = any, P = ItemProps> = {
-  watch?: { [key: string]: { immediate?: boolean, handler: WatchHandler } | WatchHandler };
+  watch?: {
+    [key: string]:
+      | { immediate?: boolean; handler: WatchHandler }
+      | WatchHandler;
+  };
   children?: unknown;
   initialValues?: unknown;
   form?: SimpleForm<V>;
-} & FormItemOptions<P> & CreateFormProps;
+} & FormItemOptions<P> &
+  CreateFormProps;
 
 export function Form(props: FormProps) {
-  const { className = '', style, children, initialValues, tagName, onSubmit, onReset, watch, ...rest } = props;
+  const {
+    className = "",
+    style,
+    id,
+    children,
+    initialValues,
+    tagName,
+    onSubmit,
+    onReset,
+    watch,
+    ...rest
+  } = props;
 
-  const classNames = 'simple-form ' + className;
+  const classNames = "simple-form " + className;
   const form = rest?.form;
 
   useEffect(() => {
     if (!form || !watch) return;
-    if (typeof watch === 'function') {
+    if (typeof watch === "function") {
       form?.subscribeFormValue(watch);
     } else {
       Object.entries(watch)?.forEach(([key, watcher]) => {
         // 函数形式
-        if (typeof watcher === 'function') {
+        if (typeof watcher === "function") {
           form?.subscribeFormValue(key, watcher);
           // 对象形式
         } else if (isObject(watcher)) {
-          if (typeof watcher.handler === 'function') {
+          if (typeof watcher.handler === "function") {
             form?.subscribeFormValue(key, watcher.handler);
           }
           if (watcher.immediate) {
@@ -56,6 +72,7 @@ export function Form(props: FormProps) {
 
   return (
     <CreateForm
+      id={id}
       tagName={tagName}
       className={classNames}
       style={style}

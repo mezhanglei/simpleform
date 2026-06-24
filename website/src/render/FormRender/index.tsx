@@ -19,7 +19,7 @@ export function FormChildren(props: CustomFormChildrenProps) {
       options={{
         ...defineConfig.options,
         ...options,
-        outside: { type: 'col', props: { flex: flexW, style: { width: 0 } } },
+        outside: { type: 'col', props: { flex: flexW, style: { width: flexW } } },
       }}
       {...rest}
     />
@@ -36,7 +36,7 @@ export default function FormRender(props: CustomFormRenderProps) {
       options={{
         ...defineConfig.options,
         ...options,
-        outside: { type: 'col', props: { flex: flexW, style: { width: 0 } } },
+        outside: { type: 'col', props: { flex: flexW, style: { width: flexW } } },
       }}
       {...rest}
     />
