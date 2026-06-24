@@ -121,10 +121,10 @@ import '@simpleform/form/lib/css/main.css';
 ### Method
 
 | form 实例方法    | 说明                                                       | 类型                                                                                 |
-| ---------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------ | -------- |
-| `getFieldValue`  | 返回指定`path`的表单域的值，不指定`path`返回整个表单的值。 | `(path?: FormPathType) => unknown `                                                  |          |
+| ---------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------ | --- |
+| `getFieldValue`  | 返回指定`path`的表单域的值，不指定`path`返回整个表单的值。 | `(path?: FormPathType) => unknown `                                                  |     |
 | `setFieldValue`  | 更新指定`name`字段的值                                     | `(path: FormPathType, value: unknown) => void`                                       |
 | `setFieldsValue` | 设置整个表单的值(覆盖)                                     | `(values: unknown) => void`                                                          |
 | `reset`          | 重置表单, 可以传值重置为目标值                             | `(values?: unknown) => void`                                                         |
 | `validate`       | 校验表单，并返回错误信息和表单值。支持单个或多个目标校验   | `(path?: FormPathType/Array<FormPathType>) => {error: true/string; values: unknown}` |
-| `getFieldError`  | 返回目标的错误信息或所有的错误信息                         | `(path?: FormPathType) => string                                                     | boolean` |
+| `getFieldError`  | 返回目标的错误信息或所有的错误信息                         | `(path?: FormPathType) => string/boolean`                                            |
