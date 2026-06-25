@@ -17,11 +17,13 @@ const CreateForm = React.forwardRef<unknown, CreateFormProps>((props, ref) => {
 
 export type WatchHandler = <T>(newValue: T, oldValue: T) => void;
 export type FormProps<V = any, P = ItemProps> = {
-  watch?: {
-    [key: string]:
-      | { immediate?: boolean; handler: WatchHandler }
-      | WatchHandler;
-  };
+  watch?:
+    | {
+        [key: string]:
+          | { immediate?: boolean; handler: WatchHandler }
+          | WatchHandler;
+      }
+    | WatchHandler;
   children?: unknown;
   initialValues?: unknown;
   form?: SimpleForm<V>;
