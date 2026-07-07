@@ -242,7 +242,9 @@ export class SimpleForm<T = unknown> {
 
   // 获取error信息
   public getFieldError(): FormErrors;
-  public getFieldError(path: FormPathType | undefined): GetMapValueType<FormErrors>;
+  public getFieldError(
+    path: FormPathType | undefined
+  ): GetMapValueType<FormErrors>;
   public getFieldError(path?: FormPathType) {
     if (path === undefined) {
       return this.formErrors;
@@ -346,21 +348,18 @@ export class SimpleForm<T = unknown> {
   }
   // 同步当前表单域值的变化
   private notifyFormItem(path?: FormPathType) {
+    const emitListener = (listener) => {
+      const formPath = listener.path;
+      const newValue = this.getFieldValue(formPath);
+      const lastValue = this.getLastValue(formPath);
+      listener?.onChange?.(newValue, lastValue);
+    };
     if (path === undefined) {
-      this.formItemListeners.forEach((listener) =>
-        listener.onChange(
-          this.getFieldValue(listener.path),
-          this.getLastValue(listener.path)
-        )
-      );
+      this.formItemListeners.forEach((listener) => emitListener(listener));
     } else {
       this.formItemListeners.forEach((listener) => {
         if (isEqualName(listener?.path, path)) {
-          listener?.onChange &&
-            listener?.onChange(
-              this.getFieldValue(listener.path),
-              this.getLastValue(listener.path)
-            );
+          emitListener(listener);
         }
       });
     }
@@ -403,21 +402,19 @@ export class SimpleForm<T = unknown> {
   }
   // 同步路径上任意节点的变化
   public notifyFormValue(path?: FormPathType) {
+    const emitListener = (listener) => {
+      const formPath = listener.path;
+      const newValue = this.getFieldValue(formPath);
+      const lastValue = this.getLastValue(formPath);
+      listener?.onChange?.(newValue, lastValue);
+    };
+
     if (path === undefined) {
-      this.formValueListeners.forEach((listener) =>
-        listener.onChange(
-          this.getFieldValue(listener.path),
-          this.getLastValue(listener.path)
-        )
-      );
+      this.formValueListeners.forEach((listener) => emitListener(listener));
     } else {
       this.formValueListeners.forEach((listener) => {
         if (comparePrefix(listener?.path, path)) {
-          listener?.onChange &&
-            listener?.onChange(
-              this.getFieldValue(listener.path),
-              this.getLastValue(listener.path)
-            );
+          emitListener(listener);
         }
       });
     }
@@ -455,14 +452,18 @@ export class SimpleForm<T = unknown> {
   }
   // 同步错误的变化
   private notifyError(path?: FormPathType) {
+    const emitListener = (listener) => {
+      const formPath = listener.path;
+      const newError = this.getFieldError(formPath);
+      listener?.onChange?.(newError);
+    };
+
     if (path === undefined) {
-      this.errorListeners.forEach((listener) =>
-        listener.onChange(this.getFieldError(listener.path))
-      );
+      this.errorListeners.forEach((listener) => emitListener(listener));
     } else {
       this.errorListeners.forEach((listener) => {
-        if (JSON.stringify(listener?.path) === JSON.stringify(path)) {
-          listener?.onChange && listener?.onChange(this.getFieldError(path));
+        if (isEqualName(listener?.path, path)) {
+          emitListener(listener);
         }
       });
     }

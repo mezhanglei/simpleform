@@ -127,7 +127,11 @@ export const ItemCore = (props: ItemCoreProps) => {
         ? deepGet(initialValues, currentPath)
         : initialValue;
     if (!isEmpty(initValue)) {
-      form.setInitialValue(currentPath, lastValue ?? initValue);
+      if (lastValue !== undefined) {
+        setValue(lastValue);
+      } else {
+        form.setInitialValue(currentPath, initValue);
+      }
     } else {
       if (clearOnUninstall === true && !isEmpty(lastValue)) {
         setValue(lastValue);
