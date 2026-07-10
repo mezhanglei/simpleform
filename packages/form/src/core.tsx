@@ -102,17 +102,20 @@ export const ItemCore = (props: ItemCoreProps) => {
   useEffect(() => {
     if (!isValidFormName(currentPath) || !form) return;
     // 订阅目标控件
-    form.subscribeFormItem(currentPath, (newValue, oldValue) => {
-      setValue(newValue);
-      if (isEmpty(newValue) && isEmpty(oldValue)) return;
-      onValuesChange &&
-        onValuesChange(
-          { name: currentPath, value: newValue },
-          form?.getFieldValue()
-        );
-    });
+    const uninstall = form.subscribeFormItem(
+      currentPath,
+      (newValue, oldValue) => {
+        setValue(newValue);
+        if (isEmpty(newValue) && isEmpty(oldValue)) return;
+        onValuesChange &&
+          onValuesChange(
+            { name: currentPath, value: newValue },
+            form?.getFieldValue()
+          );
+      }
+    );
     return () => {
-      form.unsubscribeFormItem(currentPath);
+      uninstall?.();
     };
   }, [JSON.stringify(currentPath), form, onValuesChange]);
 

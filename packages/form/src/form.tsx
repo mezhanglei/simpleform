@@ -49,17 +49,27 @@ export function Form(props: FormProps) {
 
   useEffect(() => {
     if (!form || !watch) return;
+    let queue: Array<Function> = [];
     if (typeof watch === "function") {
-      form?.subscribeFormValue(watch);
+      const uninstall = form?.subscribeFormValue(watch);
+      if (uninstall) {
+        queue.push(uninstall);
+      }
     } else {
       Object.entries(watch)?.forEach(([key, watcher]) => {
         // 函数形式
         if (typeof watcher === "function") {
-          form?.subscribeFormValue(key, watcher);
+          const uninstall = form?.subscribeFormValue(key, watcher);
+          if (uninstall) {
+            queue.push(uninstall);
+          }
           // 对象形式
         } else if (isObject(watcher)) {
           if (typeof watcher.handler === "function") {
-            form?.subscribeFormValue(key, watcher.handler);
+            const uninstall = form?.subscribeFormValue(key, watcher.handler);
+            if (uninstall) {
+              queue.push(uninstall);
+            }
           }
           if (watcher.immediate) {
             watcher.handler(form?.getFieldValue(key), form?.getLastValue(key));
@@ -68,7 +78,8 @@ export function Form(props: FormProps) {
       });
     }
     return () => {
-      form?.unsubscribeFormValue();
+      queue?.forEach((uninstall) => uninstall());
+      queue = [];
     };
   }, [watch]);
 

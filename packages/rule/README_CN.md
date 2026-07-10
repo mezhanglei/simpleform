@@ -2,7 +2,7 @@
 
 [English](./README.md) | 中文说明
 
-[![](https://img.shields.io/badge/version-0.0.5-green)](https://www.npmjs.com/package/@simpleform/rule)
+[![](https://img.shields.io/badge/version-0.0.6-green)](https://www.npmjs.com/package/@simpleform/rule)
 
 > 规则构建器，支持自定义配置控件.
 

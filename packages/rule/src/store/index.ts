@@ -76,13 +76,8 @@ export class RuleBuilder {
   public subscribeTree(listener: RuleBuilder["treeListeners"][number]) {
     this.treeListeners.push(listener);
     return () => {
-      this.unsubscribeTree();
+      this.treeListeners = this.treeListeners?.filter((cb) => cb !== listener);
     };
-  }
-
-  // 卸载
-  public unsubscribeTree() {
-    this.treeListeners = [];
   }
 
   // 同步表单渲染数据的变化

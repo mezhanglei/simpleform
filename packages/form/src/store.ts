@@ -333,18 +333,10 @@ export class SimpleForm<T = unknown> {
       path: path,
     });
     return () => {
-      this.unsubscribeFormItem(path);
-    };
-  }
-  // 卸载
-  public unsubscribeFormItem(path?: FormPathType) {
-    if (path === undefined) {
-      this.formItemListeners = [];
-    } else if (isValidFormName(path)) {
       this.formItemListeners = this.formItemListeners.filter(
-        (sub) => !isEqualName(sub.path, path)
+        (item) => item?.onChange !== listener
       );
-    }
+    };
   }
   // 同步当前表单域值的变化
   private notifyFormItem(path?: FormPathType) {
@@ -387,18 +379,16 @@ export class SimpleForm<T = unknown> {
       });
     }
     return () => {
-      this.unsubscribeFormValue(typeof path !== "function" ? path : undefined);
+      if (typeof path === "function") {
+        this.globalFormListeners = this.globalFormListeners?.filter(
+          (cb) => cb !== path
+        );
+      } else {
+        this.formValueListeners = this.formValueListeners.filter(
+          (item) => item?.onChange !== listener
+        );
+      }
     };
-  }
-  // 卸载
-  public unsubscribeFormValue(path?: FormPathType) {
-    if (path === undefined) {
-      this.formValueListeners = [];
-    } else if (isValidFormName(path)) {
-      this.formValueListeners = this.formValueListeners.filter(
-        (sub) => !isEqualName(sub.path, path)
-      );
-    }
   }
   // 同步路径上任意节点的变化
   public notifyFormValue(path?: FormPathType) {
@@ -437,18 +427,10 @@ export class SimpleForm<T = unknown> {
       path: path,
     });
     return () => {
-      this.unsubscribeError(path);
-    };
-  }
-  // 卸载
-  public unsubscribeError(path?: FormPathType) {
-    if (path === undefined) {
-      this.errorListeners = [];
-    } else {
       this.errorListeners = this.errorListeners.filter(
-        (sub) => !isEqualName(sub.path, path)
+        (item) => item?.onChange !== listener
       );
-    }
+    };
   }
   // 同步错误的变化
   private notifyError(path?: FormPathType) {

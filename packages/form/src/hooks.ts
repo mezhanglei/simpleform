@@ -1,80 +1,82 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { SimpleForm } from './store';
-import { deepGet, deepSet, FormPathType, isIndexCode, joinFormPath, pathToArr } from './utils/utils';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { SimpleForm } from "./store";
+import {
+  deepGet,
+  deepSet,
+  FormPathType,
+  isIndexCode,
+  pathToArr,
+} from "./utils/utils";
 
-export function useSimpleForm<T>(
-  values?: T
-) {
+export function useSimpleForm<T>(values?: T) {
   const formRef = useRef(new SimpleForm(values));
   return formRef.current;
 }
 
 // 获取error信息
 export function useFormError(form?: SimpleForm, path?: FormPathType) {
-  const [error, setError] = useState<ReturnType<SimpleForm['getFieldError']>>();
+  const [error, setError] = useState<ReturnType<SimpleForm["getFieldError"]>>();
 
-  const subscribe = useCallback(() => {
-    if (form?.subscribeError && path) {
-      form.subscribeError(path, (newVal) => {
-        setError(newVal);
-      });
-    }
-  }, [form?.subscribeError, JSON.stringify(path)]);
-
-  useMemo(() => {
-    subscribe?.();
-  }, [subscribe]);
+  const errorWatcher = useCallback(
+    (newVal) => {
+      setError(newVal);
+    },
+    [JSON.stringify(path)]
+  );
 
   // 订阅组件更新错误的函数
   useEffect(() => {
-    subscribe?.();
+    if (!form) return;
+    const uninstall = form.subscribeError(path, errorWatcher);
     return () => {
-      form?.unsubscribeError(path);
+      uninstall?.();
     };
-  }, [subscribe]);
+  }, [errorWatcher]);
 
   return [error, setError] as const;
 }
 
 // 获取表单值
-export function useFormValues<V>(form: SimpleForm<V>, path?: FormPathType | Array<FormPathType>) {
-  const [mapData, setMapData] = useState<Partial<V>>();
+export function useFormValues<V>(
+  form: SimpleForm<V>,
+  path?: FormPathType | Array<FormPathType>
+) {
+  const [formData, setFormData] = useState<Partial<V>>();
 
-  const subscribe = useCallback(() => {
-    if (!form?.subscribeFormValue) return;
-    form?.subscribeFormValue((newVal) => {
+  const formWatcher = useCallback(
+    (newVal) => {
       if (path) {
-        const isArr = path instanceof Array ? isIndexCode(pathToArr(path[0])?.[0]) : isIndexCode(pathToArr(path)?.[0]);
-        const initial = isArr ? [] : {};
+        const isArr =
+          path instanceof Array
+            ? isIndexCode(pathToArr(path[0])?.[0])
+            : isIndexCode(pathToArr(path)?.[0]);
         if (path instanceof Array) {
-          let temp = initial;
+          let temp = isArr ? [] : {};
           path.forEach((formPath) => {
             const item = deepGet(newVal, formPath);
             if (item !== undefined) {
               temp = deepSet(temp, formPath, item) as any;
             }
           });
-          setMapData(temp as Partial<V>);
+          setFormData(temp as Partial<V>);
         } else {
-          const result = deepGet(newVal, path) || initial;
-          setMapData(result as Partial<V>);
+          const result = deepGet(newVal, path);
+          setFormData(result as Partial<V>);
         }
       } else {
-        setMapData(newVal as Partial<V>);
+        setFormData(newVal as Partial<V>);
       }
-    });
-  }, [form?.subscribeFormValue, JSON.stringify(path)]);
-
-  useMemo(() => {
-    subscribe?.();
-  }, [subscribe]);
+    },
+    [JSON.stringify(path)]
+  );
 
   useEffect(() => {
-    subscribe?.();
+    if (!form) return;
+    const uninstall = form?.subscribeFormValue(formWatcher);
     return () => {
-      form?.unsubscribeFormValue();
+      uninstall();
     };
-  }, [subscribe]);
+  }, [formWatcher]);
 
-  return mapData;
+  return formData;
 }
