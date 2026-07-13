@@ -50,8 +50,9 @@ export function useFormValues<V>(
           path instanceof Array
             ? isIndexCode(pathToArr(path[0])?.[0])
             : isIndexCode(pathToArr(path)?.[0]);
+        const initial = isArr ? [] : {};
         if (path instanceof Array) {
-          let temp = isArr ? [] : {};
+          let temp = initial;
           path.forEach((formPath) => {
             const item = deepGet(newVal, formPath);
             if (item !== undefined) {
@@ -60,7 +61,7 @@ export function useFormValues<V>(
           });
           setFormData(temp as Partial<V>);
         } else {
-          const result = deepGet(newVal, path);
+          const result = deepGet(newVal, path) ?? initial;
           setFormData(result as Partial<V>);
         }
       } else {
