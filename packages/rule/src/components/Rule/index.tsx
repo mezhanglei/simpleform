@@ -1,11 +1,11 @@
 import React from "react";
-import { BuilderOptions, RBFactory, RuleBuilderRule } from "../../typings";
+import { BuilderOptions, RBFactory, RuleBuilderItem } from "../../typings";
 import Field from "./Field";
 import { getValueFromEvent } from "@simpleform/form";
 
 export interface RuleProps extends BuilderOptions {
   children?: React.ReactNode;
-  properties: RuleBuilderRule["properties"];
+  properties: RuleBuilderItem["properties"];
 }
 
 const Rule: React.FC<RuleProps> = (props) => {

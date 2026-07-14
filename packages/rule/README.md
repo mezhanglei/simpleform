@@ -1,7 +1,7 @@
 # `@simpleform/rule`
 English | [中文说明](./README_CN.md)
 
-[![](https://img.shields.io/badge/version-0.0.6-green)](https://www.npmjs.com/package/@simpleform/rule)
+[![](https://img.shields.io/badge/version-0.0.7-green)](https://www.npmjs.com/package/@simpleform/rule)
 
 > Rule Builder, support custom config.
 

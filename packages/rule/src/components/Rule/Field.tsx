@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import { BuilderOptions, RBField, RuleBuilderRule } from "../../typings";
+import { BuilderOptions, RBField, RuleBuilderItem } from "../../typings";
 import { bindWrapper } from "@simpleform/form";
 import { transformWidget } from "../../utils";
 
 export interface RuleFieldProps extends BuilderOptions, RBField {
-  properties?: RuleBuilderRule["properties"];
+  properties?: RuleBuilderItem["properties"];
   onFieldChange?: (...args) => void;
 }
 

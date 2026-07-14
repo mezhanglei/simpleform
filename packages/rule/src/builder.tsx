@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useRuleBuilder, useRuleBuilderTree } from "./hooks";
-import { RuleBuilderGroup, RuleBuilderProps, RuleBuilderRule } from "./typings";
+import { RuleBuilderGroup, RuleBuilderProps, RuleBuilderItem } from "./typings";
 import { deepClone } from "./utils/object";
 import Group from "./components/Group";
 import Rule from "./components/Rule";
@@ -27,7 +27,7 @@ export default function Builder(props: RuleBuilderProps) {
   const actions = builder?.getActions();
 
   const renderItem = (
-    item?: RuleBuilderGroup | RuleBuilderRule,
+    item?: RuleBuilderGroup | RuleBuilderItem,
     path?: Array<string | number>
   ) => {
     if (!item) return null;
@@ -54,7 +54,7 @@ export default function Builder(props: RuleBuilderProps) {
         </Group>
       );
     } else {
-      const ruleItem = item as RuleBuilderRule;
+      const ruleItem = item as RuleBuilderItem;
       const ruleProperties = ruleItem?.properties;
       // 单个规则
       return (

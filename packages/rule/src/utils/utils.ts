@@ -1,11 +1,6 @@
-import { nanoid } from "nanoid";
 import { defaultGroupProperties } from "../utils/defaultData";
 import { BuilderOptions, RBField, RuleBuilderConfig } from "../typings";
 import { deepGet, deepSet } from "@simpleform/form";
-
-export const uuid = () => {
-  return nanoid(6);
-};
 
 // 组件转换
 export const transformWidget = (
@@ -27,15 +22,15 @@ export const addItem = <P>(
   properties: P,
   config?: RuleBuilderConfig
 ) => {
-  const containerPath = path.concat("children");
-  const container = deepGet(treeData, containerPath) || ([] as unknown[]);
-  if (container instanceof Array) {
+  const childPath = path.concat("children");
+  const chidls = deepGet(treeData, childPath) || ([] as unknown[]);
+  if (chidls instanceof Array) {
     const newProperties =
       type === "group"
         ? { ...defaultGroupProperties(config), ...properties }
         : properties;
-    container.push({ type, properties: newProperties });
-    return deepSet(treeData, containerPath, container);
+    chidls.push({ type, properties: newProperties });
+    return deepSet(treeData, childPath, chidls);
   }
 };
 
@@ -43,7 +38,7 @@ export const removeItem = (
   treeData: RuleBuilderConfig["tree"],
   path: BuilderOptions["path"]
 ) => {
-  return deepSet(treeData, path);
+  return deepSet(treeData, path, undefined);
 };
 
 // 设置properties
@@ -56,5 +51,5 @@ export const setProperties = (treeData, path, data) => {
 // 获取properties
 export const getProperties = (treeData, path) => {
   const item = deepGet(treeData, path);
-  return item;
+  return item?.properties;
 };

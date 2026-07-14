@@ -54,7 +54,7 @@ export default {
     },
   },
   settings: {
-    maxNesting: 0,
+    maxNesting: 2,
     addGroup: { text: "添加组" },
     addRule: { text: "添加规则" },
     deleteGroup: { text: "删除" },
